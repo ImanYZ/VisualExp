@@ -58,7 +58,9 @@ const {
   ongoingEvents,
   markAttended,
   scheduleInstructors,
-  retrieveEvents
+  retrieveEvents,
+  markEntreviewAttended,
+  checkEntreviewStatus
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 
@@ -149,6 +151,8 @@ app.post("/updateThematicCode", updateThematicCode);
 app.post("/deleteThematicCode", deleteThematicCode);
 app.get("/notifyApplicationStatus", notifyApplicationStatus);
 app.post("/retrieveEvents", retrieveEvents);
+app.post("/markEntreviewAttended", markEntreviewAttended);
+app.post("/checkEntreviewStatus", checkEntreviewStatus);
 // Knowledge endpoints
 
 // Misinformation Experiment

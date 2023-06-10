@@ -1602,7 +1602,7 @@ exports.notifyApplicationStatus = async (req, res) => {
     let recallSecondRatio = 0;
     let recallThirdRatio = 0;
     const applicationsHash = {};
-    
+
     const applicationsDocs = await db.collection("applications").get();
     applicationsDocs.forEach(doc => {
       const application = doc.data();
