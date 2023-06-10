@@ -7,7 +7,7 @@ import MoreVert from "@mui/icons-material/MoreVert";
 
 import { DataGrid } from "@mui/x-data-grid";
 
-import { firebaseState, fullnameState, leadingState } from "../../store/AuthAtoms";
+import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 
 import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
