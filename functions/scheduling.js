@@ -917,7 +917,7 @@ exports.markEntreviewAttended = async (req, res) => {
               break;
             }
           }
-          if (researcher !== "") { 
+          if (researcher !== "") {
             const resData = researchersHash[researcher];
             const resRef = db.collection("researchers").doc(resData.fullname);
             const expSessionRef = db.collection("expSessions").doc();
@@ -943,6 +943,7 @@ exports.markEntreviewAttended = async (req, res) => {
       res.status(200).json({ success: true });
     });
   } catch (error) {
+    res.status(500).json({ success: false });
     console.log(error);
   }
 };
@@ -967,5 +968,8 @@ exports.checkEntreviewStatus = async (req, res) => {
       }
       return res.status(200).json({ message: true, attended });
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ error });
+    console.log(error);
+  }
 };
