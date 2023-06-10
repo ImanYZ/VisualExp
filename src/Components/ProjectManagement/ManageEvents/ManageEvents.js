@@ -205,6 +205,8 @@ const ManageEvents = props => {
         setParticipant(email);
         setModelOpen(true);
         setScheduleLoaded(false);
+        setAvailableSessions({});
+        setSchedule([]);
         // We need to first retrieve which project this user belongs to.
         let userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
         if (!userDoc.exists) {
@@ -244,7 +246,7 @@ const ManageEvents = props => {
         // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
         // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
         // that may include 0 to many researchers who are available at that session.
-        let availSessions = {};
+        let _availSessions = {};
         const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
         const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD");
         if (!scheduleMonths.includes(scheduleEnd)) {
@@ -268,21 +270,21 @@ const ManageEvents = props => {
               const slotDT = moment(scheduleSlot).utcOffset(-4, true).toDate();
               // if availability is expired already
               const _scheduleSlot = slotDT.toLocaleString();
-              if (!availSessions[_scheduleSlot]) {
-                availSessions[_scheduleSlot] = [];
+              if (!_availSessions[_scheduleSlot]) {
+                _availSessions[_scheduleSlot] = [];
               }
-              availSessions[_scheduleSlot].push(researcherFullname);
+              _availSessions[_scheduleSlot].push(researcherFullname);
             }
           }
           // date time already booked by participants
         }
         if (project === "OnlineCommunities") {
-          for (let session in availSessions) {
-            const index = availSessions[session].indexOf("Iman YeckehZaare");
+          for (let session in _availSessions) {
+            const index = _availSessions[session].indexOf("Iman YeckehZaare");
             if (index === -1) {
-              delete availSessions[session];
+              delete _availSessions[session];
             } else {
-              availSessions[session].splice(index, 1);
+              _availSessions[session].splice(index, 1);
             }
           }
         }
@@ -322,7 +324,7 @@ const ManageEvents = props => {
           if (
             event.attendees &&
             event.attendees.length > 0 &&
-            startTime in availSessions &&
+            startTime in _availSessions &&
             event.attendees.findIndex(attendee => attendee.email === email) === -1 &&
             events.findIndex(
               eve =>
@@ -333,11 +335,13 @@ const ManageEvents = props => {
           ) {
             for (let attendee of event.attendees) {
               if (!researchers[attendee.email]) continue;
-              availSessions[startTime] = availSessions[startTime].filter(
+              _availSessions[startTime] = _availSessions[startTime].filter(
                 resea => resea !== researchers[attendee.email]
               );
               if (duration >= 60 * 60 * 1000) {
-                availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
+                _availSessions[endTime] = _availSessions[endTime].filter(
+                  resea => resea !== researchers[attendee.email]
+                );
               }
             }
           }
@@ -382,18 +386,22 @@ const ManageEvents = props => {
 
           const filteredObj = {};
 
-          for (const key in availSessions) {
+          for (const key in _availSessions) {
             for (const date of filterDates) {
               if (key.startsWith(date)) {
-                filteredObj[key] = availSessions[key];
+                filteredObj[key] = _availSessions[key];
               }
             }
           }
-          availSessions = filteredObj;
+          _availSessions = filteredObj;
+        }
+        for (let key in _availSessions) {
+          if (_availSessions[key].length === 0) {
+            delete _availSessions[key];
+          }
         }
 
-
-        setAvailableSessions(availSessions);
+        setAvailableSessions(_availSessions);
         if (sch.length > 0) {
           setSchedule(sch);
           setScheduleStart(sStart);
@@ -555,6 +563,8 @@ const ManageEvents = props => {
             </Box>
           ) : (
             <Box>
+              <>tThe availble slots does not represent the availibilty set by the participant</>
+              <>Only the ones marked ✅ has been selected </>
               <SelectSessions
                 startDate={scheduleStart}
                 numDays={16}
