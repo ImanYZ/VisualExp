@@ -20,11 +20,12 @@ import { _codesColumn } from "./Columns";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import moment from "moment";
 
 import Paper from "@mui/material/Paper";
 import LoadingButton from "@mui/lab/LoadingButton";
 import orderBy from "lodash.orderby";
-import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
+import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import FormControl from "@mui/material/FormControl";
@@ -33,7 +34,11 @@ import Select from "@mui/material/Select";
 import { Card, CardHeader, CardContent } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 
-const culumns = [{ field: "participant", headerName: "Participant", width: 300 }];
+const culumns = [
+  { field: "participant", headerName: "Participant", width: 300 },
+  { field: "surveyType", headerName: "Intreview for ", width: 300 },
+  { field: "createdAt", headerName: "Submitted At", width: 300 }
+];
 const ThematicAnalysis = props => {
   const [converstaion, setConversation] = useState([]);
   const firebase = useRecoilValue(firebaseState);
@@ -44,7 +49,6 @@ const ThematicAnalysis = props => {
   const online = project === "OnlineCommunities";
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedQuote, setSelectedQuote] = useState(null);
-  const email = useRecoilValue(emailState);
   const [newCode, setNewCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const fullname = useRecoilValue(fullnameState);
@@ -52,12 +56,8 @@ const ThematicAnalysis = props => {
   const [clickedCell, setCilckedCell] = useState(false);
   const [openAdminEditModal, setOpenEditAdminModal] = useState(false);
   const [openDeleteModalAdmin, setOpenDeleteModalAdmin] = useState(false);
-  const [recentParticipants, setRecentParticipants] = useState([]);
-  const [feedbackCode, setFeedbackCode] = useState({});
   const [category, setCategory] = useState("");
-  const [choiceConditions, setChoiceConditions] = useState({});
   const [submittingUpdate, setSubmittingUpdate] = useState(false);
-  const [explanationIdsList, setExplanationIdsList] = useState({});
   const [adminCodeData, setAdminCodeData] = useState({});
   const handleOpenAdminEditModal = () => setOpenEditAdminModal(true);
   const handleCloseAdminEditModal = () => setOpenEditAdminModal(false);
@@ -69,6 +69,9 @@ const ThematicAnalysis = props => {
   const [mergeCode, setMergeCode] = useState(null);
   const [editor, setEditor] = useState(false);
   const [listOfTranscript, setListOfTranscript] = useState([]);
+  const [allOfTranscript, setAllOfTranscript] = useState([]);
+  const [surveyType, setSurveyType] = useState("");
+  const [thematicAnalysisChanges, setThematicAnalysisChanges] = useState([]);
 
   const [transcriptId, setTranscriptId] = useState(null);
 
@@ -115,7 +118,6 @@ const ThematicAnalysis = props => {
     const getResearcher = async () => {
       const researcher = await firebase.db.collection("researchers").doc(fullname).get();
       const data = researcher.data();
-      console.log(data);
       setEditor(data?.isEditor);
     };
     if (firebase && fullname) {
@@ -123,34 +125,20 @@ const ThematicAnalysis = props => {
     }
   }, [firebase, fullname]);
 
+  //snapshots
   useEffect(() => {
-    const getTranscript = async () => {
-      const _listOfTranscript = [];
-      const _previousTranscipt = [];
-      const _transcriptBooks = {};
-      const transcriptDocs = await firebase.db.collection("transcript").get();
-      const transcriptBooksDocs = await firebase.db.collection("thematicAnalysis").get();
-      for (let doc of transcriptBooksDocs.docs) {
-        const data = doc.data();
-        if (data.researcher === fullname) {
-          _transcriptBooks[data.transcriptId] = { id: doc.id, ...data };
-        }
-      }
-      for (let doc of transcriptDocs.docs) {
-        const data = doc.data();
-        if (data.coders && data.coders.includes(fullname)) {
-          _previousTranscipt.push({ id: doc.id, ...data, codesBook: _transcriptBooks[doc.id]?.codesBook || {} });
-        } else {
-          _listOfTranscript.push({ id: doc.id, ...data });
-        }
-      }
-      setListOfTranscript(_listOfTranscript);
-      setPreviousTranscipt(_previousTranscipt);
-      setTranscriptId(_listOfTranscript[0].id);
-      setConversation(_listOfTranscript[0].conversation);
-    };
-    getTranscript();
-  }, [firebase]);
+    if (firebase) {
+      const thematicAnalysisQuery = firebase.db.collection("thematicAnalysis").where("researcher", "==", fullname);
+      const thematicAnalysisSnapshot = thematicAnalysisQuery.onSnapshot(snapshot => {
+        const docChanges = snapshot.docChanges();
+        setThematicAnalysisChanges([...docChanges]);
+      });
+      return () => {
+        setThematicAnalysisChanges([]);
+        thematicAnalysisSnapshot();
+      };
+    }
+  }, [firebase, fullname]);
 
   useEffect(() => {
     if (firebase) {
@@ -166,6 +154,64 @@ const ThematicAnalysis = props => {
       };
     }
   }, [firebase, project]);
+
+  useEffect(() => {
+    const allPrevious = [...previousTranscipt];
+    if (!thematicAnalysisChanges.length) return;
+    for (let change of thematicAnalysisChanges) {
+      const data = change.doc.data();
+      const id = data.transcriptId;
+      const createdAt = moment(new Date(data.createdAt.toDate())).format("MMM DD YYYY HH:mm");
+      if (change.type === "added") {
+        const obj = { id, ...data, createdAt };
+        const existingIndex = allPrevious.findIndex(t => {
+          return t.id === id;
+        });
+        if (existingIndex === -1) {
+          allPrevious.push(obj);
+        } else {
+          allPrevious[existingIndex] = {
+            ...allPrevious[existingIndex],
+            ...data,
+            createdAt
+          };
+        }
+      } else if (change.type === "modified") {
+        const existingIndex = allPrevious.findIndex(c => {
+          return c.id === id;
+        });
+        if (existingIndex !== -1) {
+          allPrevious[existingIndex] = {
+            ...allPrevious[existingIndex],
+            ...data,
+            createdAt
+          };
+        }
+      }
+    }
+    setPreviousTranscipt(allPrevious);
+  }, [firebase, fullname, thematicAnalysisChanges]);
+
+  useEffect(() => {
+    const getTranscript = async () => {
+      const _listOfTranscript = [];
+      const _allOfTranscript = [];
+      const transcriptDocs = await firebase.db.collection("transcript").get();
+      for (let doc of transcriptDocs.docs) {
+        const data = doc.data();
+        if (!data.coders || !data.coders.includes(fullname)) {
+          _listOfTranscript.push({ id: doc.id, ...data });
+        }
+        _allOfTranscript.push({ id: doc.id, ...data });
+      }
+      setListOfTranscript(_listOfTranscript);
+      setTranscriptId(_listOfTranscript[0]?.id || "");
+      setConversation(_listOfTranscript[0]?.conversation || []);
+      setAllOfTranscript(_allOfTranscript);
+      setSurveyType(_listOfTranscript[0]?.surveyType || "");
+    };
+    getTranscript();
+  }, [firebase]);
 
   useEffect(() => {
     const func = async () => {
@@ -206,7 +252,7 @@ const ThematicAnalysis = props => {
     if (codeBooksChanges.length > 0) {
       func();
     }
-  }, [codeBooksChanges]);
+  }, [codeBooksChanges, codeBooksLoaded]);
 
   const approvedCodes = useMemo(() => {
     const codeMap = {};
@@ -460,6 +506,7 @@ const ThematicAnalysis = props => {
 
   const handleSubmit = async () => {
     try {
+      setCilckedCell(false);
       const _codesBook = { ...codesBook };
       for (let sentence in _codesBook) {
         if (_codesBook[sentence].length === 0) {
@@ -482,7 +529,9 @@ const ThematicAnalysis = props => {
           codesBook: _codesBook,
           transcriptId,
           researcher: fullname,
-          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          surveyType,
+          participant: listOfTranscript.find(transcript => transcript.id === transcriptId).participant
         });
       }
       const trabscriptionRef = firebase.db.collection("transcript").doc(transcriptId);
@@ -491,20 +540,17 @@ const ThematicAnalysis = props => {
         coders: firebase.firestore.FieldValue.arrayUnion(fullname)
       });
       const _listOfTranscript = [...listOfTranscript].filter(transcript => transcript.id !== transcriptId);
-      const _previousTranscipt = [...previousTranscipt];
       setListOfTranscript(_listOfTranscript);
-      if (_previousTranscipt.filter(transcript => transcript.id === transcriptId).length < 0) {
-        _previousTranscipt.push({ id: transcriptId, codesBook: _codesBook });
-        setPreviousTranscipt(_previousTranscipt);
-      }
       if (_listOfTranscript.length !== 0) {
         setTranscriptId(_listOfTranscript[0].id);
         setConversation(_listOfTranscript[0].conversation);
+        setSurveyType(_listOfTranscript[0].surveyType);
         setCodesBook({});
       } else {
         setTranscriptId("");
         setConversation([]);
         setCodesBook({});
+        setSurveyType("");
       }
     } catch (error) {
       console.log(error);
@@ -512,22 +558,26 @@ const ThematicAnalysis = props => {
   };
 
   const handleCellClickTranscript = clickedCell => {
-    const findTranscript = previousTranscipt.find(transcript => transcript.id === clickedCell.id);
-    setConversation(findTranscript.conversation);
+    const findTranscript = previousTranscipt.find(t => t.id === clickedCell.id);
+    const findT = allOfTranscript.find(t => t.id === clickedCell.id);
+    setConversation(findT.conversation);
     setTranscriptId(clickedCell.id);
     setCodesBook(findTranscript.codesBook);
     setCilckedCell(true);
+    setSurveyType(findT.surveyType);
   };
   const handleCancel = () => {
     setCilckedCell(false);
     if (listOfTranscript.length !== 0) {
       setTranscriptId(listOfTranscript[0].id);
       setConversation(listOfTranscript[0].conversation);
+      setSurveyType(listOfTranscript[0].surveyType);
       setCodesBook({});
     } else {
       setTranscriptId("");
       setConversation([]);
       setCodesBook({});
+      setSurveyType("");
     }
   };
   const handleAdminEdit = async () => {
@@ -600,9 +650,9 @@ const ThematicAnalysis = props => {
   const handleMerge = event => {
     setMergeCode(event.target.value);
   };
-
   return (
-    <>
+    <Box>
+      {surveyType && <h2 style={{ alignSelf: "center", marginLeft: "5px" }}> Intreview Session for : {surveyType}</h2>}
       <Box sx={{ ml: "15px", mr: "15px", mt: "15px" }}>
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
@@ -648,17 +698,18 @@ const ThematicAnalysis = props => {
             </Box>
           </Grid>
           <Grid item xs={12} style={{ display: "flex", justifyContent: "left" }}>
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              color="success"
-              size="large"
-              disabled={submitting}
-              className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
-            >
-              {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
-            </Button>
-
+            {converstaion.length > 0 && (
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                color="success"
+                size="large"
+                disabled={submitting}
+                className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
+              >
+                {submitting ? <CircularProgress color="warning" size="16px" /> : clickedCell ? "update" : "Submit"}
+              </Button>
+            )}
             {clickedCell && (
               <Button
                 variant="contained"
@@ -666,6 +717,7 @@ const ThematicAnalysis = props => {
                 size="large"
                 disabled={submitting}
                 className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
+                style={{ backgroundColor: "red" }}
               >
                 {submitting ? <CircularProgress color="warning" size="16px" /> : "Cancel"}
               </Button>
@@ -801,7 +853,7 @@ const ThematicAnalysis = props => {
         </Dialog>
         <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       </Box>
-    </>
+    </Box>
   );
 };
 
