@@ -563,7 +563,8 @@ const ManageEvents = props => {
             </Box>
           ) : (
             <Box>
-              <>tThe availble slots does not represent the availibilty set by the participant</>
+              <>The availble slots does not represent the availibilty set by the participant</>
+              <br />
               <>Only the ones marked ✅ has been selected </>
               <SelectSessions
                 startDate={scheduleStart}
