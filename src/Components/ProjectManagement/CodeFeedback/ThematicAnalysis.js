@@ -507,6 +507,7 @@ const ThematicAnalysis = props => {
   const handleSubmit = async () => {
     try {
       setCilckedCell(false);
+      setSubmitting(true);
       const _codesBook = { ...codesBook };
       for (let sentence in _codesBook) {
         if (_codesBook[sentence].length === 0) {
@@ -516,6 +517,7 @@ const ThematicAnalysis = props => {
       const thematicDocs = await firebase.db
         .collection("thematicAnalysis")
         .where("transcriptId", "==", transcriptId)
+        .where("researcher", "==", fullname)
         .get();
       if (thematicDocs.docs.length > 0) {
         thematicDocs.docs[0].ref.update({
@@ -552,6 +554,7 @@ const ThematicAnalysis = props => {
         setCodesBook({});
         setSurveyType("");
       }
+      setSubmitting(false);
     } catch (error) {
       console.log(error);
     }
