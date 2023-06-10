@@ -380,7 +380,12 @@ const ScheduleInstructorPage = props => {
             )}
             {scheduleLoaded ? (
               <>
-                <Box id="ScheduleSelectorContainer">
+                <Box
+                  sx={{
+                    overflowX: "auto",
+                    overflowY: "hidden"
+                  }}
+                >
                   <SelectSessions
                     startDate={tomorrow}
                     numDays={16}
@@ -412,7 +417,9 @@ const ScheduleInstructorPage = props => {
                 <LinearProgress />
               </Box>
             )}
-            <ConsentSurvey />
+            <Box sx={{ marginTop: "8px" }}>
+              <ConsentSurvey />
+            </Box>
           </Box>
         )}
         <Dialog

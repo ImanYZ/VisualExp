@@ -5,7 +5,7 @@ import "./ConsentDocument.css";
 const ConsentDocument = props => {
   return (
     <>
-      <div id="ConsentContainer">
+      <div id="ConsentContainer" style={{ paddingBottom: "250px" }}>
         <h2>University of Michigan</h2>
         <h2>Consent To Be Part Of A Research Study</h2>
         <h2>Title of Project: A Survey Study on Study Techniques</h2>
