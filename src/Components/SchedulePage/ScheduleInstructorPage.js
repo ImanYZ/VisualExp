@@ -348,7 +348,7 @@ const ScheduleInstructorPage = props => {
           </Alert>
         ) : (
           <Box>
-            <Alert severity="info" sx={{ mb: "5px" }}>
+            <Alert severity="info" sx={{ mb: "19px" }}>
               Participation in this research study is completely voluntary, and you have the freedom to withdraw at any
               moment. By selecting the <strong>SCHEDULE</strong> button below, you consent to engage in the study and
               allow the usage of your data exclusively for research purposes. You can find the study details and
