@@ -36,7 +36,13 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, random)
               </ul>
               <p></p>
               <p>Best regards,</p>
-              ${signatureHTML}
+              <p>--</p>
+
+              <p>Iman YeckehZaare </p>
+              <p>Ph.D. Candidate</p>
+              <p>University of Michigan School of Information</p>
+              <p>Outstanding Graduate Student Instructor of the Year 2018-2019</p>
+              <p>NSF I-Corps Program Member</p>
               <img src="https://1cademy.us/api/loadImage/professor/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
