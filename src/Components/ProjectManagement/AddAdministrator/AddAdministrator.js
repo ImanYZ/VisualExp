@@ -334,7 +334,7 @@ const AddAdministrator = props => {
       setAdministratorsToday(0);
       setUpvotedAdministratorsToday(0);
       setOtherAdministrator({});
-      const administratorsQuery = firebase.db.collection("administrators").where("project", "==", project);
+      const administratorsQuery = firebase.db.collection("administrators");
       const administratorsSnapshot = administratorsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setAdministratorsChanges(oldAdministratorsChanges => {
@@ -356,8 +356,7 @@ const AddAdministrator = props => {
     if (firebase && project && fullname && administratorsLoaded) {
       const administratorVotesQuery = firebase.db
         .collection("administratorVotes")
-        .where("voter", "==", fullname)
-        .where("project", "==", project);
+        .where("voter", "==", fullname);
 
       const administratorVotesSnapshot = administratorVotesQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
@@ -377,7 +376,6 @@ const AddAdministrator = props => {
       const today = getISODateString(new Date());
       const dayUpVotesDocs = await firebase.db
         .collection("dayAdministratorUpVotes")
-        .where("project", "==", project)
         .where("voter", "==", fullname)
         .where("date", "==", today)
         .limit(1)
@@ -904,7 +902,7 @@ const AddAdministrator = props => {
             const today = getISODateString(new Date());
             const dayAdministratorsDocs = await firebase.db
               .collection("dayAdministrators")
-              .where("project", "==", project)
+    
               .where("fullname", "==", fullname)
               .where("date", "==", today)
               .limit(1)
