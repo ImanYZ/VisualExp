@@ -23,7 +23,7 @@ const {
   markPaidEndpoint,
   passagesNumberCorrection,
   retreiveFeedbackcodes,
-  lodResponses,
+  loadResponses,
   voteOnSingleRecall,
   loadRecallGrades,
   updateThematicCode,
@@ -140,7 +140,7 @@ app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
 app.use("/participants", participantsRouter);
 app.post("/recallUpload", recallUpload);
-app.post("/lodResponses", lodResponses);
+app.post("/loadResponses", loadResponses);
 app.post("/voteOnSingleRecall", voteOnSingleRecall);
 app.use("/admin", adminRouter);
 app.post("/loadRecallGrades", loadRecallGrades);

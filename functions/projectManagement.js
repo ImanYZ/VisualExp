@@ -1273,67 +1273,55 @@ exports.retreiveFeedbackcodes = async (req, res) => {
 };
 
 //post lodResponses
-exports.lodResponses = async (req, res) => {
+exports.loadResponses = async (req, res) => {
   try {
     const _all = {};
     const { researcher } = req.body;
     console.log(researcher);
-    const recallGradesCollection = db.collection("recallGradesV2");
-    let batchIndex = 0;
-    while (true) {
-      const recallGradesDocs = await recallGradesCollection
-        .limit(100)
-        .offset(batchIndex * 100)
-        .get();
-      console.log("Done loading",recallGradesDocs.docs.length);
+    const recallGradesDocs = await db.collection("recallGradesV2").select("sessions").get();
+    console.log("Done Loading");
+    const promises = recallGradesDocs.docs.map(async recallDoc => {
+      const recallData = recallDoc.data();
       await Promise.all(
-        recallGradesDocs.docs.map(async recallDoc => {
-          const recallData = recallDoc.data();
+        Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
           await Promise.all(
-            Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
-              await Promise.all(
-                conditionItems.map(async conditionItem => {
-                  if (conditionItem.response !== "") {
-                    const votes = {};
-                    await Promise.all(
-                      conditionItem.phrases.map(async phrase => {
-                        const resIdx = phrase.researchers.indexOf(researcher);
-                        votes[phrase.phrase] = {
-                          vote: resIdx !== -1 ? phrase.grades[resIdx] : null
-                        };
-                      })
-                    );
-                    if (_all.hasOwnProperty(conditionItem.passage)) {
-                      _all[conditionItem.passage].push({
-                        response: conditionItem.response.trim(),
-                        documentId: recallDoc.id,
-                        session,
-                        condition: conditionItem.condition,
-                        votes
-                      });
-                    } else {
-                      _all[conditionItem.passage] = [
-                        {
-                          response: conditionItem.response.trim(),
-                          documentId: recallDoc.id,
-                          session,
-                          condition: conditionItem.condition,
-                          votes
-                        }
-                      ];
+            conditionItems.map(async conditionItem => {
+              if (conditionItem.response !== "") {
+                const votes = {};
+                await Promise.all(
+                  conditionItem.phrases.map(async phrase => {
+                    const resIdx = phrase.researchers.indexOf(researcher);
+                    votes[phrase.phrase] = {
+                      vote: resIdx !== -1 ? phrase.grades[resIdx] : null
+                    };
+                  })
+                );
+                if (_all.hasOwnProperty(conditionItem.passage)) {
+                  _all[conditionItem.passage].push({
+                    response: conditionItem.response.trim(),
+                    documentId: recallDoc.id,
+                    session,
+                    condition: conditionItem.condition,
+                    votes
+                  });
+                } else {
+                  _all[conditionItem.passage] = [
+                    {
+                      response: conditionItem.response.trim(),
+                      documentId: recallDoc.id,
+                      session,
+                      condition: conditionItem.condition,
+                      votes
                     }
-                  }
-                })
-              );
+                  ];
+                }
+              }
             })
           );
         })
       );
-      batchIndex++;
-      if (recallGradesDocs.docs.length === 0) {
-        break;
-      }
-    }
+    });
+    await Promise.all(promises);
     res.status(200).send({ message: "success", responses: _all });
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
