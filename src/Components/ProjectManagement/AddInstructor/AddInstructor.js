@@ -435,12 +435,7 @@ const AddInstructor = props => {
       setInstructorsToday(0);
       setUpvotedInstructorsToday(0);
       setOtherInstructor({});
-      let instructorsQuery;
-      if (project === "Annotating") {
-        instructorsQuery = firebase.db.collection("instructors");
-      } else {
-        instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
-      }
+      let instructorsQuery =firebase.db.collection("instructors");
       const instructorsSnapshot = instructorsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setInstructorsChanges(oldInstructorsChanges => {
@@ -460,16 +455,9 @@ const AddInstructor = props => {
   // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
     if (firebase && project && fullname && instructorsLoaded) {
-      let instructorVotesQuery;
-      if (project === "Annotating") {
-        instructorVotesQuery = firebase.db.collection("instructorVotes").where("voter", "==", fullname);
-      } else {
-        instructorVotesQuery = firebase.db
+      let instructorVotesQuery= firebase.db
           .collection("instructorVotes")
           .where("voter", "==", fullname)
-          .where("project", "==", project);
-      }
-
       const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setVotesChanges(oldVotesChanges => {
@@ -486,23 +474,13 @@ const AddInstructor = props => {
   const assignDayUpVotesPoint = async nUpVotedToday => {
     if (nUpVotedToday === 16) {
       const today = getISODateString(new Date());
-      let dayUpVotesDocs;
-      if (project === "Annotating") {
-        dayUpVotesDocs = await firebase.db
+      let dayUpVotesDocs = await firebase.db
           .collection("dayInstructorUpVotes")
           .where("voter", "==", fullname)
           .where("date", "==", today)
           .limit(1)
           .get();
-      } else {
-        dayUpVotesDocs = await firebase.db
-          .collection("dayInstructorUpVotes")
-          .where("project", "==", project)
-          .where("voter", "==", fullname)
-          .where("date", "==", today)
-          .limit(1)
-          .get();
-      }
+
       if (dayUpVotesDocs.docs.length === 0) {
         try {
           const dayUpVoteRef = firebase.db.collection("dayInstructorUpVotes").doc();
