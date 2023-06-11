@@ -78,7 +78,7 @@ export const SchemaGeneration = () => {
     const retrieveResponses = async () => {
       try {
         setSearching(true);
-        const response = await axios.post("/lodResponses", { researcher: fullname });
+        const response = await axios.post("/loadResponses", { researcher: fullname });
         setAllTheResponses(response.data.responses);
       } catch (error) {
         console.log(error);
