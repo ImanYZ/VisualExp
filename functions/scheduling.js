@@ -891,17 +891,17 @@ exports.markEntreviewAttended = async (req, res) => {
       const scheduleDoc = await db.collection("schedule").where("id", "==", event.id).get();
       if (scheduleDoc.docs.length > 0) {
         const participant = scheduleDoc.docs[0].data().email;
+        let meetingId = "";
+        const regex = /[a-z]{3}-[a-z]{4}-[a-z]{3}/;
+        const matchResult = meetingURL.match(regex);
+        if (matchResult) {
+          meetingId = matchResult[0];
+        }
         const userDoc = await t.get(db.collection("usersSurvey").where("email", "==", participant));
-        const transcriptDoc = await t.get(db.collection("transcript").where("mettingUrl", "==", meetingURL));
+        const transcriptDoc = await t.get(db.collection("transcript").where("mettingUrl", "==", meetingId));
         const scheduleId = scheduleDoc.docs[0].id;
         t.update(db.collection("schedule").doc(scheduleId), { started: true, attended: true });
         if (userDoc.docs.length > 0 && transcriptDoc.docs.length === 0) {
-          let meetingId = "";
-          const regex = /[a-z]{3}-[a-z]{4}-[a-z]{3}/;
-          const matchResult = meetingURL.match(regex);
-          if (matchResult) {
-            meetingId = matchResult[0];
-          }
           const data = userDoc.docs[0].data();
           const transcriptRef = db.collection("transcript").doc();
           t.set(transcriptRef, {
@@ -916,7 +916,7 @@ exports.markEntreviewAttended = async (req, res) => {
           for (let attendee of event.attendees) {
             if (
               researchersHash.hasOwnProperty(attendee.email) &&
-              // attendee.email !== "ouhrac@gmail.com" &&
+              attendee.email !== "ouhrac@gmail.com" &&
               attendee.email !== "oneweb@umich.edu"
             ) {
               researcher = attendee.email;
