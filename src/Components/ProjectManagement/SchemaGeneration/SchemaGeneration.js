@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
@@ -74,6 +74,7 @@ export const SchemaGeneration = () => {
   const [tryout, setTryout] = useState(false);
 
   useEffect(() => {
+    console.log("loadSchema");
     const retrieveResponses = async () => {
       try {
         setSearching(true);
@@ -84,7 +85,7 @@ export const SchemaGeneration = () => {
       }
     };
     retrieveResponses();
-  }, []);
+  }, [fullname]);
 
   useEffect(() => {
     if (Object.keys(allTheResponses).length === 0) return;
@@ -136,19 +137,35 @@ export const SchemaGeneration = () => {
   }, [firebase, fullname]);
 
   useEffect(() => {
-    if (selectedPhrase && selectedPassage) {
-      const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
-      const logsData = {
-        passageId: selectedPassage.id,
-        passage: selectedPassage.title,
-        selectedPhrase: selectedPhrase,
-        email,
-        schema
-      };
-      logsRef.set(logsData);
-    }
-    return () => {};
-  }, [firebase, selectedPhrase, selectedPassage, schema]);
+    const recordLogs = async () => {
+      if (selectedPhrase && selectedPassage) {
+        const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
+        const logsDoc = await logsRef.get();
+        if (logsDoc.exists) {
+          await logsRef.update({
+            passageId: selectedPassage.id,
+            passage: selectedPassage.title,
+            selectedPhrase: selectedPhrase,
+            schema,
+            updatedAt: new Date()
+          });
+        } else {
+          const logsData = {
+            passageId: selectedPassage.id,
+            passage: selectedPassage.title,
+            selectedPhrase: selectedPhrase,
+            email,
+            schema,
+            createdAt: new Date()
+          };
+          await logsRef.set(logsData);
+        }
+      }
+    };
+    setTimeout(() => {
+      recordLogs();
+    }, 2000);
+  }, [selectedPhrase, selectedPassage, firebase.db, fullname, email, schema]);
 
   useEffect(() => {
     setHighlightedWords([]);
@@ -454,7 +471,7 @@ export const SchemaGeneration = () => {
             p: "10px"
           }}
         >
-          <div dangerouslySetInnerHTML={{ __html: renderResponses(r.response) }} />
+          <Box dangerouslySetInnerHTML={{ __html: renderResponses(r.response) }} />
 
           {tryout && (
             <Button
@@ -526,7 +543,7 @@ export const SchemaGeneration = () => {
         researcher: fullname,
         phrase: selectedPhrase,
         documentId: response.documentId,
-        grade: vote ,
+        grade: vote
       });
     } catch (error) {
       console.log(error);
@@ -580,21 +597,23 @@ export const SchemaGeneration = () => {
       <Box className="section">
         <Box className="blocks search-box">
           <Box className="phrases-box">
-            <Button
-              sx={{ color: "black", alignItems: "center" }}
-              variant="text"
-              disabled={phrases.indexOf(selectedPhrase) === 0}
-              onClick={previousPhrase}
-            >
-              {`< Prev `}
-            </Button>
+            <Box sx={{ display: "center", pt: "15px", pl: "15px" }}>
+              <Button
+                sx={{ color: "black", alignItems: "center" }}
+                variant="text"
+                disabled={phrases.indexOf(selectedPhrase) === 0}
+                onClick={previousPhrase}
+              >
+                {`< Prev `}
+              </Button>
+            </Box>
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
                 marginTop: "10px",
                 paddingRight: "20px",
-                paddingLeft: "10px"
+                paddingLeft: "5px"
               }}
             >
               <Autocomplete
@@ -764,7 +783,7 @@ export const SchemaGeneration = () => {
                   const isLastElement = index === notSatisfiedResponses.length - 1;
                   return (
                     <Paper
-                      key={index}
+                      key={index + r.response}
                       elevation={3}
                       sx={{
                         display: "flex",
@@ -775,6 +794,7 @@ export const SchemaGeneration = () => {
                     >
                       {r.response}
                       <Button
+                        key={index + r.response}
                         variant="outlined"
                         onClick={() => {
                           handleResponse(r, false);
