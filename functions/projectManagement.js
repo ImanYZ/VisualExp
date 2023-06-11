@@ -1278,42 +1278,62 @@ exports.lodResponses = async (req, res) => {
     const _all = {};
     const { researcher } = req.body;
     console.log(researcher);
-    const recallGradesDocs = await db.collection("recallGradesV2").get();
-    recallGradesDocs.docs.map(async recallDoc => {
-      const recallData = recallDoc.data();
-      Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
-        conditionItems.forEach(conditionItem => {
-          if (conditionItem.response !== "") {
-            const votes = {};
-            conditionItem.phrases.forEach(phrase => {
-              const resIdx = phrase.researchers.indexOf(researcher);
-              votes[phrase.phrase] = {
-                vote: resIdx !== -1 ? phrase.grades[resIdx] : null
-              };
-            });
-            if (_all.hasOwnProperty(conditionItem.passage)) {
-              _all[conditionItem.passage].push({
-                response: conditionItem.response.trim(),
-                documentId: recallDoc.id,
-                session,
-                condition: conditionItem.condition,
-                votes
-              });
-            } else {
-              _all[conditionItem.passage] = [
-                {
-                  response: conditionItem.response.trim(),
-                  documentId: recallDoc.id,
-                  session,
-                  condition: conditionItem.condition,
-                  votes
-                }
-              ];
-            }
-          }
-        });
-      });
-    });
+    const recallGradesCollection = db.collection("recallGradesV2");
+    let batchIndex = 0;
+    while (true) {
+      const recallGradesDocs = await recallGradesCollection
+        .limit(100)
+        .offset(batchIndex * 100)
+        .get();
+      console.log("Done loading",recallGradesDocs.docs.length);
+      await Promise.all(
+        recallGradesDocs.docs.map(async recallDoc => {
+          const recallData = recallDoc.data();
+          await Promise.all(
+            Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
+              await Promise.all(
+                conditionItems.map(async conditionItem => {
+                  if (conditionItem.response !== "") {
+                    const votes = {};
+                    await Promise.all(
+                      conditionItem.phrases.map(async phrase => {
+                        const resIdx = phrase.researchers.indexOf(researcher);
+                        votes[phrase.phrase] = {
+                          vote: resIdx !== -1 ? phrase.grades[resIdx] : null
+                        };
+                      })
+                    );
+                    if (_all.hasOwnProperty(conditionItem.passage)) {
+                      _all[conditionItem.passage].push({
+                        response: conditionItem.response.trim(),
+                        documentId: recallDoc.id,
+                        session,
+                        condition: conditionItem.condition,
+                        votes
+                      });
+                    } else {
+                      _all[conditionItem.passage] = [
+                        {
+                          response: conditionItem.response.trim(),
+                          documentId: recallDoc.id,
+                          session,
+                          condition: conditionItem.condition,
+                          votes
+                        }
+                      ];
+                    }
+                  }
+                })
+              );
+            })
+          );
+        })
+      );
+      batchIndex++;
+      if (recallGradesDocs.docs.length === 0) {
+        break;
+      }
+    }
     res.status(200).send({ message: "success", responses: _all });
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
