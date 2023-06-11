@@ -498,11 +498,10 @@ exports.inviteInstructors = async context => {
           inst.reminders < 4
       );
     for (let instructor of instructors) {
-      console.log(instructor.email);
       const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructor;
       const topic = interestedTopic
         .split(" ")
-        .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+        .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word))
         .join(" ");
       let randomNumber = 0;
       if (instructor.hasOwnProperty("emailNumber")) {
