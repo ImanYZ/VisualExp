@@ -1535,12 +1535,12 @@ exports.loadRecallGrades = async (req, res) => {
 exports.updateThematicCode = async (req, res) => {
   try {
     await db.runTransaction(async t => {
-      let { oldCodeId, newCode, mergeCode, category } = req.body;
+      let { oldCodeId, newCode, mergeCode, category, title } = req.body;
       const codeRef = db.collection("feedbackCodeBooks").doc(oldCodeId);
       const thematicAnalysisDocs = await t.get(db.collection("thematicAnalysis"));
       const codeDoc = await t.get(codeRef);
       const codeData = codeDoc.data();
-      if (newCode === codeData.code && !mergeCode && category === codeData.category) return;
+      if (newCode === codeData.code && !mergeCode && category === codeData.category && title === codeData.title) return;
       if (mergeCode) {
         newCode = mergeCode;
         const mergeCodeDoc = await t.get(
@@ -1564,7 +1564,7 @@ exports.updateThematicCode = async (req, res) => {
         console.log(updateCBook);
         t.update(db.collection("thematicAnalysis").doc(thematicAnalysisDoc.id), { codesBook: updateCBook });
       }
-      t.update(codeRef, { code: newCode, category });
+      t.update(codeRef, { code: newCode, category, title });
     });
     return res.status(200).send({ message: "success" });
   } catch (error) {
