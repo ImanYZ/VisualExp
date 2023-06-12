@@ -46,7 +46,6 @@ const ThematicAnalysis = props => {
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const project = useRecoilValue(projectState);
-  const online = project === "OnlineCommunities";
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [newCode, setNewCode] = useState("");
@@ -72,7 +71,7 @@ const ThematicAnalysis = props => {
   const [allOfTranscript, setAllOfTranscript] = useState([]);
   const [surveyType, setSurveyType] = useState("");
   const [thematicAnalysisChanges, setThematicAnalysisChanges] = useState([]);
-
+  const [addCodeFor, setAddCodeFor] = useState("");
   const [transcriptId, setTranscriptId] = useState(null);
 
   const [codesBook, setCodesBook] = useState({});
@@ -95,6 +94,7 @@ const ThematicAnalysis = props => {
                 setCategory(cellValues.row.category || "");
                 setAdminCodeData(cellValues.row);
                 handleOpenAdminEditModal();
+                setAddCodeFor(cellValues.row.title);
               }}
             >
               <EditIcon />
@@ -113,7 +113,8 @@ const ThematicAnalysis = props => {
         );
       }
     }
-  ];
+  ].filter(c => c.field !== "question" && c.field !== "addedBy");
+  codesColumn[0].width = "900";
   useEffect(() => {
     const getResearcher = async () => {
       const researcher = await firebase.db.collection("researchers").doc(fullname).get();
@@ -259,42 +260,26 @@ const ThematicAnalysis = props => {
     const filtered = allExperimentCodes.filter(c => {
       let exist = codeMap[c.code] || false;
       codeMap[c.code] = true;
-      return c.approved && !exist;
+      return c.approved && !exist && c.title === surveyType;
     });
 
     return filtered.sort((a, b) => a.code - b.code);
-  }, [allExperimentCodes, project]);
+  }, [allExperimentCodes, project, surveyType]);
 
   const adminCodes = useMemo(() => {
     const mapped = allExperimentCodes.map(c => {
-      if (online) {
-        if (c.project === "OnlineCommunities") {
-          return {
-            id: c.id,
-            code: c.code,
-            coder: c.coder,
-            addedBy: c.addedBy,
-            category: c.category,
-            title: c?.title || "",
-            question: c.question,
-            approved: c.approved ? "✅" : "◻",
-            rejected: c.rejected ? "❌" : "◻"
-          };
-        }
-      } else {
-        if (c.project !== "OnlineCommunities") {
-          return {
-            id: c.id,
-            code: c.code,
-            coder: c.coder,
-            addedBy: c.addedBy,
-            category: c.category,
-            title: c?.title || "",
-            question: c.question,
-            approved: c.approved ? "✅" : "◻",
-            rejected: c.rejected ? "❌" : "◻"
-          };
-        }
+      if (c.project === "OnlineCommunities") {
+        return {
+          id: c.id,
+          code: c.code,
+          coder: c.coder,
+          addedBy: c.addedBy,
+          category: c.category,
+          title: c?.title || "",
+          question: c.question,
+          approved: c.approved ? "✅" : "◻",
+          rejected: c.rejected ? "❌" : "◻"
+        };
       }
       return {};
     });
@@ -479,8 +464,8 @@ const ThematicAnalysis = props => {
         checked: false,
         approved: true,
         rejected: false,
+        title: surveyType,
         category: "no_category",
-        title: "Researcher",
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       });
 
@@ -590,7 +575,8 @@ const ThematicAnalysis = props => {
         oldCodeId: adminCodeData.id,
         newCode: code,
         mergeCode,
-        category
+        category,
+        title: addCodeFor
       });
       setCode("");
       setCategory("");
@@ -625,13 +611,13 @@ const ThematicAnalysis = props => {
   };
   let categories = useMemo(() => {
     const _categories = [];
-    for (let code of approvedCodes) {
+    for (let code of allExperimentCodes) {
       if (!_categories.includes(code.category)) {
         _categories.push(code.category);
       }
     }
     return _categories;
-  }, [approvedCodes]);
+  }, [allExperimentCodes]);
   const handleChange = event => {
     setCategory(event.target.value);
   };
@@ -652,6 +638,9 @@ const ThematicAnalysis = props => {
 
   const handleMerge = event => {
     setMergeCode(event.target.value);
+  };
+  const handleTitle = event => {
+    setAddCodeFor(event.target.value);
   };
   return (
     <Box>
@@ -786,6 +775,16 @@ const ThematicAnalysis = props => {
                     }}
                   />
                   <FormControl className="select" variant="outlined" style={{ width: "160px" }}>
+                    <InputLabel>Code For</InputLabel>
+                    <Select label="Code For" value={addCodeFor} onChange={handleTitle} id="merge-code">
+                      {["instructor", "student"].map(title => (
+                        <MenuItem key={title} value={title}>
+                          {title}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl className="select" variant="outlined" style={{ width: "160px" }}>
                     <InputLabel>Merge Code</InputLabel>
                     <Select label="New Category" value={mergeCode} onChange={handleMerge} id="merge-code">
                       <MenuItem key={null} value={null}>
@@ -815,6 +814,7 @@ const ThematicAnalysis = props => {
                       setCode("");
                       handleCloseAdminEditModal();
                       setMergeCode(null);
+                      setAddCodeFor("");
                     }}
                   >
                     cancel
