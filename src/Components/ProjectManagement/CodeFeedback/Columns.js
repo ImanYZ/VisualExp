@@ -27,6 +27,7 @@ export const _codesColumn = [
   {
     field: "coder",
     headerName: "Coder",
+    width: "150",
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
