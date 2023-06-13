@@ -324,10 +324,29 @@ exports.markAttended = async (req, res) => {
       const scheduleDoc = await t.get(db.collection("schedule").doc(scheduleId));
       const scheduleData = scheduleDoc.data();
       if (project === "OnlineCommunities") {
+        const meetingURL = ev.event.hangoutLink;
+        let meetingId = "";
+        const regex = /[a-z]{3}-[a-z]{4}-[a-z]{3}/;
+        const matchResult = meetingURL.match(regex);
+        if (matchResult) {
+          meetingId = matchResult[0];
+        }
+        const transcriptDoc = await t.get(db.collection("transcript").where("mettingUrl", "==", meetingId));
         const resRef = db.collection("researchers").doc(fullname);
         const resDoc = await t.get(resRef);
         const resData = resDoc.data();
         const userRef = db.collection("usersSurvey").doc(participantFullname);
+        const userDoc = await t.get(userRef);
+        const userData = userDoc.data();
+        if (transcriptDoc.docs.length === 0) {
+          const transcriptRef = db.collection("transcript").doc();
+          t.set(transcriptRef, {
+            mettingUrl: meetingId,
+            participant: participantFullname,
+            surveyType: userData.surveyType,
+            createdAt: new Date()
+          });
+        }
         t.update(userRef, { projectDone: true });
         const expSessionRef = db.collection("expSessions").doc();
         t.set(expSessionRef, {
