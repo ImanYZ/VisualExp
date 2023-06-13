@@ -3,7 +3,7 @@ const { futureEvents, pastEvents } = require("./scheduling");
 const { isToday, fetchRecentParticipants } = require("./utils");
 const { delay } = require("./helpers/common");
 const {
-  reschEventNotificationEmail,
+  participantNotificationEmail,
   researcherEventNotificationEmail,
   eventNotificationEmail,
   notAttendedEmail,
@@ -999,11 +999,12 @@ exports.remindCalendarInvitations = async context => {
                       // Then, we delete all their sessions from Google Calendar and
                       // schedule them, send them an email asking them to reschedule
                       // all their sessions.
-                      reschEventNotificationEmail(
+                      participantNotificationEmail(
                         participant.email,
                         participant.firstname,
                         hoursLeft,
-                        attendee.responseStatus === "declined"
+                        attendee.responseStatus === "declined", 
+                        userData
                       );
                     } else if (
                       (order === "2nd" && !participant.secondDone) ||
@@ -1047,18 +1048,20 @@ exports.remindCalendarInvitations = async context => {
                     } else {
                       // Email every four hours to remind them that they need to accept the
                       // Google Calendar invite for whichever session they have not accepted yet.
-                      eventNotificationEmail(
-                        participant.email,
-                        participant.firstname,
-                        false,
-                        participant.courseName,
-                        hoursLeft,
-                        false,
-                        "",
-                        order,
-                        false,
-                        false
-                      );
+                      if (!userData.hasOwnProperty("surveyType") || userData.surveyType !== "instructor") {
+                        eventNotificationEmail(
+                          participant.email,
+                          participant.firstname,
+                          false,
+                          participant.courseName,
+                          hoursLeft,
+                          false,
+                          "",
+                          order,
+                          false,
+                          false
+                        );
+                      }
                     }
                   }
                 }
@@ -1133,7 +1136,7 @@ exports.remindCalendarInvitations = async context => {
                   // schedule then, send them an email asking them to reschedule
                   // all their sessions.
 
-                  reschEventNotificationEmail(
+                  participantNotificationEmail(
                     participant.email,
                     participant.firstname,
                     hoursLeft,
