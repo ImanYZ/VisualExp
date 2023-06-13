@@ -13,7 +13,6 @@ import { projectState } from "../../../../store/ProjectAtoms";
 import { chunk } from "lodash";
 import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { fi } from "date-fns/locale";
 
 export const LeaderBoard = ({
   fullname,
