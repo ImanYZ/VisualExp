@@ -939,7 +939,7 @@ exports.sendEventNotificationEmail = (req, res) => {
   }
 };
 
-const reschEventNotificationEmail = async (email, firstname, hoursLeft, declined) => {
+const participantNotificationEmail = async (email, firstname, hoursLeft, declined, participant) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const scheduleDocs = await db.collection("schedule").where("email", "==", email).get();
@@ -955,6 +955,10 @@ const reschEventNotificationEmail = async (email, firstname, hoursLeft, declined
       }
     }
 
+    const isInstructor = participant.hasOwnProperty("surveyType") && participant?.surveyType === "instructor";
+    const websiteURL = isInstructor
+      ? "https://1cademy.us/ScheduleInstructorSurvey/" + participant.instructorId
+      : "https://1cademy.us/Activities/Experiment";
     const nameString = await getNameFormatted(email, firstname);
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -976,7 +980,9 @@ ${
   " the session" +
   (declined ? " that will begin in " + hoursLeft : "") +
   "!</p><p>We deleted your scheduled sessions.</p>" +
-  "<p>Please reschedule your sessions on <a href='https://1cademy.us/Activities/Experiment' target='_blank'>our website</a> ASAP.</p>" +
+  "<p>Please reschedule your sessions on <a href=" +
+  websiteURL +
+  "target='_blank'> our website</a> ASAP.</p>" +
   "<p>Please reply to this email if you have any questions or experience any difficulties scheduling your sessions."
 }
 </p>
@@ -989,7 +995,7 @@ ${
       mailOptions,
       createdAt: Timestamp.fromDate(new Date()),
       email,
-      reason: "reschEventNotificationEmail",
+      reason: "participantNotificationEmail",
       urgent: true,
       sent: false
     });
@@ -998,7 +1004,7 @@ ${
     return err;
   }
 };
-exports.reschEventNotificationEmail = reschEventNotificationEmail;
+exports.participantNotificationEmail = participantNotificationEmail;
 
 exports.rescheduleEventNotificationEmail = (req, res) => {
   try {
@@ -1017,7 +1023,7 @@ exports.rescheduleEventNotificationEmail = (req, res) => {
       if ("hoursLeft" in req.body) {
         hoursLeft = req.body.hoursLeft;
       }
-      reschEventNotificationEmail(email, firstname, hoursLeft, true);
+      participantNotificationEmail(email, firstname, hoursLeft, true);
     }
     return res.status(200).json({ message: "Email Sent" });
   } catch (err) {
