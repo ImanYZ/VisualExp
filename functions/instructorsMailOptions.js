@@ -2,8 +2,48 @@ const { generateUID, capitalizeFirstLetter } = require("./utils");
 const { ImanSignatureHTML } = require("./emailSignature");
 
 exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introducedBy, random) => {
+  let emailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    cc: introducedBy.email,
+    subject: `Request to Interview for NSF I-Corps Program to Improve Teaching and Learning in  ${topic}`,
+    html:
+      `
+          <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>` +
+      (introducedBy ? `<p>Dr. ${introducedBy.fullname} has introduced you to me.</p>` : ``) +
+      `<p>My name is Iman YeckehZaare, a PhD candidate at the University of Michigan, School of Information.I’m part of an NSF I-Corps  program where we are investigating difficulties that instructors experience in college education. I’d highly appreciate it if you could give me 30 minutes of your time to interview you about your experience and challenges as an instructor this past academic year.</p>
+            <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
+            <ul>
+              <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
+                // These are all sending requests to the client side.
+                instructorId
+              }" target="_blank">Yes, let's schedule.</a></li>
+              <li><a href="https://1cademy.us/notInterestedFaculty/${
+                // These are all sending requests to the client side.
+                instructorId
+              }" target="_blank"> No, do not contact me again.</a></li>
+              <li><a href="https://1cademy.us/interestedFacultyLater/${
+                // These are all sending requests to the client side.
+                instructorId
+              }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
+            </ul>
+            <p></p>
+            <p>Best regards,</p>
+            ${ImanSignatureHTML}
+            <img src="https://1cademy.us/api/loadImage/professor/${
+              // For tracking when they open their email.
+              // Note that the email clients that cache emails like those on iPad or Outlook open the content
+              // of the emails without the user's knowlege, so those would be false positives for us.
+              instructorId + "/" + generateUID()
+            }"
+            data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
+            width="420" height="37"><br></div></div></div>`
+  };
+  if (introducedBy.hasOwnProperty("email")) {
+    emailOptions.cc = introducedBy.email;
+  }
   if (random === 0 && !introducedBy) {
-    return {
+    emailOptions = {
       from: process.env.EMAIL,
       to: email,
       subject: `Collaborate with an NSF I-Corps Research Team to Optimize Teaching and Learning  ${topic}`,
@@ -47,42 +87,5 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
               width="420" height="37"><br></div></div></div>`
     };
   }
-  return {
-    from: process.env.EMAIL,
-    to: email,
-    cc: introducedBy.email,
-    subject: `Request to Interview for NSF I-Corps Program to Improve Teaching and Learning in  ${topic}`,
-    html:
-      `
-          <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>` + introducedBy
-        ? `<p>Dr. ${introducedBy.fullname} has introduced you to me.</p>`
-        : "" +
-          `<p>My name is Iman YeckehZaare, a PhD candidate at the University of Michigan, School of Information.I’m part of an NSF I-Corps  program where we are investigating difficulties that instructors experience in college education. I’d highly appreciate it if you could give me 30 minutes of your time to interview you about your experience and challenges as an instructor this past academic year.</p>
-            <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
-            <ul>
-              <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
-                // These are all sending requests to the client side.
-                instructorId
-              }" target="_blank">Yes, let's schedule.</a></li>
-              <li><a href="https://1cademy.us/notInterestedFaculty/${
-                // These are all sending requests to the client side.
-                instructorId
-              }" target="_blank"> No, do not contact me again.</a></li>
-              <li><a href="https://1cademy.us/interestedFacultyLater/${
-                // These are all sending requests to the client side.
-                instructorId
-              }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
-            </ul>
-            <p></p>
-            <p>Best regards,</p>
-            ${ImanSignatureHTML}
-            <img src="https://1cademy.us/api/loadImage/professor/${
-              // For tracking when they open their email.
-              // Note that the email clients that cache emails like those on iPad or Outlook open the content
-              // of the emails without the user's knowlege, so those would be false positives for us.
-              instructorId + "/" + generateUID()
-            }"
-            data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
-            width="420" height="37"><br></div></div></div>`
-  };
+  return emailOptions;
 };
