@@ -45,9 +45,9 @@ const createExperimentEvent = async (email, researcher, order, start, end, proje
     colorId = surveyType === "student" ? "5" : surveyType === "instructor" ? "6" : "4";
   }
   const attendees = [{ email }, { email: researcher }, { email: "ouhrac@gmail.com" }];
-  // if (isAnnotating && surveyType === "instructor") {
-  //   attendees.push({ email: "oneweb@umich.edu" });
-  // }
+  if (isAnnotating && surveyType === "instructor") {
+    attendees.push({ email: "oneweb@umich.edu" });
+  }
   const eventCreated = await insertEvent(start, end, summary, description, [...attendees], colorId);
   return eventCreated;
 };
