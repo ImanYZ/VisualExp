@@ -28,7 +28,8 @@ const {
   loadRecallGrades,
   updateThematicCode,
   deleteThematicCode,
-  notifyApplicationStatus
+  notifyApplicationStatus,
+  recordAudio
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -153,6 +154,7 @@ app.get("/notifyApplicationStatus", notifyApplicationStatus);
 app.post("/retrieveEvents", retrieveEvents);
 app.post("/markEntreviewAttended", markEntreviewAttended);
 app.post("/checkEntreviewStatus", checkEntreviewStatus);
+app.post("/recordAudio", recordAudio);
 // Knowledge endpoints
 
 // Misinformation Experiment
