@@ -6,7 +6,6 @@ const { Timestamp } = require("firebase-admin/firestore");
 
 const {
   insertEvent,
-  getEvent,
   getEvents,
   deleteEvent,
   getLifeLogEvents,
@@ -15,7 +14,6 @@ const {
 
 const { pad2Num, capitalizeFirstLetter } = require("./utils");
 const { toOrdinal } = require("number-to-words");
-const { findIndex } = require("lodash");
 
 const createExperimentEvent = async (email, researcher, order, start, end, projectSpecs, surveyType) => {
   const isAnnotating = projectSpecs.numberOfSessions === 1;
@@ -47,9 +45,9 @@ const createExperimentEvent = async (email, researcher, order, start, end, proje
     colorId = surveyType === "student" ? "5" : surveyType === "instructor" ? "6" : "4";
   }
   const attendees = [{ email }, { email: researcher }, { email: "ouhrac@gmail.com" }];
-  if (isAnnotating && surveyType === "instructor") {
-    attendees.push({ email: "oneweb@umich.edu" });
-  }
+  // if (isAnnotating && surveyType === "instructor") {
+  //   attendees.push({ email: "oneweb@umich.edu" });
+  // }
   const eventCreated = await insertEvent(start, end, summary, description, [...attendees], colorId);
   return eventCreated;
 };
@@ -511,7 +509,7 @@ const getfutureEvents = async nextDays => {
 
 exports.scheduleInstructors = async (req, res) => {
   try {
-    let { sessions, project, surveyType, instructorId, email } = req.body;
+    let { sessions, project, surveyType, instructorId, email, firstname, lastname, institution, unknown } = req.body;
     const batch = db.batch();
 
     sessions.sort((a, b) => (a < b ? -1 : 1)); // asc sorting
@@ -703,8 +701,58 @@ exports.scheduleInstructors = async (req, res) => {
         id: eventCreated.data.id,
         project
       });
-
-      if (project === "OnlineCommunities") {
+    }
+    if (project === "OnlineCommunities") {
+      if (unknown) {
+        const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
+        let instructorId = "";
+        if (instructorsDocs.docs.length === 0) {
+          const newInstructor = {
+            website: "",
+            prefix: "Prof",
+            firstname,
+            lastname,
+            email,
+            country: "🇺🇸 United States;US",
+            stateInfo: "",
+            city: "",
+            institution,
+            scraped: false,
+            createdAt: new Date(),
+            interestedTopic: "",
+            project: "H1L2",
+            fullname: "Iman YeckehZaare",
+            no: false,
+            yes: false,
+            deleted: false,
+            scheduled: true,
+            reminders: 0
+          };
+          const instructorRef = db.collection("instructors").doc();
+          batch.set(instructorRef, newInstructor);
+          instructorId = instructorRef.id;
+        } else {
+          instructorId = instructorsDocs.docs[0].id;
+          batch.update(instructorsDocs.docs[0].ref, {
+            scheduled: true
+          });
+        }
+        const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
+        const userSurevyRef = db.collection("usersSurvey").doc(fullName);
+        batch.set(userSurevyRef, {
+          email: email,
+          project,
+          scheduled: true,
+          institution: institution,
+          instructorId: instructorId,
+          firstname: firstname,
+          uid: "",
+          surveyType: "instructor",
+          lastname: lastname,
+          noRetaineData: false,
+          createdAt: Timestamp.fromDate(new Date())
+        });
+      } else {
         const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
         const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
         if (instructorsDocs.docs.length > 0) {
@@ -752,6 +800,7 @@ exports.scheduleInstructors = async (req, res) => {
         }
       }
     }
+
     await batch.commit();
     return res.status(200).json({ message: "Sessions successfully scheduled" });
   } catch (err) {
