@@ -5,7 +5,6 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
   let emailOptions = {
     from: process.env.EMAIL,
     to: email,
-    cc: introducedBy.email,
     subject: `Request to Interview for NSF I-Corps Program to Improve Teaching and Learning in  ${topic}`,
     html:
       `
