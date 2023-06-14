@@ -7,7 +7,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import { firebaseOne } from "../../Components/firebase/firebase";
-import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, institutionsState } from "../../store/AuthAtoms";
@@ -62,7 +61,7 @@ const Auth = props => {
 
   const institutions = useRecoilValue(institutionsState);
 
-  const navigateTo = useNavigate();
+
 
   useEffect(() => {
     const getCourses = async () => {

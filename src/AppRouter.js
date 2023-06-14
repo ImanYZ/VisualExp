@@ -31,6 +31,7 @@ import {
 import App from "./App";
 import SchedulePage from "./Components/SchedulePage/SchedulePage";
 import ScheduleInstructorPage from "./Components/SchedulePage/ScheduleInstructorPage";
+import ScheduleUnknownInstructorPage from "./Components/SchedulePage/ScheduleUnknownInstructorPage";
 import ScheduleAdministratorPage from "./Components/SchedulePage/ScheduleAdministratorPage";
 import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
@@ -546,6 +547,7 @@ const AppRouter = props => {
                   }
                 />
                 <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
+                <Route path="ScheduleInstructor/" element={<ScheduleUnknownInstructorPage />} />
               </>
             </>
           )}
@@ -553,6 +555,7 @@ const AppRouter = props => {
       ) : (
         <>
           <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
+          <Route path="ScheduleInstructor/" element={<ScheduleUnknownInstructorPage />} />
           <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
           <Route path="survey/*" element={<AuthConsent project="OnlineCommunities" />} />
           <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />

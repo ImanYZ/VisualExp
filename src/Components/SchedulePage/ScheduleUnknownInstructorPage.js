@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { firebaseOne } from "../../Components/firebase/firebase";
 import moment from "moment";
 
 import axios from "axios";
@@ -13,8 +14,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
-import { useNavigate, useParams } from "react-router-dom";
-import { firebaseState, emailState } from "../../store/AuthAtoms";
+import { useParams } from "react-router-dom";
+import { firebaseState, emailState, institutionsState } from "../../store/AuthAtoms";
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
 import RouterNav from "../../Components/RouterNav/RouterNav";
@@ -24,6 +25,10 @@ import ConsentSurvey from "../Auth/ConsentSurvey";
 import "./SchedulePage.css";
 import AppConfig from "../../AppConfig";
 import LoadingPage from "./LoadingPage";
+import ValidatedInput from "../ValidatedInput/ValidatedInput";
+import { isEmail } from "../../utils";
+import Paper from "@mui/material/Paper";
+import { Autocomplete, TextField } from "@mui/material";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -36,11 +41,9 @@ const errorAlert = data => {
 };
 
 const ScheduleInstructorPage = props => {
-  const { instructorId } = useParams();
-
+  const { db: dbOne } = firebaseOne;
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
-
   const [availableSessions, setAvailableSessions] = useState({});
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
@@ -52,33 +55,26 @@ const ScheduleInstructorPage = props => {
   const [submitted, setSubmitted] = useState(false);
   const [project, setProject] = useRecoilState(projectState);
   const [projectSpecs, setProjectSpecs] = useState({});
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    axios.post("/instructorYes", {
-      id: instructorId
-    });
-  }, []);
+  const [validEmail, setValidEmail] = useState(false);
+  const [validlastname, setValidlastname] = useState(false);
+  const [firstname, setFirstname] = useState("");
+  const [validFirstname, setValidFirstname] = useState(false);
+  const [lastname, setLastname] = useState("");
+  const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
+  const institutions = useRecoilValue(institutionsState);
+  const validInfo = validFirstname && validlastname && validEmail && nameFromInstitutionSelected;
 
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
-      let instructorDoc = await firebase.db.collection("instructors").doc(instructorId).get();
-      const instructorData = instructorDoc.data();
       const project = "OnlineCommunities";
       setProject(project);
-      setEmail(instructorData.email);
-      const _email = instructorData.email;
       const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs(projSp.data());
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
       for (let researcherDoc of researcherDocs.docs) {
-        if (researcherDoc.id === instructorDoc.id) {
-          navigate("/Activities/Experiments");
-          return;
-        }
         const researcherData = researcherDoc.data();
         // We only need the researchers who are active in the project that the user belongs to.
         if (
@@ -104,7 +100,6 @@ const ScheduleInstructorPage = props => {
         .where("month", "in", scheduleMonths)
         .where("project", "==", project)
         .get();
-
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
 
@@ -148,7 +143,7 @@ const ScheduleInstructorPage = props => {
           if (
             event.attendees &&
             event.attendees.length > 0 &&
-            event.attendees.findIndex(attendee => attendee.email === _email) !== -1
+            event.attendees.findIndex(attendee => attendee.email === email) !== -1
           ) {
             setParticipatedBefore(true);
             return;
@@ -163,12 +158,12 @@ const ScheduleInstructorPage = props => {
           event.attendees &&
           event.attendees.length > 0 &&
           startTime in availSessions &&
-          event.attendees.findIndex(attendee => attendee.email === _email) === -1 &&
+          event.attendees.findIndex(attendee => attendee.email === email) === -1 &&
           events.findIndex(
             eve =>
               new Date(eve.start.dateTime).getTime() === startMinus30Min.getTime() &&
               new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 === new Date(eve.end.dateTime).getTime() &&
-              eve.attendees.includes(_email)
+              eve.attendees.includes(email)
           ) === -1
         ) {
           for (let attendee of event.attendees) {
@@ -184,8 +179,9 @@ const ScheduleInstructorPage = props => {
           }
         }
       }
+
       setAvailableSessions(availSessions);
-      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", _email.toLowerCase()).get();
+      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
       const sch = [];
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
@@ -209,7 +205,7 @@ const ScheduleInstructorPage = props => {
     if (firebase) {
       loadSchedule();
     }
-  }, [firebase]);
+  }, [firebase, email]);
 
   const confirmClickOpen = event => {
     setOpenConfirm(true);
@@ -234,9 +230,11 @@ const ScheduleInstructorPage = props => {
         sessions,
         project: "OnlineCommunities",
         surveyType: "instructor",
-        instructorId,
         email,
-        unknown: false
+        firstname,
+        lastname,
+        institution: nameFromInstitutionSelected.name,
+        unknown: true
       });
       errorAlert(responseObj.data);
 
@@ -315,6 +313,57 @@ const ScheduleInstructorPage = props => {
     }
     return str;
   };
+  useEffect(() => {
+    setValidEmail(isEmail(email));
+  }, [email]);
+  useEffect(() => {
+    setValidFirstname(firstname.length > 1 && firstname.slice(-1) !== " ");
+  }, [firstname]);
+
+  useEffect(() => {
+    setValidlastname(lastname.length > 1 && lastname.slice(-1) !== " ");
+  }, [lastname]);
+
+  const firstnameChange = event => {
+    let fName = event.target.value;
+    fName = fName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
+    setFirstname(fName);
+  };
+
+  const lastnameChange = event => {
+    let lName = event.target.value;
+    lName = lName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
+    setLastname(lName);
+  };
+  const emailChange = event => {
+    setEmail(event.target.value.toLowerCase());
+  };
+
+  useEffect(() => {
+    const checkEmailInstitution = async () => {
+      try {
+        const domainName = email.match("@(.+)$")?.[0];
+        if (!domainName) return;
+        const institutionDoc = await dbOne
+          .collection("institutions")
+          .where("domains", "array-contains", domainName)
+          .limit(1)
+          .get();
+        if (institutionDoc && institutionDoc.docs.length > 0) {
+          const institutionData = institutionDoc.docs[0].data();
+          setNameFromInstitutionSelected(institutionData);
+          return institutionData;
+        } else {
+          setNameFromInstitutionSelected({});
+        }
+      } catch (err) {
+        console.log("err", err);
+      }
+    };
+    checkEmailInstitution();
+  }, [email]);
+
+
 
   if (isSubmitting) return <LoadingPage project={project} />;
   return (
@@ -374,6 +423,59 @@ const ScheduleInstructorPage = props => {
                 </ul>
               </Alert>
             )}
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: "15px", mb: "15px" }}>
+              <Paper
+                elevation={5}
+                style={{ padding: "20px", border: "1px solid rgba(0, 0, 0, 0.2)", borderRadius: "4px" }}
+              >
+                <Alert severity="info">
+                  {" "}
+                  Enter your name and email address below. We will use this information to send you a Google Calendar
+                </Alert>
+                <ValidatedInput
+                  className="PleaseSpecify"
+                  label="Firstname"
+                  onChange={firstnameChange}
+                  name="firstname"
+                  value={firstname}
+                  errorMessage={validFirstname ? null : "Please enter your firstname!"}
+                />
+                <ValidatedInput
+                  className="PleaseSpecify"
+                  label="lastname"
+                  onChange={lastnameChange}
+                  name="lastname"
+                  value={lastname}
+                  errorMessage={validlastname ? null : "Please enter your lastname!"}
+                />
+                <ValidatedInput
+                  className="PleaseSpecify"
+                  label="Email address"
+                  onChange={emailChange}
+                  name="email"
+                  value={email}
+                  errorMessage={validEmail ? null : "Please enter your valid email address!"}
+                />
+                <Autocomplete
+                  id="institution"
+                  value={nameFromInstitutionSelected}
+                  options={institutions}
+                  onChange={(_, value) => setNameFromInstitutionSelected(value || null)}
+                  renderInput={params => (
+                    <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />
+                  )}
+                  getOptionLabel={option => (option.name ? option.name : "")}
+                  renderOption={(props, option) => (
+                    <li key={option.id} {...props}>
+                      {option.name}
+                    </li>
+                  )}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  fullWidth
+                  sx={{ mb: "16px" }}
+                />
+              </Paper>
+            </Box>
             {scheduleLoaded ? (
               <>
                 <Box
@@ -400,9 +502,11 @@ const ScheduleInstructorPage = props => {
                 <Box id="SignBtnContainer">
                   <Button
                     onClick={confirmClickOpen}
-                    className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
+                    className={
+                      submitable && !isSubmitting && validInfo ? "Button SubmitButton" : "Button SubmitButton Disabled"
+                    }
                     variant="contained"
-                    disabled={submitable && !isSubmitting ? null : true}
+                    disabled={submitable && !isSubmitting && validInfo ? null : true}
                   >
                     Schedule
                   </Button>
