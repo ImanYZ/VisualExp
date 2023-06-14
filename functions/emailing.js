@@ -507,7 +507,11 @@ exports.inviteInstructors = async context => {
       if (instructor.hasOwnProperty("emailNumber")) {
         randomNumber = instructor.emailNumber;
       }
-      const mailOptions = instMailOptions(email, topic, prefix, lastname, instructor.id, randomNumber);
+      let introducedBy = false;
+      if (instructor.hasOwnProperty("introducedBy")) {
+        introducedBy = instructor.introducedBy;
+      }
+      const mailOptions = instMailOptions(email, topic, prefix, lastname, instructor.id, introducedBy, randomNumber);
       const emailRef = db.collection("emails").doc();
       await batchSet(emailRef, {
         mailOptions,

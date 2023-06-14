@@ -1,8 +1,8 @@
 const { generateUID, capitalizeFirstLetter } = require("./utils");
 const { ImanSignatureHTML } = require("./emailSignature");
 
-exports.instMailOptions = (email, topic, prefix, lastname, instructorId, random) => {
-  if (random === 0) {
+exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introducedBy, random) => {
+  if (random === 0 && !introducedBy) {
     return {
       from: process.env.EMAIL,
       to: email,
@@ -50,10 +50,14 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, random)
   return {
     from: process.env.EMAIL,
     to: email,
+    cc: introducedBy.email,
     subject: `Request to Interview for NSF I-Corps Program to Improve Teaching and Learning in  ${topic}`,
-    html: `
-          <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
-            <p>My name is Iman YeckehZaare, a PhD candidate at the University of Michigan, School of Information.I’m part of an NSF I-Corps  program where we are investigating difficulties that instructors experience in college education. I’d highly appreciate it if you could give me 30 minutes of your time to interview you about your experience and challenges as an instructor this past academic year.</p>
+    html:
+      `
+          <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>` + introducedBy
+        ? `<p>Dr. ${introducedBy.fullname} has introduced you to me.</p>`
+        : "" +
+          `<p>My name is Iman YeckehZaare, a PhD candidate at the University of Michigan, School of Information.I’m part of an NSF I-Corps  program where we are investigating difficulties that instructors experience in college education. I’d highly appreciate it if you could give me 30 minutes of your time to interview you about your experience and challenges as an instructor this past academic year.</p>
             <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
             <ul>
               <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
