@@ -14,7 +14,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useNavigate, useParams } from "react-router-dom";
-import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
+import { firebaseState, emailState } from "../../store/AuthAtoms";
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
 import RouterNav from "../../Components/RouterNav/RouterNav";
