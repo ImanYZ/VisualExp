@@ -1126,7 +1126,9 @@ exports.remindCalendarInvitations = async context => {
                 } else {
                   participant.thirdDone = false;
                 }
-
+                if (userData.hasOwnProperty("surveyType")) {
+                  participant.surveyType = userData.surveyType;
+                }
                 // For project OnlineCommunities (survey) we will not have firstDone field in the participant
                 // So if they missed they attended the first session  that means
                 // the schedule object should have a attended field
@@ -1141,7 +1143,8 @@ exports.remindCalendarInvitations = async context => {
                     participant.email,
                     participant.firstname,
                     hoursLeft,
-                    attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
+                    attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
+                    participant
                   );
                 } else if (order === "3rd" && !participant.secondDone) {
                   // If it's their 3rd session, but they did not complete their 2nd session:
