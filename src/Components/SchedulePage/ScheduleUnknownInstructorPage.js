@@ -66,11 +66,11 @@ const ScheduleInstructorPage = props => {
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
-      setScheduleLoaded(false);
       const project = "OnlineCommunities";
       setProject(project);
       const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs(projSp.data());
+      setScheduleLoaded(false);
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
       for (let researcherDoc of researcherDocs.docs) {
@@ -168,12 +168,14 @@ const ScheduleInstructorPage = props => {
           for (let attendee of event.attendees) {
             if (!researchers[attendee.email]) continue;
             if (availSessions.hasOwnProperty(startTime)) {
-              availSessions[startTime] = availSessions[startTime].filter(
-                resea => resea !== researchers[attendee.email]
-              );
+              delete availSessions[startTime];
+              // availSessions[startTime] = availSessions[startTime].filter(
+              //   resea => resea !== researchers[attendee.email]
+              // );
             }
             if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
-              availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
+              delete availSessions[endTime];
+              // availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
             }
           }
         }
@@ -233,7 +235,6 @@ const ScheduleInstructorPage = props => {
         firstname,
         lastname,
         institution: nameFromInstitutionSelected.name,
-        unknown: true
       });
       errorAlert(responseObj.data);
 
@@ -363,7 +364,6 @@ const ScheduleInstructorPage = props => {
   }, [email]);
 
 
-
   if (isSubmitting) return <LoadingPage project={project} />;
   return (
     <>
@@ -402,8 +402,13 @@ const ScheduleInstructorPage = props => {
               <ul id="WarningPoints">
                 <li>
                   {" "}
-                  Please specify your availability {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs.sessionDuration[0], 0)} introduction and
-                  interview session
+                  Please specify your availability{" "}
+                  {formatSlotTime(
+                    projectSpecs.hourlyChunks,
+                    projectSpecs.sessionDuration ? projectSpecs.sessionDuration[0] : 2,
+                    0
+                  )}{" "}
+                  introduction and interview session
                 </li>
                 <li>
                   There is no researcher available to take the time slots labeled with UNAVBL! You can only take the
@@ -429,7 +434,8 @@ const ScheduleInstructorPage = props => {
               >
                 <Alert severity="info">
                   {" "}
-                  Enter your name and email address below. We will use this information to send you a Google Calendar invitation.
+                  Enter your name and email address below. We will use this information to send you a Google Calendar
+                  invitation.
                 </Alert>
                 <ValidatedInput
                   className="PleaseSpecify"

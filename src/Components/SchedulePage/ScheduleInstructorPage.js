@@ -52,6 +52,8 @@ const ScheduleInstructorPage = props => {
   const [submitted, setSubmitted] = useState(false);
   const [project, setProject] = useRecoilState(projectState);
   const [projectSpecs, setProjectSpecs] = useState({});
+  const [instData, setInstData] = useState({});
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +71,7 @@ const ScheduleInstructorPage = props => {
       const project = "OnlineCommunities";
       setProject(project);
       setEmail(instructorData.email);
+      setInstData(instructorData);
       const _email = instructorData.email;
       const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs(projSp.data());
@@ -174,12 +177,14 @@ const ScheduleInstructorPage = props => {
           for (let attendee of event.attendees) {
             if (!researchers[attendee.email]) continue;
             if (availSessions.hasOwnProperty(startTime)) {
-              availSessions[startTime] = availSessions[startTime].filter(
-                resea => resea !== researchers[attendee.email]
-              );
+              delete availSessions[startTime];
+              // availSessions[startTime] = availSessions[startTime].filter(
+              //   resea => resea !== researchers[attendee.email]
+              // );
             }
             if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
-              availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
+              delete availSessions[endTime];
+              // availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
             }
           }
         }
@@ -236,7 +241,9 @@ const ScheduleInstructorPage = props => {
         surveyType: "instructor",
         instructorId,
         email,
-        unknown: false
+        firstname: instData.firstname,
+        lastname: instData.lastname,
+        institution: instData.institution
       });
       errorAlert(responseObj.data);
 
@@ -355,8 +362,12 @@ const ScheduleInstructorPage = props => {
                 <li>
                   {" "}
                   Please specify your availability{" "}
-                  {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs.sessionDuration[0], 0)} introduction and
-                  interview session
+                  {formatSlotTime(
+                    projectSpecs.hourlyChunks,
+                    projectSpecs.sessionDuration ? projectSpecs.sessionDuration[0] : 2,
+                    0
+                  )}{" "}
+                  introduction and interview session
                 </li>
                 <li>
                   There is no researcher available to take the time slots labeled with UNAVBL! You can only take the
