@@ -66,12 +66,10 @@ const ScheduleInstructorPage = props => {
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
-      console.log("projSp called");
       const project = "OnlineCommunities";
       setProject(project);
       const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs(projSp.data());
-      console.log("projSp", projSp);
       setScheduleLoaded(false);
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
@@ -365,7 +363,7 @@ const ScheduleInstructorPage = props => {
     checkEmailInstitution();
   }, [email]);
 
-  console.log(projectSpecs.sessionDuration);
+
   if (isSubmitting) return <LoadingPage project={project} />;
   return (
     <>
