@@ -354,7 +354,8 @@ const ScheduleInstructorPage = props => {
               <ul id="WarningPoints">
                 <li>
                   {" "}
-                  Please specify your availability {formatSlotTime(projectSpecs.hourlyChunks, 1, 0)} introduction and
+                  Please specify your availability{" "}
+                  {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs.sessionDuration[0], 0)} introduction and
                   interview session
                 </li>
                 <li>
@@ -393,7 +394,7 @@ const ScheduleInstructorPage = props => {
                     setSubmitable={setSubmitable}
                     numberOfSessions={1}
                     hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
-                    sessionDuration={[1]}
+                    sessionDuration={projectSpecs.sessionDuration}
                     daysLater={projectSpecs.daysLater || AppConfig.daysLater}
                   />
                 </Box>
