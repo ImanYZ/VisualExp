@@ -749,19 +749,18 @@ exports.scheduleInstructors = async (req, res) => {
       });
       const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
       if (usersServeyDocs.docs.length === 0) {
-        const instuctorsData = instructorsDocs.docs[0].data();
-        const fullName = await getAvailableFullname(`${instuctorsData.firstname} ${instuctorsData.lastname}`);
+        const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
         const userSurevyRef = db.collection("usersSurvey").doc(fullName);
         batch.set(userSurevyRef, {
           email: email,
           project,
           scheduled: true,
-          institution: instuctorsData.institution,
+          institution: institution,
           instructorId: instructorId,
-          firstname: instuctorsData.firstname,
+          firstname: firstname,
           uid: "",
           surveyType: "instructor",
-          lastname: instuctorsData.lastname,
+          lastname: lastname,
           noRetaineData: false,
           createdAt: Timestamp.fromDate(new Date())
         });
