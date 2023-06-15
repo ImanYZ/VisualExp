@@ -29,7 +29,8 @@ const {
   updateThematicCode,
   deleteThematicCode,
   notifyApplicationStatus,
-  recordAudio
+  recordAudio,
+  submitThematic
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -155,6 +156,7 @@ app.post("/retrieveEvents", retrieveEvents);
 app.post("/markEntreviewAttended", markEntreviewAttended);
 app.post("/checkEntreviewStatus", checkEntreviewStatus);
 app.post("/recordAudio", recordAudio);
+app.post("/submitThematic", submitThematic);
 // Knowledge endpoints
 
 // Misinformation Experiment

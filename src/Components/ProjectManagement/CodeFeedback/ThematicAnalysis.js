@@ -499,32 +499,13 @@ const ThematicAnalysis = props => {
           delete _codesBook[sentence];
         }
       }
-      const thematicDocs = await firebase.db
-        .collection("thematicAnalysis")
-        .where("transcriptId", "==", transcriptId)
-        .where("researcher", "==", fullname)
-        .get();
-      if (thematicDocs.docs.length > 0) {
-        thematicDocs.docs[0].ref.update({
-          codesBook: _codesBook,
-          updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
-        });
-      } else {
-        const ref = firebase.db.collection("thematicAnalysis").doc();
-        ref.set({
-          project,
-          codesBook: _codesBook,
-          transcriptId,
-          researcher: fullname,
-          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-          surveyType,
-          participant: listOfTranscript.find(transcript => transcript.id === transcriptId).participant
-        });
-      }
-      const trabscriptionRef = firebase.db.collection("transcript").doc(transcriptId);
-
-      await trabscriptionRef.update({
-        coders: firebase.firestore.FieldValue.arrayUnion(fullname)
+      await axios.post("/submitThematic", {
+        codesBook: _codesBook,
+        transcriptId,
+        fullname,
+        surveyType,
+        participant: listOfTranscript.find(transcript => transcript.id === transcriptId).participant,
+        project: "OnlineCommunities"
       });
       const _listOfTranscript = [...listOfTranscript].filter(transcript => transcript.id !== transcriptId);
       setListOfTranscript(_listOfTranscript);
@@ -539,9 +520,10 @@ const ThematicAnalysis = props => {
         setCodesBook({});
         setSurveyType("");
       }
-      setSubmitting(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
