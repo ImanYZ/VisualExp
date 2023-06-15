@@ -4,13 +4,7 @@ const moment = require("moment");
 require("dotenv").config();
 const { Timestamp } = require("firebase-admin/firestore");
 
-const {
-  insertEvent,
-  getEvents,
-  deleteEvent,
-  getLifeLogEvents,
-  insertLifeLogEvent
-} = require("./GoogleCalendar");
+const { insertEvent, getEvents, deleteEvent, getLifeLogEvents, insertLifeLogEvent } = require("./GoogleCalendar");
 
 const { pad2Num, capitalizeFirstLetter } = require("./utils");
 const { toOrdinal } = require("number-to-words");
@@ -509,7 +503,7 @@ const getfutureEvents = async nextDays => {
 
 exports.scheduleInstructors = async (req, res) => {
   try {
-    let { sessions, project, surveyType, instructorId, email, firstname, lastname, institution, unknown } = req.body;
+    let { sessions, project, surveyType, email, firstname, lastname, institution } = req.body;
     const batch = db.batch();
 
     sessions.sort((a, b) => (a < b ? -1 : 1)); // asc sorting
@@ -620,10 +614,12 @@ exports.scheduleInstructors = async (req, res) => {
         for (let attendee of event.attendees) {
           if (!researchers[attendee.email]) continue;
           if (availSessions.hasOwnProperty(startTime)) {
-            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+            delete availSessions[startTime];
+            // availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
           }
           if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
-            availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
+            delete availSessions[endTime];
+            // availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
           }
         }
       }
@@ -703,104 +699,74 @@ exports.scheduleInstructors = async (req, res) => {
       });
     }
     if (project === "OnlineCommunities") {
-      if (unknown) {
-        const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
-        let instructorId = "";
-        if (instructorsDocs.docs.length === 0) {
-          const newInstructor = {
-            website: "",
-            prefix: "Prof",
-            firstname,
-            lastname,
-            email,
-            country: "🇺🇸 United States;US",
-            stateInfo: "",
-            city: "",
-            institution,
-            scraped: false,
-            createdAt: new Date(),
-            interestedTopic: "",
-            project: "H1L2",
-            fullname: "Iman YeckehZaare",
-            no: false,
-            yes: false,
-            deleted: false,
-            scheduled: true,
-            reminders: 0
-          };
-          const instructorRef = db.collection("instructors").doc();
-          batch.set(instructorRef, newInstructor);
-          instructorId = instructorRef.id;
-        } else {
-          instructorId = instructorsDocs.docs[0].id;
-          batch.update(instructorsDocs.docs[0].ref, {
-            scheduled: true
-          });
-        }
-        const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
+      const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
+      let instructorId = "";
+      if (instructorsDocs.docs.length === 0) {
+        const newInstructor = {
+          website: "",
+          prefix: "Prof",
+          firstname,
+          lastname,
+          email,
+          country: "🇺🇸 United States;US",
+          stateInfo: "",
+          city: "",
+          institution,
+          scraped: false,
+          createdAt: new Date(),
+          interestedTopic: "",
+          project: "H1L2",
+          fullname: "Iman YeckehZaare",
+          no: false,
+          yes: false,
+          deleted: false,
+          scheduled: true,
+          reminders: 0
+        };
+        const instructorRef = db.collection("instructors").doc();
+        batch.set(instructorRef, newInstructor);
+        instructorId = instructorRef.id;
+      } else {
+        instructorId = instructorsDocs.docs[0].id;
+        batch.update(instructorsDocs.docs[0].ref, {
+          scheduled: true
+        });
+      }
+      const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
+      const userSurevyRef = db.collection("usersSurvey").doc(fullName);
+      batch.set(userSurevyRef, {
+        email: email,
+        project,
+        scheduled: true,
+        institution: institution,
+        instructorId: instructorId,
+        firstname: firstname,
+        uid: "",
+        surveyType: "instructor",
+        lastname: lastname,
+        noRetaineData: false,
+        createdAt: Timestamp.fromDate(new Date())
+      });
+      const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
+      if (usersServeyDocs.docs.length === 0) {
+        const instuctorsData = instructorsDocs.docs[0].data();
+        const fullName = await getAvailableFullname(`${instuctorsData.firstname} ${instuctorsData.lastname}`);
         const userSurevyRef = db.collection("usersSurvey").doc(fullName);
         batch.set(userSurevyRef, {
           email: email,
           project,
           scheduled: true,
-          institution: institution,
+          institution: instuctorsData.institution,
           instructorId: instructorId,
-          firstname: firstname,
+          firstname: instuctorsData.firstname,
           uid: "",
           surveyType: "instructor",
-          lastname: lastname,
+          lastname: instuctorsData.lastname,
           noRetaineData: false,
           createdAt: Timestamp.fromDate(new Date())
         });
-      } else {
-        const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
-        const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
-        if (instructorsDocs.docs.length > 0) {
-          batch.update(instructorsDocs.docs[0].ref, {
-            scheduled: true
-          });
-          if (usersServeyDocs.docs.length === 0) {
-            const instuctorsData = instructorsDocs.docs[0].data();
-            const fullName = await getAvailableFullname(`${instuctorsData.firstname} ${instuctorsData.lastname}`);
-            const userSurevyRef = db.collection("usersSurvey").doc(fullName);
-            batch.set(userSurevyRef, {
-              email: email,
-              project,
-              scheduled: true,
-              institution: instuctorsData.institution,
-              instructorId: instructorId,
-              firstname: instuctorsData.firstname,
-              uid: "",
-              surveyType: "instructor",
-              lastname: instuctorsData.lastname,
-              noRetaineData: false,
-              createdAt: Timestamp.fromDate(new Date())
-            });
-          }
-        }
-        if (usersServeyDocs.docs.length === 0 && instructorsDocs.docs.length === 0) {
-          const usersDocs = await db.collection("users").where("email", "==", email).get();
-          if (usersDocs.docs.length > 0) {
-            const userSurevyRef = db.collection("usersSurvey").doc(usersDocs.docs[0].id);
-            const userData = usersDocs.docs[0].data();
-            batch.set(userSurevyRef, {
-              email: email,
-              project,
-              scheduled: true,
-              institution: userData.institution,
-              instructorId: "student",
-              firstname: userData.firstname,
-              uid: userData.uid,
-              surveyType: "student",
-              lastname: userData.lastname,
-              noRetaineData: false,
-              createdAt: Timestamp.fromDate(new Date())
-            });
-          }
-        }
       }
     }
-
     await batch.commit();
     return res.status(200).json({ message: "Sessions successfully scheduled" });
   } catch (err) {
