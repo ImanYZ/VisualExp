@@ -1754,3 +1754,81 @@ exports.recordAudio = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.submitThematic = async (req, res) => {
+  try {
+    const { codesBook, transcriptId, fullname, surveyType, participant, project } = req.body;
+    await db.runTransaction(async t => {
+      const reaserchersPoints = {};
+      const themathicDocs = await t.get(db.collection("thematicAnalysis").where("transcriptId", "==", transcriptId));
+      const reaserchers = {};
+      const reaserchersDocs = await t.get(db.collection("researchers"));
+      const thematicDocs = await t.get(
+        db.collection("thematicAnalysis").where("transcriptId", "==", transcriptId).where("researcher", "==", fullname)
+      );
+      reaserchersDocs.docs.forEach(doc => {
+        if (doc.data().projects && doc.data().projects.hasOwnProperty(project)) {
+          reaserchers[doc.id] = doc.data();
+        }
+      });
+      for (let doc of themathicDocs.docs) {
+        const data = doc.data();
+        const selectedCodes = [...new Set(Object.values(doc.data().codesBook).flatMap(x => x))];
+        selectedCodes.forEach(code => {
+          if (reaserchersPoints.hasOwnProperty(code)) {
+            reaserchersPoints[code].push(data.researcher);
+          } else {
+            reaserchersPoints[code] = [data.researcher];
+          }
+        });
+        if (data.researcher in reaserchersPoints) {
+          reaserchersPoints[data.researcher] += 1;
+        } else {
+          reaserchersPoints[data.researcher] = 1;
+        }
+      }
+      const selectedCodes = [...new Set(Object.values(codesBook).flatMap(x => x))];
+      selectedCodes.forEach(code => {
+        if (reaserchersPoints.hasOwnProperty(code)) {
+          reaserchersPoints[code].push(fullname);
+        } else {
+          reaserchersPoints[code] = [fullname];
+        }
+      });
+      for (let code in reaserchersPoints) {
+        if (reaserchersPoints[code].length >= 3) {
+          for (let researcher of reaserchersPoints[code]) {
+            const resRef = db.collection("researchers").doc(researcher);
+            reaserchers[researcher].projects[project].positiveCodingPoints += 0.04;
+            t.update(resRef, reaserchers[researcher]);
+          }
+        }
+      }
+      if (thematicDocs.docs.length > 0) {
+        t.update(thematicDocs.docs[0].ref, {
+          codesBook: codesBook,
+          updatedAt: Timestamp.fromDate(new Date())
+        });
+      } else {
+        const ref = db.collection("thematicAnalysis").doc();
+        t.set(ref, {
+          project,
+          codesBook: codesBook,
+          transcriptId,
+          researcher: fullname,
+          createdAt: Timestamp.fromDate(new Date()),
+          surveyType,
+          participant
+        });
+      }
+      const trabscriptionRef = db.collection("transcript").doc(transcriptId);
+      t.update(trabscriptionRef, {
+        coders: FieldValue.arrayUnion(fullname)
+      });
+    });
+    res.status(200).send({ message: "success" });
+  } catch (error) {
+    res.status(500).send({ message: "error" });
+    console.log(error);
+  }
+};

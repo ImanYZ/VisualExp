@@ -14,7 +14,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
-import { useParams } from "react-router-dom";
 import { firebaseState, emailState, institutionsState } from "../../store/AuthAtoms";
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
@@ -430,7 +429,7 @@ const ScheduleInstructorPage = props => {
               >
                 <Alert severity="info">
                   {" "}
-                  Enter your name and email address below. We will use this information to send you a Google Calendar
+                  Enter your name and email address below. We will use this information to send you a Google Calendar invitation.
                 </Alert>
                 <ValidatedInput
                   className="PleaseSpecify"
