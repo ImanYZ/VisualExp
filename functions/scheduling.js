@@ -539,7 +539,7 @@ exports.scheduleInstructors = async (req, res) => {
     }
 
     const projectSpecsData = projectSpecs.data();
-    projectSpecsData.sessionDuration = [1];
+
     // 1 hour / 2 = 30 mins
     const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
