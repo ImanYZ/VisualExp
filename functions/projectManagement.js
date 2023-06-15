@@ -1004,7 +1004,7 @@ exports.remindCalendarInvitations = async context => {
                         participant.email,
                         participant.firstname,
                         hoursLeft,
-                        attendee.responseStatus === "declined", 
+                        attendee.responseStatus === "declined",
                         userData
                       );
                     } else if (
@@ -1763,6 +1763,9 @@ exports.submitThematic = async (req, res) => {
     const { codesBook, transcriptId, fullname, surveyType, participant, project } = req.body;
     await db.runTransaction(async t => {
       const reaserchersPoints = {};
+      const trabscriptionRef = db.collection("transcript").doc(transcriptId);
+      const transcriptDoc = await t.get(trabscriptionRef);
+      const transcriptData = transcriptDoc.data();
       const themathicDocs = await t.get(db.collection("thematicAnalysis").where("transcriptId", "==", transcriptId));
       const reaserchers = {};
       const reaserchersDocs = await t.get(db.collection("researchers"));
@@ -1807,6 +1810,13 @@ exports.submitThematic = async (req, res) => {
           }
         }
       }
+      if (transcriptData.hasOwnProperty("coders") || !transcriptData.coders.includes(fullname)) {
+        if (reaserchers[fullname].projects[project].hasOwnProperty("codingNum")) {
+          reaserchers[fullname].projects[project].codingNum += 1;
+        } else {
+          reaserchers[fullname].projects[project].codingNum = 1;
+        }
+      }
       if (thematicDocs.docs.length > 0) {
         t.update(thematicDocs.docs[0].ref, {
           codesBook: codesBook,
@@ -1824,7 +1834,7 @@ exports.submitThematic = async (req, res) => {
           participant
         });
       }
-      const trabscriptionRef = db.collection("transcript").doc(transcriptId);
+
       t.update(trabscriptionRef, {
         coders: FieldValue.arrayUnion(fullname)
       });
