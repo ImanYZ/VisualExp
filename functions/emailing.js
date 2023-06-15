@@ -284,7 +284,7 @@ exports.inviteAdministrators = async context => {
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
     const administratorDocs = await db.collection("administrators").get();
-    const emailsDocs = await db.collection("emails").get();
+    const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
     const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
     for (let administratorDoc of administratorDocs.docs) {
       const administratorData = administratorDoc.data();
@@ -483,7 +483,7 @@ exports.inviteInstructors = async context => {
       .where("scheduled", "==", false)
       .where("deleted", "==", false)
       .get();
-    const emailsDocs = await db.collection("emails").get();
+    const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
     const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
     const instructors = instructorDocs.docs
       .map(instructorDoc => {
@@ -945,6 +945,13 @@ exports.sendEventNotificationEmail = (req, res) => {
 
 const participantNotificationEmail = async (email, firstname, hoursLeft, declined, participant) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("sent", "==", false)
+      .where("reason", "==", "participantNotificationEmail")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const scheduleDocs = await db.collection("schedule").where("email", "==", email).get();
     for (let scheduleDoc of scheduleDocs.docs) {
@@ -1041,6 +1048,7 @@ exports.emailCommunityLeader = async (email, firstname, communiId, applicants) =
     const emailOnProgress = await db
       .collection("emails")
       .where("email", "==", email)
+      .where("sent", "==", false)
       .where("reason", "==", "emailCommunityLeader")
       .get();
     if (emailOnProgress.docs.length > 0) return;
@@ -1137,6 +1145,7 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
     const emailOnProgress = await db
       .collection("emails")
       .where("email", "==", email)
+      .where("sent", "==", false)
       .where("reason", "==", "emailApplicationStatus")
       .get();
     if (emailOnProgress.docs.length > 0) return;
@@ -1180,6 +1189,7 @@ exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, pr
     const emailOnProgress = await db
       .collection("emails")
       .where("email", "==", email)
+      .where("sent", "==", false)
       .where("reason", "==", "remindResearcherToSpecifyAvailability")
       .get();
     if (emailOnProgress.docs.length > 0) return;
@@ -1219,7 +1229,7 @@ exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, pr
 
 exports.sendingEmails = async context => {
   try {
-    const emailsDocs = await db.collection("emails").get();
+    const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
     let emails = emailsDocs.docs.map(doc => {
       return { ...doc.data(), id: doc.id };
     });
@@ -1269,7 +1279,10 @@ exports.sendingEmails = async context => {
                 });
               }
             }
-            await emailRef.delete();
+            await emailRef.update({
+              sent: true,
+              sentAt: Timestamp.fromDate(new Date())
+            });
           }
         });
         // We don't want to send many emails at once, because it may drive Gmail crazy.
