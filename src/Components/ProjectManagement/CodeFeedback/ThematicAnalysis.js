@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
 import { Grid, Box } from "@mui/material";
@@ -161,6 +161,7 @@ const ThematicAnalysis = props => {
     if (!thematicAnalysisChanges.length) return;
     for (let change of thematicAnalysisChanges) {
       const data = change.doc.data();
+      if (data.hasOwnProperty("ignore") && data.ignore) continue;
       const id = data.transcriptId;
       const createdAt = moment(new Date(data.createdAt.toDate())).format("MMM DD YYYY HH:mm");
       if (change.type === "added") {
