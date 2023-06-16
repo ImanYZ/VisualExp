@@ -1,5 +1,5 @@
 const { admin, db, storage, batchUpdate, batchSet, commitBatch } = require("./admin");
-
+const { ImanSignatureHTML } = require("./emailSignature");
 const { Timestamp, FieldValue } = require("firebase-admin/firestore");
 const { delay } = require("./helpers/common");
 const nodemailer = require("nodemailer");
@@ -999,7 +999,7 @@ ${
 </p>
 <p></p>
 <p>Best regards,</p>
-` + signatureHTML
+` + (isInstructor ? ImanSignatureHTML : signatureHTML)
     };
     const urgetEmail = db.collection("emails").doc();
     await urgetEmail.set({
