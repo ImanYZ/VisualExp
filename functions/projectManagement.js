@@ -1129,6 +1129,9 @@ exports.remindCalendarInvitations = async context => {
                 if (userData.hasOwnProperty("surveyType")) {
                   participant.surveyType = userData.surveyType;
                 }
+                if (userData.hasOwnProperty("instructorId")) {
+                  participant.instructorId = userData.instructorId;
+                }
                 // For project OnlineCommunities (survey) we will not have firstDone field in the participant
                 // So if they missed they attended the first session  that means
                 // the schedule object should have a attended field
