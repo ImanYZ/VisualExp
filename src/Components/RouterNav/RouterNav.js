@@ -965,9 +965,9 @@ const RouterNav = props => {
                     >
                       {projectPoints.commentsPoints ? (
                         <Tooltip
-                          title={`You've coded ${
-                            codingNums[fullname]?.num || 0
-                          } explanations.Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                          title={`You've coded ${codingNums[fullname]?.num || 0} ${
+                            project === "OnlineCommunities" ? `transcripts` : `explanations`
+                          }.Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
                         >
                           <Box># of 💬 :</Box>
                         </Tooltip>
