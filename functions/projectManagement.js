@@ -1805,7 +1805,7 @@ exports.submitThematic = async (req, res) => {
         if (reaserchersPoints[code].length >= 3) {
           for (let researcher of reaserchersPoints[code]) {
             const resRef = db.collection("researchers").doc(researcher);
-            reaserchers[researcher].projects[project].positiveCodingPoints += 0.04;
+            reaserchers[researcher].projects[project].positiveCodingPoints += 0.4;
             t.update(resRef, reaserchers[researcher]);
           }
         }
