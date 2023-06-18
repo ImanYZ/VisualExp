@@ -489,10 +489,8 @@ const ThematicAnalysis = props => {
     setNewCode("");
     setCreating(false);
   };
-
   const handleSubmit = async () => {
     try {
-      setCilckedCell(false);
       setSubmitting(true);
       const _codesBook = { ...codesBook };
       for (let sentence in _codesBook) {
@@ -505,7 +503,7 @@ const ThematicAnalysis = props => {
         transcriptId,
         fullname,
         surveyType,
-        participant: listOfTranscript.find(transcript => transcript.id === transcriptId).participant,
+        participant: allOfTranscript.find(transcript => transcript.id === transcriptId).participant,
         project: "OnlineCommunities"
       });
       const _listOfTranscript = [...listOfTranscript].filter(transcript => transcript.id !== transcriptId);
@@ -521,13 +519,18 @@ const ThematicAnalysis = props => {
         setCodesBook({});
         setSurveyType("");
       }
+      setSnackbarMessage("You successfully submitted your selection!");
+      setCilckedCell(false);
     } catch (error) {
+      setSnackbarMessage(
+        "There is some error while submitting your selection, please try again or talk to iman abou the issue!"
+      );
+      setSubmitting(false);
       console.log(error);
     } finally {
       setSubmitting(false);
     }
   };
-
   const handleCellClickTranscript = clickedCell => {
     const findTranscript = previousTranscipt.find(t => t.id === clickedCell.id);
     const findT = allOfTranscript.find(t => t.id === clickedCell.id);
