@@ -161,7 +161,7 @@ const processProject = async theProject => {
   for (let passageDoc of passageDocs.docs) {
     const passageData = passageDoc.data();
     passages[passageDoc.id] = passageData;
-    if (theProject in passageData.projects && passageData.title !== "The Quiet Sideman") {
+    if (theProject in passageData.projects) {
       usedPassages.push(passageDoc.id);
     }
   }
