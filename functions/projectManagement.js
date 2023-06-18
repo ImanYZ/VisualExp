@@ -1813,7 +1813,7 @@ exports.submitThematic = async (req, res) => {
           }
         }
       }
-      if (transcriptData.hasOwnProperty("coders") || !transcriptData.coders.includes(fullname)) {
+      if (!transcriptData.hasOwnProperty("coders") || !transcriptData.coders.includes(fullname)) {
         if (reaserchers[fullname].projects[project].hasOwnProperty("codingNum")) {
           reaserchers[fullname].projects[project].codingNum += 1;
         } else {
