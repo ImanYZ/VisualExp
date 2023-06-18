@@ -422,9 +422,9 @@ const processProject = async theProject => {
               : "";
           if (thirdDuration && thirdDuration > 5) {
             if (theProject === "H2K2") {
-              rowLong.push("After 1 Week");
-            } else {
-              rowLong.push("After 10 days");
+              row.push("After 1 Week");
+            }else{
+              row.push("After 10 days");
             }
             // row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
             row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
