@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 import PassageComponent from "./PassageComponent";
+import axios from "axios";
+import SnackbarComp from "../../SnackbarComp";
 
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import Select from "@mui/material/Select";
@@ -54,6 +56,7 @@ const ResearcherPassage = () => {
   const [deletingPhrase, setDeletingPhrase] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
   const email = useRecoilValue(emailState);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const editor = email === "oneweb@umich.edu";
 
@@ -87,15 +90,13 @@ const ResearcherPassage = () => {
         const pasageData = change.doc.data();
         let passageProjects = Object.keys(pasageData.projects);
         if (passageProjects.length !== 0) {
-
-            if (change.type === "modified") {
-              passags[titls.indexOf(pasageData.title)] = { ...pasageData };
-            } else {
-              passags.push({
-                ...pasageData
-              });
-              titls.push(pasageData.title);
-            
+          if (change.type === "modified") {
+            passags[titls.indexOf(pasageData.title)] = { ...pasageData };
+          } else {
+            passags.push({
+              ...pasageData
+            });
+            titls.push(pasageData.title);
           }
         }
       }
@@ -159,168 +160,67 @@ const ResearcherPassage = () => {
   const hundleUpdatePhrase = async event => {
     try {
       setUpdatingPhrase(true);
-      const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
-      const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-      const passageUpdate = passageDoc.docs[0].data();
-      passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
-
-      const recallGradesDoc = await firebase.db
-        .collection("recallGradesV2")
-        .where("passages", "array-contains", passageDoc.docs[0].id)
-        .get();
-
-      recallGradesDoc.docs.forEach(async recallDoc => {
-        let needUpdate = false;
-        const recallData = recallDoc.data();
-        let sessions = recallData.sessions;
-
-        for (let session in sessions) {
-          for (let conditionItem of sessions[session]) {
-            for (let phraseItem of conditionItem.phrases) {
-              needUpdate = true;
-              if (phraseItem.phrase === selectedPhrase) {
-                phraseItem.phrase = newPhrase;
-                if (phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
-                  delete phraseItem["GPT-4-Mentioned"];
-                  conditionItem.doneGPT4Mentioned = false;
-                }
-              }
-            }
-          }
-        }
-
-        const recallRef = firebase.db.collection("recallGradesV2").doc(recallDoc.id);
-        if (needUpdate) {
-          await recallRef.update({
-            sessions
-          });
-        }
-      });
-
-      await passageRef.update(passageUpdate);
+      await axios.post("/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase });
       handleCloseEditModal();
       setPassagesLoaded(false);
       setUpdatingPhrase(false);
+      setSnackbarMessage("Phrase updated successfully");
     } catch (error) {
       handleCloseEditModal();
       setPassagesLoaded(false);
       setUpdatingPhrase(false);
       console.log(error);
+      window.alert("There was an error updating the phrase");
     }
   };
 
   const handleDeletePhrase = async event => {
-    setDeletingPhrase(true);
-    let updateDocuments = [];
-    const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
-    let allowDelete = true;
-    let numberRecord = 0;
-
-    const recallGradesDoc = await firebase.db
-      .collection("recallGradesV2")
-      .where("passages", "array-contains", passageDoc.docs[0].id)
-      .get();
-
-    if (numberRecorded === 0) {
-      for (let recallDoc of recallGradesDoc.docs) {
-        const recallData = recallDoc.data();
-        let sessions = recallData.sessions;
-        for (let session in sessions) {
-          for (let conditionItem of sessions[session]) {
-            if (conditionItem.passage === passageDoc.docs[0].id) {
-              const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === selectedPhrase);
-              if (phraseIndex !== -1 && conditionItem.phrases[phraseIndex].hasOwnProperty("researchers")) {
-                console.log("researchers", conditionItem.phrases[phraseIndex].researchers);
-              }
-              if (
-                phraseIndex !== -1 &&
-                conditionItem.phrases[phraseIndex].hasOwnProperty("researchers") &&
-                conditionItem.phrases[phraseIndex].researchers.length > 0
-              ) {
-                if (!updateDocuments.includes(recallDoc.id)) {
-                  updateDocuments.push(recallDoc.id);
-                }
-                allowDelete = false;
-                numberRecord = numberRecord + 1;
-              }
-            }
-          }
-        }
+    try {
+      setDeletingPhrase(true);
+      const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
+      let numberRecord = 0;
+      let allowDelete = true;
+      if (numberRecorded === 0) {
+        const response = await axios.post("/calcultesRecallGradesRecords", {
+          passageId: passageDoc.docs[0].id,
+          selectedPhrase
+        });
+        numberRecord = response.data.numberRecord;
+        setNumberRecorded(numberRecord);
+        console.log(numberRecord);
+        allowDelete = numberRecord === 0;
       }
-    }
-    setNumberRecorded(numberRecord);
-
-    const oldPhrase = selectedPhrase;
-    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-    const passageUpdate = passageDoc.docs[0].data();
-    if (allowDelete) {
-      setNumberRecorded(0);
-      passageUpdate.phrases.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
-      if (passageUpdate.phrasesTypes) {
-        passageUpdate.phrasesTypes.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
+      if (allowDelete) {
+        setNumberRecorded(0);
+        await axios.post("/deletePhraseFromPassage", {
+          passageId: passageDoc.docs[0].id,
+          selectedPhrase
+        });
+        setPassagesLoaded(false);
+        handleCloseDeleteModal();
+        setSnackbarMessage("Phrase deleted successfully");
       }
-      if (passageUpdate.keys) {
-        delete passageUpdate.keys[oldPhrase];
-      }
-
-      for (let updateDoc of recallGradesDoc.docs) {
-        const recallRef = firebase.db.collection("recallGradesV2").doc(updateDoc.id);
-        const recallData = updateDoc.data();
-        let updateSessions = recallData.sessions;
-        let needUpdate = false;
-        for (let session in updateSessions) {
-          for (let conditionItem of updateSessions[session]) {
-            const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === selectedPhrase);
-            if (conditionItem.passage === passageDoc.docs[0].id && phraseIndex !== -1) {
-              needUpdate = true;
-              conditionItem.phrases.splice(phraseIndex, 1);
-            }
-          }
-        }
-        if (needUpdate) {
-          await recallRef.update({ sessions: updateSessions });
-        }
-      }
-      await passageRef.update(passageUpdate);
-      setPassagesLoaded(false);
+      setDeletingPhrase(false);
+    } catch (error) {
+      console.log(error);
+      window.alert("There was an error deleting the phrase");
       handleCloseDeleteModal();
+      setDeletingPhrase(true);
     }
-    setDeletingPhrase(false);
   };
 
   const handleAddNewPhrase = async () => {
-    const passageDoc = await firebase.db.collection("passages").where("title", "==", chosenPassage).get();
-    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-    const passageUpdate = passageDoc.docs[0].data();
-    passageUpdate.phrases.push(newPhraseAdded);
-
-    const recallGradesDoc = await firebase.db
-      .collection("recallGradesV2")
-      .where("passages", "array-contains", passageDoc.docs[0].id)
-      .get();
-
-    for (let recallDoc of recallGradesDoc.docs) {
-      let needUpdate = false;
-      const recallRef = firebase.db.collection("recallGradesV2").doc(recallDoc.id);
-      const recallData = recallDoc.data();
-      let updateSessions = recallData.sessions;
-      for (let session in updateSessions) {
-        for (let conditionItem of recallData.sessions[session]) {
-          needUpdate = true;
-          if (conditionItem.passage === passageDoc.docs[0].id) {
-            conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
-          }
-        }
-      }
-      if (needUpdate) {
-        await recallRef.update({ sessions: updateSessions });
-      }
+    try {
+      await axios.post("/addNewPhraseForPassage", { chosenPassage, newPhraseAdded });
+      handleCloseAddPhraseModal();
+      setPassagesLoaded(false);
+      setSubmtingNewPhrase(false);
+      setNewPhraseAdded("");
+      setSnackbarMessage("Phrase added successfully");
+    } catch (error) {
+      alert("There was an error adding the phrase");
+      setSubmtingNewPhrase(false);
     }
-    await passageRef.update(passageUpdate);
-    handleCloseAddPhraseModal();
-    setPassagesLoaded(false);
-    setSubmtingNewPhrase(false);
-    setNewPhraseAdded("");
   };
 
   const handleTypeOfQuestion = async (type, title, questionIndex) => {
@@ -506,6 +406,7 @@ const ResearcherPassage = () => {
             handleTypeOfPhrase={handleTypeOfPhrase}
           />
         </Box>
+        <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       </Box>
     </Paper>
   );

@@ -1848,3 +1848,156 @@ exports.submitThematic = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.updatePhraseForPassage = async (req, res) => {
+  try {
+    const { passagTitle, selectedPhrase, newPhrase } = req.body;
+    const passageQuery = db.collection("passages").where("title", "==", passagTitle);
+    const passageSnapshot = await passageQuery.get();
+    const passageDoc = passageSnapshot.docs[0];
+    const passageUpdate = { ...passageDoc.data() };
+    passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
+    await batchUpdate(passageDoc.ref, passageUpdate);
+
+    const recallsDocs = await db.collection("recallGradesV2").where("passages", "array-contains", passageDoc.id).get();
+    console.log("got the recall query");
+    for (let recallDoc of recallsDocs.docs) {
+      const recallData = recallDoc.data();
+      let sessions = recallData.sessions;
+      let needUpdate = false;
+
+      for (let session in sessions) {
+        for (let conditionItem of sessions[session]) {
+          for (let phraseItem of conditionItem.phrases) {
+            if (phraseItem.phrase === selectedPhrase) {
+              needUpdate = true;
+              phraseItem.phrase = newPhrase;
+              if (phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
+                delete phraseItem["GPT-4-Mentioned"];
+                conditionItem.doneGPT4Mentioned = false;
+              }
+            }
+          }
+        }
+      }
+
+      if (needUpdate) {
+        await batchUpdate(recallDoc.ref, { sessions });
+      }
+    }
+    await commitBatch();
+    res.status(200).send({ message: "success" });
+  } catch (error) {
+    res.status(500).send({ message: "error" });
+    console.log(error);
+  }
+};
+
+exports.addNewPhraseForPassage = async (req, res) => {
+  try {
+    const { chosenPassage, newPhraseAdded } = req.body;
+    const passageDoc = await db.collection("passages").where("title", "==", chosenPassage).get();
+    await batchUpdate(passageDoc.docs[0].ref, {
+      phrases: FieldValue.arrayUnion(newPhraseAdded)
+    });
+    const recallGradesDoc = await db
+      .collection("recallGradesV2")
+      .where("passages", "array-contains", passageDoc.docs[0].id)
+      .get();
+
+    for (let recallDoc of recallGradesDoc.docs) {
+      let needUpdate = false;
+      const recallData = recallDoc.data();
+      let updateSessions = recallData.sessions;
+      for (let session in updateSessions) {
+        for (let conditionItem of recallData.sessions[session]) {
+          needUpdate = true;
+          if (conditionItem.passage === passageDoc.docs[0].id) {
+            conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
+          }
+        }
+      }
+      if (needUpdate) {
+        await batchUpdate(recallDoc.ref, {
+          sessions: updateSessions
+        });
+      }
+    }
+    await commitBatch();
+    res.status(200).send({ message: "success" });
+  } catch (error) {
+    res.status(500).send({ message: "error" });
+    console.log(error);
+  }
+};
+
+exports.calcultesRecallGradesRecords = async (req, res) => {
+  try {
+    const { passageId, selectedPhrase } = req.body;
+    const recallGradesDoc = await db.collection("recallGradesV2").where("passages", "array-contains", passageId).get();
+    let numberRecord = 0;
+    for (let recallDoc of recallGradesDoc.docs) {
+      const recallData = recallDoc.data();
+      let sessions = recallData.sessions;
+      for (let session in sessions) {
+        for (let conditionItem of sessions[session]) {
+          if (conditionItem.passage === passageId) {
+            const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === selectedPhrase);
+            if (phraseIndex !== -1 && conditionItem.phrases[phraseIndex].hasOwnProperty("researchers")) {
+              console.log("researchers", conditionItem.phrases[phraseIndex].researchers);
+            }
+            if (
+              phraseIndex !== -1 &&
+              conditionItem.phrases[phraseIndex].hasOwnProperty("researchers") &&
+              conditionItem.phrases[phraseIndex].researchers.length > 0
+            ) {
+              numberRecord = numberRecord + 1;
+            }
+          }
+        }
+      }
+    }
+    return res.status(200).send({ numberRecord });
+  } catch {
+    return res.status(500).send({ message: "error" });
+  }
+};
+
+exports.deletePhraseFromPassage = async (req, res) => {
+  try {
+    const { passageId, selectedPhrase } = req.body;
+    const passageRef = db.collection("passages").doc(passageId);
+    const recallGradesDoc = await db.collection("recallGradesV2").where("passages", "array-contains", passageId).get();
+    const passageDoc = await passageRef.get();
+    const passageData = passageDoc.data();
+    if (passageData.phrasesTypes) {
+      passageData.phrasesTypes.splice(passageData.phrases.indexOf(selectedPhrase), 1);
+    }
+    batchUpdate(passageRef, {
+      phrases: FieldValue.arrayRemove(selectedPhrase),
+      phrasesTypes: passageData.phrasesTypes
+    });
+
+    for (let recallDoc of recallGradesDoc.docs) {
+      let updateSessions = recallDoc.data().sessions;
+      let needUpdate = false;
+      for (let session in updateSessions) {
+        for (let conditionItem of updateSessions[session]) {
+          const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === selectedPhrase);
+          if (conditionItem.passage === passageId && phraseIndex !== -1) {
+            needUpdate = true;
+            conditionItem.phrases[phraseIndex].deleted = true;
+          }
+        }
+      }
+      if (needUpdate) {
+        batchUpdate(recallDoc.ref, { sessions: updateSessions });
+      }
+    }
+    await commitBatch();
+    res.status(200).send({ message: "success" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "error" });
+  }
+};
