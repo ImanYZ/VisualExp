@@ -298,7 +298,7 @@ const processProject = async theProject => {
                   if (theProject === "H2K2") {
                     rowLong.push("After 1 Week");
                   } else {
-                    rowLong.push("After 10 days");
+                    rowLong.push("After 10 Days");
                   }
 
                   rowLong.push(pCond.passage + "Q" + idx);
