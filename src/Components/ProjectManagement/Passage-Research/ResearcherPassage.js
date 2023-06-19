@@ -61,7 +61,7 @@ const ResearcherPassage = () => {
   const editor = email === "oneweb@umich.edu";
 
   useEffect(() => {
-    if (firebase && !passagesLoaded) {
+    if (firebase) {
       const passagesQuery = firebase.db.collection("passages");
 
       const passagesSnapshot = passagesQuery.onSnapshot(snapshot => {
@@ -76,10 +76,9 @@ const ResearcherPassage = () => {
         passagesSnapshot();
       };
     }
-  }, [firebase, passagesLoaded]);
+  }, [firebase]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
+  useEffect(() => {
     let passags = passages;
     if (passagesLoadedUse) {
       const tempPassagesChanges = [...passagesChanges];
@@ -235,19 +234,24 @@ const ResearcherPassage = () => {
   };
 
   const handleTypeOfPhrase = async (type, title, phraseIndex) => {
-    const passageDoc = await firebase.db.collection("passages").where("title", "==", title).get();
-    let passageUpdate = passageDoc.docs[0].data();
-    const initPhrasesTypes = new Array(passageUpdate.phrases.length).fill("");
-    if (!passageUpdate.phrasesTypes) {
-      passageUpdate = {
-        ...passageUpdate,
-        phrasesTypes: initPhrasesTypes
-      };
+    try {
+      const passageDoc = await firebase.db.collection("passages").where("title", "==", title).get();
+      let passageData = passageDoc.docs[0].data();
+      const newPhrasesTypes = new Array(passageData.phrases.length).fill("null");
+      if (passageData.hasOwnProperty("phrasesTypes")) {
+        newPhrasesTypes.forEach(
+          (type, index) =>
+            (newPhrasesTypes[index] = passageData.phrasesTypes[index] ? passageData.phrasesTypes[index] : "null")
+        );
+      }
+      newPhrasesTypes[phraseIndex] = type;
+      console.log(newPhrasesTypes);
+      passageDoc.docs[0].ref.update({
+        phrasesTypes: newPhrasesTypes
+      });
+    } catch (error) {
+      console.log(error);
     }
-    passageUpdate.phrasesTypes[phraseIndex] = type;
-
-    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-    passageRef.update(passageUpdate);
   };
 
   const handlNewPharse = event => {
@@ -282,7 +286,9 @@ const ResearcherPassage = () => {
           <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
             Update
           </LoadingButton>
-          <Button onClick={handleCloseEditModal}>Cancel</Button>
+          <Button onClick={handleCloseEditModal} disabled={updatingPhrase}>
+            Cancel
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -307,6 +313,7 @@ const ResearcherPassage = () => {
               handleCloseDeleteModal();
               setDeletingPhrase(false);
             }}
+            disabled={deletingPhrase}
           >
             Cancel
           </Button>
@@ -357,6 +364,7 @@ const ResearcherPassage = () => {
               setChosenPassage("");
               handleCloseAddPhraseModal();
             }}
+            disabled={submtingNewPhrase}
           >
             Cancel
           </Button>
