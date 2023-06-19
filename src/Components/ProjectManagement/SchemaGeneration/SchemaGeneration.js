@@ -729,7 +729,7 @@ export const SchemaGeneration = () => {
         <Box className="blocks result-box">
           <Box sx={{ padding: "15px" }}>
             {notSatisfiedResponses.length > 0 ? (
-              <span className="header">Response that satify the Boolean expression </span>
+              <span className="header">Response that satisfy the Boolean expression </span>
             ) : (
               <span className="header">All Responses</span>
             )}
