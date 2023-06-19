@@ -1857,8 +1857,13 @@ exports.updatePhraseForPassage = async (req, res) => {
     const passageDoc = passageSnapshot.docs[0];
     const passageUpdate = { ...passageDoc.data() };
     passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
-    await batchUpdate(passageDoc.ref, passageUpdate);
+    const updateTasks = [];
 
+    updateTasks.push(
+      passageDoc.ref.update({
+        phrases: passageUpdate.phrases
+      })
+    );
     const recallsDocs = await db.collection("recallGradesV2").where("passages", "array-contains", passageDoc.id).get();
     console.log("got the recall query");
     for (let recallDoc of recallsDocs.docs) {
@@ -1880,12 +1885,11 @@ exports.updatePhraseForPassage = async (req, res) => {
           }
         }
       }
-
       if (needUpdate) {
-        await batchUpdate(recallDoc.ref, { sessions });
+        updateTasks.push(recallDoc.ref.update({ sessions }));
       }
     }
-    await commitBatch();
+    await Promise.all(updateTasks);
     res.status(200).send({ message: "success" });
   } catch (error) {
     res.status(500).send({ message: "error" });
@@ -1896,34 +1900,34 @@ exports.updatePhraseForPassage = async (req, res) => {
 exports.addNewPhraseForPassage = async (req, res) => {
   try {
     const { chosenPassage, newPhraseAdded } = req.body;
-    const passageDoc = await db.collection("passages").where("title", "==", chosenPassage).get();
-    await batchUpdate(passageDoc.docs[0].ref, {
-      phrases: FieldValue.arrayUnion(newPhraseAdded)
-    });
-    const recallGradesDoc = await db
-      .collection("recallGradesV2")
-      .where("passages", "array-contains", passageDoc.docs[0].id)
-      .get();
-
-    for (let recallDoc of recallGradesDoc.docs) {
-      let needUpdate = false;
+    const passageDocs = await db.collection("passages").where("title", "==", chosenPassage).get();
+    const passageDoc = passageDocs.docs[0];
+    const recallDocs = await db.collection("recallGradesV2").where("passages", "array-contains", passageDoc.id).get();
+    const updateTasks = [];
+    updateTasks.push(
+      passageDoc.ref.update({
+        phrases: FieldValue.arrayUnion(newPhraseAdded)
+      })
+    );
+    for (const recallDoc of recallDocs.docs) {
       const recallData = recallDoc.data();
-      let updateSessions = recallData.sessions;
-      for (let session in updateSessions) {
-        for (let conditionItem of recallData.sessions[session]) {
-          needUpdate = true;
-          if (conditionItem.passage === passageDoc.docs[0].id) {
+      let needUpdate = false;
+
+      for (const session in recallData.sessions) {
+        for (const conditionItem of recallData.sessions[session]) {
+          if (conditionItem.passage === passageDoc.id) {
             conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
+            needUpdate = true;
           }
         }
       }
+
       if (needUpdate) {
-        await batchUpdate(recallDoc.ref, {
-          sessions: updateSessions
-        });
+        updateTasks.push(recallDoc.ref.update({ sessions: recallData.sessions }));
       }
     }
-    await commitBatch();
+
+    await Promise.all(updateTasks);
     res.status(200).send({ message: "success" });
   } catch (error) {
     res.status(500).send({ message: "error" });
@@ -1973,10 +1977,13 @@ exports.deletePhraseFromPassage = async (req, res) => {
     if (passageData.hasOwnProperty("phrasesTypes")) {
       passageData.phrasesTypes.splice(passageData.phrases.indexOf(selectedPhrase), 1);
     }
-    batchUpdate(passageRef, {
-      phrases: FieldValue.arrayRemove(selectedPhrase),
-      phrasesTypes: passageData.hasOwnProperty("phrasesTypes") ? passageData.phrasesTypes : []
-    });
+    const updateTasks = [];
+    updateTasks.push(
+      passageDoc.ref.update({
+        phrases: FieldValue.arrayRemove(selectedPhrase),
+        phrasesTypes: passageData.hasOwnProperty("phrasesTypes") ? passageData.phrasesTypes : []
+      })
+    );
 
     for (let recallDoc of recallGradesDoc.docs) {
       let updateSessions = recallDoc.data().sessions;
@@ -1991,10 +1998,10 @@ exports.deletePhraseFromPassage = async (req, res) => {
         }
       }
       if (needUpdate) {
-        batchUpdate(recallDoc.ref, { sessions: updateSessions });
+        updateTasks.push(recallDoc.ref.update({ sessions: updateSessions }));
       }
     }
-    await commitBatch();
+    await Promise.all(updateTasks);
     res.status(200).send({ message: "success" });
   } catch (error) {
     console.log(error);
