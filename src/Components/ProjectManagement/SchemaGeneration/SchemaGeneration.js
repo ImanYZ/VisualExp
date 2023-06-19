@@ -452,10 +452,10 @@ export const SchemaGeneration = () => {
     setTryout(true);
   };
 
-  const renderResponses = paragraph => {
+  const renderResponses = (paragraph, backgroundColor) => {
     if (!paragraph) return null;
     const pattern = new RegExp(`(${highlightedWords.join("|")})`, "gi");
-    return paragraph.replace(pattern, '<span style="background-color: yellow;">$1</span>');
+    return paragraph.replace(pattern, `<span style="background-color:${backgroundColor} ;">$1</span>`);
   };
 
   const searchResultsRD = useMemo(() => {
@@ -471,7 +471,7 @@ export const SchemaGeneration = () => {
             p: "10px"
           }}
         >
-          <Box dangerouslySetInnerHTML={{ __html: renderResponses(r.response) }} />
+          <Box dangerouslySetInnerHTML={{ __html: renderResponses(r.response, "yellow") }} />
 
           {tryout && (
             <Button
@@ -490,6 +490,44 @@ export const SchemaGeneration = () => {
       );
     });
   }, [searchResules]);
+
+  const notSatisfiedResponsesRD = useMemo(() => {
+    return (notSatisfiedResponses || []).map((r, index) => {
+      const isLastElement = index === notSatisfiedResponses.length - 1;
+      return (
+        <Paper
+          key={index + r.response}
+          elevation={3}
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            p: "10px",
+            mb: isLastElement ? "200px" : "10px"
+          }}
+        >
+          <Box dangerouslySetInnerHTML={{ __html: renderResponses(r.response, "orange") }} />
+
+          {tryout && (
+            <Button
+              key={index + r.response}
+              variant="outlined"
+              onClick={() => {
+                handleResponse(r, false);
+              }}
+              sx={{
+                mt: "15px",
+                backgroundColor:
+                  r.votes[selectedPhrase] && r.votes[selectedPhrase].vote !== null && !r.votes[selectedPhrase].vote
+                    ? "red"
+                    : "",
+                color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote !== null ? "white" : ""
+              }}
+            >{`NO `}</Button>
+          )}
+        </Paper>
+      );
+    });
+  }, [notSatisfiedResponses]);
 
   const deleteSchema = async id => {
     try {
@@ -769,50 +807,19 @@ export const SchemaGeneration = () => {
                 <br />
               </Box>
             ) : null}
+
             {notSatisfiedResponses.length > 0 ? (
               <Box
                 style={{
+                  flex: "1",
                   background: "#F8F8F8",
                   borderRadius: "10px",
                   overflow: "auto",
                   padding: "15px",
-                  height: "50%"
+                  maxHeight: "50vh"
                 }}
               >
-                {notSatisfiedResponses.map((r, index) => {
-                  const isLastElement = index === notSatisfiedResponses.length - 1;
-                  return (
-                    <Paper
-                      key={index + r.response}
-                      elevation={3}
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        p: "10px",
-                        mb: isLastElement ? "200px" : "10px"
-                      }}
-                    >
-                      {r.response}
-                      <Button
-                        key={index + r.response}
-                        variant="outlined"
-                        onClick={() => {
-                          handleResponse(r, false);
-                        }}
-                        sx={{
-                          mt: "15px",
-                          backgroundColor:
-                            r.votes[selectedPhrase] &&
-                            r.votes[selectedPhrase].vote !== null &&
-                            !r.votes[selectedPhrase].vote
-                              ? "red"
-                              : "",
-                          color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote !== null ? "white" : ""
-                        }}
-                      >{`NO `}</Button>
-                    </Paper>
-                  );
-                })}
+                {notSatisfiedResponsesRD}{" "}
               </Box>
             ) : null}
           </Box>
