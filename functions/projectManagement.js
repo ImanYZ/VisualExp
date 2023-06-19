@@ -1970,12 +1970,12 @@ exports.deletePhraseFromPassage = async (req, res) => {
     const recallGradesDoc = await db.collection("recallGradesV2").where("passages", "array-contains", passageId).get();
     const passageDoc = await passageRef.get();
     const passageData = passageDoc.data();
-    if (passageData.phrasesTypes) {
+    if (passageData.hasOwnProperty("phrasesTypes")) {
       passageData.phrasesTypes.splice(passageData.phrases.indexOf(selectedPhrase), 1);
     }
     batchUpdate(passageRef, {
       phrases: FieldValue.arrayRemove(selectedPhrase),
-      phrasesTypes: passageData.phrasesTypes
+      phrasesTypes: passageData.hasOwnProperty("phrasesTypes") ? passageData.phrasesTypes : []
     });
 
     for (let recallDoc of recallGradesDoc.docs) {
