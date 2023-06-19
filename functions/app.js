@@ -30,7 +30,11 @@ const {
   deleteThematicCode,
   notifyApplicationStatus,
   recordAudio,
-  submitThematic
+  submitThematic,
+  updatePhraseForPassage,
+  addNewPhraseForPassage,
+  calcultesRecallGradesRecords,
+  deletePhraseFromPassage
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -157,6 +161,10 @@ app.post("/markEntreviewAttended", markEntreviewAttended);
 app.post("/checkEntreviewStatus", checkEntreviewStatus);
 app.post("/recordAudio", recordAudio);
 app.post("/submitThematic", submitThematic);
+app.post("/updatePhraseForPassage", updatePhraseForPassage);
+app.post("/addNewPhraseForPassage", addNewPhraseForPassage);
+app.post("/calcultesRecallGradesRecords", calcultesRecallGradesRecords);
+app.post("/deletePhraseFromPassage", deletePhraseFromPassage);
 // Knowledge endpoints
 
 // Misinformation Experiment
