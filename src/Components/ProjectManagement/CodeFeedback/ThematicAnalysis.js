@@ -523,7 +523,7 @@ const ThematicAnalysis = props => {
       setCilckedCell(false);
     } catch (error) {
       setSnackbarMessage(
-        "There is some error while submitting your selection, please try again or talk to iman abou the issue!"
+        "There is some error while submitting your selection, please try again or talk to iman about the issue!"
       );
       setSubmitting(false);
       console.log(error);
