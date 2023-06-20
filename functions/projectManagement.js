@@ -1560,6 +1560,8 @@ exports.updateThematicCode = async (req, res) => {
           t.delete(mergeCodeDoc.docs[0].ref);
         }
       }
+      t.update(codeRef, { code: newCode, category, title });
+      if (newCode === codeData.code) return;
       for (let thematicAnalysisDoc of thematicAnalysisDocs.docs) {
         const thematicAnalysisData = thematicAnalysisDoc.data();
         const updateCBook = thematicAnalysisData.codesBook;
@@ -1574,7 +1576,6 @@ exports.updateThematicCode = async (req, res) => {
         console.log(updateCBook);
         t.update(db.collection("thematicAnalysis").doc(thematicAnalysisDoc.id), { codesBook: updateCBook });
       }
-      t.update(codeRef, { code: newCode, category, title });
     });
     return res.status(200).send({ message: "success" });
   } catch (error) {
