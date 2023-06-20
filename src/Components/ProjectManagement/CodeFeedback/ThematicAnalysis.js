@@ -738,7 +738,7 @@ const ThematicAnalysis = props => {
                   value={code}
                   multiline
                   rows={4}
-                  sx={{ width: "45%", m: 0.5 }}
+                  sx={{ width: "35%", m: 0.5 }}
                   onChange={event => setCode(event.target.value)}
                 />
                 <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "15px", justifyContent: "center" }}>
@@ -759,6 +759,8 @@ const ThematicAnalysis = props => {
                         handleNewCategory();
                       }
                     }}
+                    sx={{ width: "35%", m: 0.5 }}
+                    fullWidth
                   />
                   <FormControl className="select" variant="outlined" style={{ width: "160px" }}>
                     <InputLabel>Code For</InputLabel>
@@ -773,8 +775,8 @@ const ThematicAnalysis = props => {
                   <FormControl className="select" variant="outlined" style={{ width: "160px" }}>
                     <InputLabel>Merge Code</InputLabel>
                     <Select label="New Category" value={mergeCode} onChange={handleMerge} id="merge-code">
-                      <MenuItem key={null} value={null}>
-                        {"Ignore merging"}
+                      <MenuItem key={null} value={null} style={{ backgroundColor: mergeCode === null ? "orange" : "" }}>
+                        {"no-merge"}
                       </MenuItem>
                       {approvedCodes
                         .filter(c => c.code !== code)
