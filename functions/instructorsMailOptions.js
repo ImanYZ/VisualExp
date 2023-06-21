@@ -38,7 +38,7 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
             data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
             width="420" height="37"><br></div></div></div>`
   };
-  if (random !== 0 && !introducedBy) {
+  if (random === 0 && !introducedBy) {
     emailOptions = {
       from: process.env.EMAIL,
       to: email,
