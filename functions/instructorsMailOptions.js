@@ -10,7 +10,7 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
       `
           <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>` +
       (introducedBy ? `<p>Dr. ${introducedBy.fullname} has introduced you to me.</p>` : ``) +
-      `<p>My name is Iman YeckehZaare, a PhD candidate at the University of Michigan, School of Information.I’m part of an NSF I-Corps  program where we are investigating difficulties that instructors experience in college education. I’d highly appreciate it if you could give me  1 hour of your time to interview you about your experience and challenges as an instructor this past academic year.</p>
+      `<p>My name is Iman YeckehZaare, a PhD candidate at the University of Michigan, School of Information.I’m part of an NSF I-Corps  program where we are investigating difficulties that instructors experience in college education.I’d highly appreciate it if you could give me  1 hour of your time to interview you about your experience and challenges as an instructor this past academic year.</p>
             <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
             <ul>
               <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
@@ -38,19 +38,16 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
             data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
             width="420" height="37"><br></div></div></div>`
   };
-  if (introducedBy.hasOwnProperty("email")) {
-    emailOptions.cc = introducedBy.email;
-  }
-  if (random === 0 && !introducedBy) {
+  if (random !== 0 && !introducedBy) {
     emailOptions = {
       from: process.env.EMAIL,
       to: email,
       subject: `Collaborate with an NSF I-Corps Research Team to Optimize Teaching and Learning  ${topic}`,
       html: `
             <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
-              <p>We are a research group at the University of Michigan, School of Information, in an NSF Regional program that is committed to developing learning technologies. Our goal is to help instructors who teach large courses that primarily rely on exams for student assessment. We can help by saving your time and improving your student learning outcomes and satisfaction. We have developed <a href="https://1cademy.com">1Cademy.com, </a>, an online platform for collaborative learning. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
-              <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
-              <p>We would like to collaborate with you to provide your courses with 1Cademy Assistant. You can learn about some of its functionalities in the following videos:</p>
+              <p>We are a research group at the University of Michigan, School of Information, in an NSF Regional program that is committed to developing learning technologies. Our goal is to help instructors who teach large courses that primarily rely on exams for student assessment. We can help by saving your time and improving your student learning outcomes and satisfaction. We have developed <a href="https://1cademy.com">1Cademy.com</a>, an online platform for collaborative learning. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
+              <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience.Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
+              <p>We would like to collaborate with you to provide your courses with 1Cademy Assistant.You can learn about some of its functionalities in the following videos:</p>
               <ul>
               <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Question Answering</a></li>
               <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">Introducing 1Cademy Assistant - Practice Tool</a></li>
