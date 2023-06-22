@@ -336,7 +336,9 @@ exports.markAttended = async (req, res) => {
             mettingUrl: meetingId,
             participant: participantFullname,
             surveyType: userData.surveyType,
-            createdAt: new Date()
+            createdAt: new Date(), 
+            email: userData.email,
+            checked: false,
           });
         }
         t.update(userRef, { projectDone: true });
@@ -941,7 +943,9 @@ exports.markEntreviewAttended = async (req, res) => {
             mettingUrl: meetingId,
             participant: userDoc.docs[0].id,
             surveyType: data.surveyType,
-            createdAt: new Date()
+            createdAt: new Date(),
+            email: data.email, 
+            checked: false
           });
           const userRef = db.collection("usersSurvey").doc(userDoc.docs[0].id);
           t.update(userRef, { projectDone: true });
