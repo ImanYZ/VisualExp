@@ -1296,5 +1296,3 @@ exports.sendingEmails = async context => {
     console.log(error);
   }
 };
-
-console.log(error);
