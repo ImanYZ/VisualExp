@@ -49,9 +49,11 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
               <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience.Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
               <p>We would like to collaborate with you to provide your courses with 1Cademy Assistant.You can learn about some of its functionalities in the following videos:</p>
               <ul>
-              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Question Answering</a></li>
-              <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">Introducing 1Cademy Assistant - Practice Tool</a></li>
-              <li><a href="https://youtu.be/Un6s1rtfZVA" rel="nofollow">Introducing 1Cademy Assistant - Voice-based Practice</a></li>
+              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">1Cademy Assistant - Question Answering</a></li>
+              <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">1Cademy Assistant - Practice Tool</a></li>
+              <li><a href="https://youtu.be/Un6s1rtfZVA" rel="nofollow">1Cademy Assistant - Voice-based Practice</a></li>
+              <li><a href="https://youtu.be/9vWGSEBf8WQ" rel="nofollow">1Cademy Instructor and Student Dashboards</a></li>
+              
               </ul>
               
               <p>To schedule an appointment, please click the first link or directly reply to this email.</p>

@@ -491,7 +491,7 @@ exports.inviteInstructors = async context => {
       })
       .filter(
         inst =>
-          ((inst?.upVotes || 0) - (inst?.downVotes || 0) >= 3 || inst.scraped) &&
+          (((inst?.upVotes || 0) >= 1 && (inst?.downVotes || 0) === 0) || inst.scraped) &&
           (!inst.nextReminder || inst.nextReminder.toDate().getTime() < new Date().getTime()) &&
           !emails.includes(inst.email) &&
           inst.interestedTopic &&
