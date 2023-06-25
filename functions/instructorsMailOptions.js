@@ -53,7 +53,7 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
               <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">1Cademy Assistant - Practice Tool</a></li>
               <li><a href="https://youtu.be/Un6s1rtfZVA" rel="nofollow">1Cademy Assistant - Voice-based Practice</a></li>
               <li><a href="https://youtu.be/9vWGSEBf8WQ" rel="nofollow">1Cademy Instructor and Student Dashboards</a></li>
-              
+              <li><a href="https://youtu.be/E2ClCIX9g0g" rel="nofollow">1Cademy Auto-graded Assignments and Exams</a></li>
               </ul>
               
               <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
