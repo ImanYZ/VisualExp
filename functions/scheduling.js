@@ -714,7 +714,7 @@ exports.scheduleInstructors = async (req, res) => {
           stateInfo: "",
           city: "",
           institution,
-          scraped: false,
+          scraped: true,
           createdAt: new Date(),
           interestedTopic: "",
           project: "H1L2",
