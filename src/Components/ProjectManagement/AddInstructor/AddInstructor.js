@@ -540,7 +540,7 @@ const AddInstructor = props => {
       let instToday = instructorsToday;
       for (let change of tempInstructorsChanges) {
         const instructorData = change.doc.data();
-        if (instructorData.scraped) continue;
+        if (instructorData.scraped || !instructorData.stateInfo) continue;
         // If the change indicates that the instructor doc is removed:
         if (instructorData.deleted || change.type === "removed") {
           // If the instructor was added by the authenticated researcher:
