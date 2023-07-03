@@ -242,7 +242,6 @@ const MCQuestion = props => {
     setProcessingSubmit(false);
     setRandom(!random);
   };
-  console.log(codes);
   const CodeList = ({ codes }) => {
     const codesByCategory = {};
     for (const code of codes) {
