@@ -1866,6 +1866,7 @@ exports.updatePhraseForPassage = async (req, res) => {
       })
     );
     const recallsDocs = await db.collection("recallGradesV2").where("passages", "array-contains", passageDoc.id).get();
+    const booleanExpressionsDocs = await db.collection("booleanScratch").where("phrase", "==", selectedPhrase).get();
     console.log("got the recall query");
     for (let recallDoc of recallsDocs.docs) {
       const recallData = recallDoc.data();
@@ -1889,6 +1890,9 @@ exports.updatePhraseForPassage = async (req, res) => {
       if (needUpdate) {
         updateTasks.push(recallDoc.ref.update({ sessions }));
       }
+    }
+    for (let booleanDoc of booleanExpressionsDocs.docs) {
+      updateTasks.push(booleanDoc.ref.update({ phrase: newPhrase }));
     }
     await Promise.all(updateTasks);
     res.status(200).send({ message: "success" });

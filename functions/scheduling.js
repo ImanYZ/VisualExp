@@ -935,7 +935,7 @@ exports.markEntreviewAttended = async (req, res) => {
         const userDoc = await t.get(db.collection("usersSurvey").where("email", "==", participant));
         const transcriptDoc = await t.get(db.collection("transcript").where("mettingUrl", "==", meetingId));
         const scheduleId = scheduleDoc.docs[0].id;
-        t.update(db.collection("schedule").doc(scheduleId), { started: true, attended: true });
+        t.update(db.collection("schedule").doc(scheduleId), { hasStarted: true, attended: true });
         if (userDoc.docs.length > 0 && transcriptDoc.docs.length === 0) {
           const data = userDoc.docs[0].data();
           const transcriptRef = db.collection("transcript").doc();
