@@ -9,7 +9,6 @@ import FormLabel from "@mui/material/FormLabel";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -18,6 +17,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import { Card, CardHeader, CardContent } from "@mui/material";
 // import LiveHelp from "@mui/icons-material/LiveHelp";
 
 import { choicesState } from "../../store/ExperimentAtoms";
@@ -60,7 +60,7 @@ const MCQuestion = props => {
     let _codes = experimentCodeDocs.docs
       .map(doc => {
         if (doc.data().project !== "OnlineCommunities") {
-          return doc.data().code;
+          return { ...doc.data(), id: doc.id };
         } else {
           return null;
         }
@@ -186,20 +186,27 @@ const MCQuestion = props => {
   };
 
   const addCode = async () => {
-    const newCodes = [...codes];
-    newCodes.push(newCode);
-    setCodes(newCodes);
-    const experimentCodeRef = firebase.db.collection("feedbackCodeBooks").doc();
-    experimentCodeRef.set({
-      approved: false,
-      code: newCode,
-      coder: fullname,
-      project: project,
-      title: "Participant",
-      question: curQuestion,
-      createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-    });
-    setNewCode("");
+    try {
+      const newCodes = [...codes];
+      const newDoc = {
+        approved: false,
+        code: newCode,
+        coder: fullname,
+        project: project,
+        title: "Participant",
+        question: curQuestion,
+        category: "No Category",
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+      };
+
+      const experimentCodeRef = firebase.db.collection("feedbackCodeBooks").doc();
+      await experimentCodeRef.set(newDoc);
+      newDoc.id = experimentCodeRef.id;
+      setCodes(oldCode => [...oldCode, newDoc]);
+      setNewCode("");
+    } catch (error) {
+      setNewCode("");
+    }
   };
 
   const choiceCodeChange = value => {
@@ -234,6 +241,64 @@ const MCQuestion = props => {
     await props.nextStep();
     setProcessingSubmit(false);
     setRandom(!random);
+  };
+  console.log(codes);
+  const CodeList = ({ codes }) => {
+    const codesByCategory = {};
+    for (const code of codes) {
+      if (!codesByCategory[code.category]) {
+        codesByCategory[code.category] = [];
+      }
+      codesByCategory[code.category].push(code);
+    }
+    const cards = Object.entries(codesByCategory).map(([category, codes]) => (
+      <Card key={category} sx={{ mb: 1 }}>
+        <CardHeader
+          title={
+            <Typography variant="h6" component="h2">
+              {category}
+            </Typography>
+          }
+          sx={{ bgcolor: "grey.300" }}
+        />
+        <CardContent sx={{ p: 0 }}>
+          <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+            {codes.map(codeDoc => {
+              const labelId = `checkbox-list-label-${codeDoc.code}`;
+
+              return (
+                <ListItem key={codeDoc.id} disablePadding>
+                  <ListItemButton
+                    role={undefined}
+                    onClick={() => {
+                      choiceCodeChange(codeDoc.code);
+                    }}
+                    dense
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={
+                          props.currentQIdx === 0
+                            ? codeChoice.indexOf(codeDoc.code) !== -1
+                            : codeChoice1.indexOf(codeDoc.code) !== -1
+                        }
+                        tabIndex={-1}
+                        disableRipple
+                        inputProps={{ "aria-labelledby": labelId }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText id={labelId} primary={`${codeDoc.code}`} />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        </CardContent>
+      </Card>
+    ));
+
+    return <div>{cards}</div>;
   };
   return (
     <div
@@ -304,7 +369,7 @@ const MCQuestion = props => {
                 fullWidth
                 multiline
                 rows={5}
-                sx={{ width: "95%", m: 0.5 }}
+                sx={{m: 0.5 }}
               />
             </>
           ) : null}
@@ -317,39 +382,7 @@ const MCQuestion = props => {
                 <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
                   Please select some of the following options or enter new ones to better explain your feedback:
                 </FormLabel>
-                <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-                  {codes.map(value => {
-                    const labelId = `checkbox-list-label-${value}`;
-
-                    return (
-                      <ListItem key={value} disablePadding>
-                        <ListItemButton
-                          role={undefined}
-                          onClick={() => {
-                            choiceCodeChange(value);
-                          }}
-                          dense
-                        >
-                          <ListItemIcon>
-                            <Checkbox
-                              edge="start"
-                              checked={
-                                props.currentQIdx === 0
-                                  ? codeChoice.indexOf(value) !== -1
-                                  : codeChoice1.indexOf(value) !== -1
-                              }
-                              tabIndex={-1}
-                              disableRipple
-                              inputProps={{ "aria-labelledby": labelId }}
-                            />
-                          </ListItemIcon>
-                          <ListItemText id={labelId} primary={`${value}`} />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-
+                <CodeList codes={codes} />
                 <TextField
                   label=""
                   variant="outlined"
