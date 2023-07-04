@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { Routes, Route, useNavigate } from "react-router-dom";
-
+import RecallForIman from "./Components/ProjectManagement/FreeRecallGrading/RecallForIman.js";
 import {
   firebaseState,
   emailState,
@@ -60,13 +60,7 @@ import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
-import {
-  CURRENT_PROJ_LOCAL_S_KEY,
-  notAResearcherState,
-  projectsState,
-  projectState,
-  projectSpecsState
-} from "./store/ProjectAtoms";
+import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
 import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
@@ -107,7 +101,6 @@ const AppRouter = props => {
   const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
-  const projectSpecs = useRecoilValue(projectSpecsState);
   const processAuth = async user => {
     const { db } = firebase;
     // const uid = user.uid;
@@ -522,7 +515,6 @@ const AppRouter = props => {
                 <Route path="Activities/Intellectual" element={<Activities activityName="Intellectual" />} />
                 <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
                 <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
-                <Route path="Activities/RecallForIman" element={<Activities activityName="RecallForIman" />} />
                 <Route path="Activities/Accumulative" element={<Activities activityName="Accumulative" />} />
                 <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
                 <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
@@ -548,6 +540,7 @@ const AppRouter = props => {
                 />
                 <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
                 <Route path="ScheduleInstructor/" element={<ScheduleUnknownInstructorPage />} />
+                <Route path="Activities/RecallForIman" element={<RecallForIman/>} />
               </>
             </>
           )}

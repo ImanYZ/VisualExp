@@ -19,7 +19,6 @@ import { hideLeaderBoardState } from "../../../store/ExperimentAtoms";
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
-import RecallForIman from "../FreeRecallGrading/RecallForIman";
 import { SchemaGeneration } from "../SchemaGeneration";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
@@ -42,7 +41,6 @@ const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "AddAdministrator",
 const AdminAccessPages = [
   { page: "Intellectual", view: <ExpenseReports /> },
   { page: "Experiments", view: <ManageEvents /> },
-  { page: "RecallForIman", view: <RecallForIman /> },
   { page: "Accumulative", view: <Accumulative /> }
 ];
 
