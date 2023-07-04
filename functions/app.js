@@ -34,6 +34,7 @@ const {
   updatePhraseForPassage,
   addNewPhraseForPassage,
   calcultesRecallGradesRecords,
+  loadRecallGradesNumbers,
   deletePhraseFromPassage
 } = require("./projectManagement");
 const {
@@ -165,6 +166,7 @@ app.post("/updatePhraseForPassage", updatePhraseForPassage);
 app.post("/addNewPhraseForPassage", addNewPhraseForPassage);
 app.post("/calcultesRecallGradesRecords", calcultesRecallGradesRecords);
 app.post("/deletePhraseFromPassage", deletePhraseFromPassage);
+app.get("/loadRecallGradesNumbers", loadRecallGradesNumbers);
 // Knowledge endpoints
 
 // Misinformation Experiment
