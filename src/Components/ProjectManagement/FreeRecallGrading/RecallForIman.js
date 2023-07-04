@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-import { firebaseState } from "../../../store/AuthAtoms";
+import { firebaseState, emailState } from "../../../store/AuthAtoms";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import { Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
-
+import axios from "axios";
 const RecallForIman = props => {
   const firebase = useRecoilValue(firebaseState);
-  const gptResearcher = "Iman YeckehZaare";
+  const email = useRecoilValue(emailState);
 
   const [indexOfNoMajority, setIndexOfNoMajority] = useState(0);
   const [indexOfmajorityDifferentThanBot, setIndexOfmajorityDifferentThanBot] = useState(0);
-
   const [noMajority, setNoMajority] = useState([]);
   const [majorityDifferentThanBot, setMajorityDifferentThanBot] = useState([]);
-
-  const [passagesHash, setPassagesHash] = useState({});
-
   const [doneProcessing, setDoneProcessing] = useState(false);
   const [countPhrases, setCountPhrases] = useState([]);
 
@@ -34,140 +30,27 @@ const RecallForIman = props => {
   ];
 
   useEffect(() => {
-    const getPassages = async () => {
-      const _passagesHash = {};
-      const passageDocs = await firebase.db.collection("passages").get();
-      passageDocs.forEach(passageDoc => {
-        _passagesHash[passageDoc.id] = passageDoc.data().text;
-      });
-      setPassagesHash(_passagesHash);
-    };
-    if (firebase) {
-      getPassages();
-    }
-  }, [firebase]);
-
-  useEffect(() => {
-    if (!Object.keys(passagesHash).length) return;
     const getRecall = async () => {
-      const _noMajority = [];
-      const _majorityDifferentThanBot = [];
-      const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
-      //records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them
-      let _countGraded = 0;
-      //number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them
-      let _notGrades = 0;
-      // # of phrases that the bot has graded and their boolean expressions are not satisfied
-      let _countNSatisfiedGraded = 0;
-      //# of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them
-      let _countSatifiedGraded = 0;
-      //# of phrases that their boolean expressions are not satisfied
-      let _notSatisfied = 0;
-      //# of phrases that their boolean expressions are satisfied and 2 or more researchers graded them
-      let _satisfiedThreeRes = 0;
-
-      //Total # of phrases
-      let countPairPhrases = 0;
-
-      let i = 0;
-      for (let recallDoc of recallGradesDocs.docs) {
-        const recallData = recallDoc.data();
-
-        for (let session in recallData.sessions) {
-          for (let conditionItem of recallData.sessions[session]) {
-            const conditionIndex = recallData.sessions[session].indexOf(conditionItem);
-            for (let phraseItem of conditionItem.phrases) {
-              const phraseIndex = conditionItem.phrases.indexOf(phraseItem);
-              countPairPhrases++;
-              const researcherIdx = phraseItem.researchers.indexOf(gptResearcher);
-              let otherResearchers = phraseItem.researchers.slice();
-              let otherGrades = phraseItem.grades.slice();
-              if (researcherIdx !== -1) {
-                otherResearchers.splice(researcherIdx, 1);
-                otherGrades.splice(researcherIdx, 1);
-              }
-              const trueVotes = otherGrades.filter(grade => grade).length;
-              const falseVotes = otherGrades.filter(grade => !grade).length;
-              if(!phraseItem.hasOwnProperty("GPT-4-Mentioned") && phraseItem.satisfied && otherResearchers.length <=2) {
-                _notGrades++;
-              }
-              if(phraseItem.hasOwnProperty("GPT-4-Mentioned") && phraseItem.satisfied && otherResearchers.length <=2) {
-                _countGraded++;
-              }
-
-
-              if (phraseItem.hasOwnProperty("GPT-4-Mentioned") && !phraseItem.satisfied) {
-                _countNSatisfiedGraded++;
-              }
-              if (
-                phraseItem.hasOwnProperty("GPT-4-Mentioned") &&
-                phraseItem.satisfied &&
-                otherResearchers.length >= 2
-              ) {
-                _countSatifiedGraded++;
-              }
-              if (!phraseItem.satisfied) {
-                _notSatisfied++;
-              }
-              if (otherResearchers.length >= 2 && phraseItem.satisfied) {
-                _satisfiedThreeRes++;
-              }
-              const botGrade = phraseItem.hasOwnProperty("GPT-4-Mentioned") ? phraseItem["GPT-4-Mentioned"] : null;
-              if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
-                if ((trueVotes >= 3 && !botGrade) || (falseVotes >= 3 && botGrade)) {
-                  _majorityDifferentThanBot.push({
-                    ...phraseItem,
-                    botGrade,
-                    grades: otherGrades,
-                    Response: conditionItem.response,
-                    session: session,
-                    condition: conditionIndex,
-                    id: recallDoc.id,
-                    originalPassgae: passagesHash[conditionItem.passage],
-                    phraseIndex
-                  });
-                }
-              }
-              if (!phraseItem.hasOwnProperty("majority") && trueVotes === falseVotes && otherGrades.length >= 4) {
-                _noMajority.push({
-                  ...phraseItem,
-                  botGrade,
-                  grades: otherGrades,
-                  Response: conditionItem.response,
-                  session: session,
-                  condition: conditionIndex,
-                  id: recallDoc.id,
-                  originalPassgae: passagesHash[conditionItem.passage],
-                  phraseIndex
-                });
-              }
-            }
-          }
-        }
-      }
-
-      const __noMajority = _noMajority.filter(gradeMajority => gradeMajority.grades.length !== 0);
-      const __majorityDifferentThanBot = _majorityDifferentThanBot.filter(
-        gradeMajority => gradeMajority.grades.length !== 0
-      );
-      setNoMajority(__noMajority);
-      setMajorityDifferentThanBot(__majorityDifferentThanBot);
+      const response = await axios.get("/loadRecallGradesNumbers");
+      console.log(response.data);
+      setNoMajority(response.data.noMajority);
+      setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
       setCountPhrases([
-        _notGrades,
-        _countGraded,
-        _countNSatisfiedGraded,
-        _countSatifiedGraded,
-        _notSatisfied,
-        _satisfiedThreeRes,
-        countPairPhrases
+        response.data.notGrades,
+        response.data.countGraded,
+        response.data.countNSatisfiedGraded,
+        response.data.countSatifiedGraded,
+        response.data.notSatisfied,
+        response.data.satisfiedThreeRes,
+        response.data.countPairPhrases
       ]);
       setDoneProcessing(true);
     };
 
-    if (firebase && passagesHash) {
+    if (firebase) {
       getRecall();
     }
-  }, [firebase, passagesHash]);
+  }, [firebase]);
 
   const nextPhrase = () => {
     if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1)
@@ -249,31 +132,53 @@ const RecallForIman = props => {
       </Box>
     );
   }
-
+  if (email !== "oneweb@umich.edu") {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100vh",
+          padding: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Typography align="center" variant="h3">
+          You don't have Access!
+        </Typography>
+      </div>
+    );
+  }
   if (!doneProcessing && !majorityDifferentThanBot.length)
     return (
       <Box
         sx={{
           display: "flex",
-          width: "100%",
-          justifyContent: "center"
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          flexDirection: "column"
         }}
       >
         <CircularProgress />
+        <br />
+        <Typography sx={{ mt: "5px" }}> Loading...</Typography>
       </Box>
     );
 
   return (
-    <Box sx={{ mb: "15px", ml: "15px" }}>
+    <Box sx={{ mb: "15px", ml: "15px", height: "100vh", overflow: "auto" }}>
       {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot] && (
         <Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="h5" component="h5">
               The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
             </Typography>
+            <br />
             <Box sx={{ display: "flex", alignItems: "center" }}>
               {text.map((meaning, index) => (
-                <Tooltip title={meaning} placement="top">
+                <Tooltip title={meaning}>
                   <Box
                     style={{
                       fontSize: 25,
