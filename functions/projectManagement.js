@@ -1516,25 +1516,21 @@ const consumeRecallGradesChanges = (recallGradesDocs, fullname) => {
 };
 exports.loadRecallGrades = async (req, res) => {
   try {
+    console.log("loadRecallGrades");
     const { fullname } = req.body;
     const recentParticipants = await fetchRecentParticipants(fullname);
     let recallGradesDocs = await db.collection("recallGradesV2").get();
-    let _recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname);
-    for (let project in _recallGrades) {
-      if (Object.keys(recentParticipants).length > 0) {
-        _recallGrades[project].sort((g1, g2) => {
-          const p1 =
-            Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
-          const p2 =
-            Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
-          if (p1 && p2) return 0;
-          return p1 && !p2 ? -1 : 1;
-        });
-      } else {
-        _recallGrades[project].sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
-      }
+    let recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname);
+    for (let project in recallGrades) {
+      let includeRecentParticipants = recallGrades[project].filter(g =>
+        Object.keys(recentParticipants[project]).includes(g.user)
+      );
+      let dontIncludeRecentParticipants = recallGrades[project].filter(
+        g => !Object.keys(recentParticipants[project]).includes(g.user)
+      );
+      recallGrades[project] = [...includeRecentParticipants, ...dontIncludeRecentParticipants].slice(0, 200);
     }
-    res.status(200).send(_recallGrades);
+    res.status(200).send(recallGrades);
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
     console.log(error);
