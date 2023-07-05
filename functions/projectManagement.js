@@ -1533,7 +1533,6 @@ exports.loadRecallGrades = async (req, res) => {
       } else {
         _recallGrades[project].sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
       }
-      _recallGrades[project] = _recallGrades[project].slice(0, 200);
     }
     res.status(200).send(_recallGrades);
   } catch (error) {
