@@ -50,111 +50,6 @@ const goToLink = theLink => event => {
   window.open(theLink, "_blank");
 };
 
-const lineDiagramTooltip = type => (obj, key, uname) => {
-  if (type === "proposals") {
-    return (
-      <>
-        {key === uname ? (
-          "You've posted"
-        ) : uname === "Iman YeckehZaare" ? (
-          <>
-            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Posted
-          </>
-        ) : (
-          "Posted"
-        )}
-
-        {` ${obj[key].num}  proposals.`}
-      </>
-    );
-  }
-  if (type === "instructors") {
-    return (
-      <>
-        {key === uname ? (
-          "You've added"
-        ) : uname === "Iman YeckehZaare" ? (
-          <>
-            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Added
-          </>
-        ) : (
-          "Added"
-        )}
-
-        {` ${obj[key].num}  instructors.`}
-      </>
-    );
-  }
-  if (type === "administrators") {
-    return (
-      <>
-        {key === uname ? (
-          "You've added"
-        ) : uname === "Iman YeckehZaare" ? (
-          <>
-            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Added
-          </>
-        ) : (
-          "Added"
-        )}
-
-        {` ${obj[key].num}  administrators.`}
-      </>
-    );
-  }
-  if (type === "grading") {
-    return (
-      <>
-        {key === uname ? (
-          "You've graded"
-        ) : uname === "Iman YeckehZaare" ? (
-          <>
-            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Graded
-          </>
-        ) : (
-          "Graded"
-        )}
-
-        {` ${obj[key].num} free-recall responses.`}
-      </>
-    );
-  }
-  if (type === "coding") {
-    return (
-      <>
-        {key === uname ? (
-          "You've coded"
-        ) : uname === "Iman YeckehZaare" ? (
-          <>
-            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Coded
-          </>
-        ) : (
-          "Coded"
-        )}
-
-        {` ${obj[key].num} explanations.`}
-      </>
-    );
-  }
-  if (type === "intellectual") {
-    return (
-      <>
-        {key === uname ? (
-          "You've added"
-        ) : uname === "Iman YeckehZaare" ? (
-          <>
-            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Coded
-          </>
-        ) : (
-          "Coded"
-        )}
-
-        {` ${obj[key].num} intellectual activities.`}
-      </>
-    );
-  }
-};
-
 const RouterNav = props => {
   const firebase = useRecoilValue(firebaseState);
   const firebaseOne = useRecoilValue(firebaseOneState);
@@ -221,6 +116,117 @@ const RouterNav = props => {
   const isOtherPagesMenuOpen = Boolean(otherPagesMenuOpen);
   const projectPoints = projectSpecs?.points || {};
 
+  const lineDiagramTooltip = type => (obj, key, uname) => {
+    if (type === "proposals") {
+      return (
+        <>
+          {key === uname ? (
+            "You've posted"
+          ) : uname === "Iman YeckehZaare" ? (
+            <>
+              <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Posted
+            </>
+          ) : (
+            "Posted"
+          )}
+
+          {` ${obj[key].num}  proposals.`}
+        </>
+      );
+    }
+    if (type === "instructors") {
+      return (
+        <>
+          {key === uname ? (
+            "You've added"
+          ) : uname === "Iman YeckehZaare" ? (
+            <>
+              <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Added
+            </>
+          ) : (
+            "Added"
+          )}
+
+          {` ${obj[key].num}  instructors.`}
+        </>
+      );
+    }
+    if (type === "administrators") {
+      return (
+        <>
+          {key === uname ? (
+            "You've added"
+          ) : uname === "Iman YeckehZaare" ? (
+            <>
+              <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Added
+            </>
+          ) : (
+            "Added"
+          )}
+
+          {` ${obj[key].num}  administrators.`}
+        </>
+      );
+    }
+    if (type === "grading") {
+      return (
+        <>
+          {key === uname ? (
+            "You've graded"
+          ) : uname === "Iman YeckehZaare" ? (
+            <>
+              <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Graded
+            </>
+          ) : (
+            "Graded"
+          )}
+
+          {` ${obj[key].num} free-recall responses.`}
+        </>
+      );
+    }
+    if (type === "coding") {
+      return (
+        <>
+          {key === uname ? (
+            "You've coded"
+          ) : uname === "Iman YeckehZaare" ? (
+            <>
+              <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Coded
+            </>
+          ) : (
+            "Coded"
+          )}
+
+          {` ${obj[key].num}` +
+            (project === "OnlineCommunities"
+              ? obj[key].num === 1
+                ? ` interview`
+                : ` interviews`
+              : obj[key].num === 1
+              ? ` explanation`
+              : ` explanations`)}
+        </>
+      );
+    }
+    if (type === "intellectual") {
+      return (
+        <>
+          {key === uname ? (
+            "You've added"
+          ) : uname === "Iman YeckehZaare" ? (
+            <>
+              <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Coded
+            </>
+          ) : (
+            "Coded"
+          )}
+
+          {` ${obj[key].num} intellectual activities.`}
+        </>
+      );
+    }
+  };
   useEffect(() => {
     const getProjectSpecs = async () => {
       const pSpec = await firebase.db.collection("projectSpecs").doc(project).get();
@@ -966,8 +972,14 @@ const RouterNav = props => {
                       {projectPoints.commentsPoints ? (
                         <Tooltip
                           title={`You've coded ${codingNums[fullname]?.num || 0} ${
-                            project === "OnlineCommunities" ? `transcripts` : `explanations`
-                          }.Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                            project === "OnlineCommunities"
+                              ? codingNums[fullname]?.num === 1
+                                ? ` interview`
+                                : ` interviews`
+                              : codingNums[fullname]?.num === 1
+                              ? ` explanation`
+                              : ` explanations`
+                          }. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
                         >
                           <Box># of 💬 :</Box>
                         </Tooltip>
