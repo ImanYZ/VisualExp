@@ -2,9 +2,11 @@ const csv = require("fast-csv");
 const { db } = require("./admin");
 
 let columns = ["Participant", "numResearchers", "Code", "Category"];
+let columns2 = ["Code", "participantsNum", "Category"];
 (async () => {
   console.log("thematicAnalysis");
   let counts = {};
+  let codesCountes = {};
   const thematicDocs = await db.collection("thematicAnalysis").get();
   const feedbackCodeBooks = await db.collection("feedbackCodeBooks").get();
 
@@ -40,9 +42,30 @@ let columns = ["Participant", "numResearchers", "Code", "Category"];
       }
     }
   }
+
   console.log(participants);
   let row;
   let rowData = [[...columns]];
+  let rowData2 = [[...columns2]];
+  for (let tId of Object.keys(counts)) {
+    for (let code of Object.keys(counts[tId])) {
+      if (codeCategories.hasOwnProperty(code)) {
+        if (counts[tId][code].length >= 2) {
+          if (codesCountes.hasOwnProperty(code)) {
+            codesCountes[code] = codesCountes[code] + 1;
+          } else {
+            codesCountes[code] = 1;
+          }
+        }
+      }
+    }
+  }
+
+  for (let code of Object.keys(codesCountes)) {
+    row = [code, codesCountes[code], codeCategories[code]];
+    rowData2.push(row);
+  }
+
   for (let tId of Object.keys(counts)) {
     for (let code of Object.keys(counts[tId])) {
       if (codeCategories.hasOwnProperty(code)) {
@@ -53,6 +76,13 @@ let columns = ["Participant", "numResearchers", "Code", "Category"];
   }
   csv
     .writeToPath("csv/thematicAnalysis.csv", [...rowData], {
+      headers: true
+    })
+    .on("finish", () => {
+      console.log("Done!");
+    });
+  csv
+    .writeToPath("csv/thematicAnalysisCodes.csv", [...rowData2], {
       headers: true
     })
     .on("finish", () => {
