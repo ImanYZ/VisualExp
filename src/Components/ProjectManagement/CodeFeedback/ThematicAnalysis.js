@@ -201,6 +201,7 @@ const ThematicAnalysis = props => {
       const transcriptDocs = await firebase.db.collection("transcript").get();
       for (let doc of transcriptDocs.docs) {
         const data = doc.data();
+        if (data.ignore) continue;
         if (!data.coders || !data.coders.includes(fullname)) {
           _listOfTranscript.push({ id: doc.id, ...data });
         }
