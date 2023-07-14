@@ -261,7 +261,7 @@ const processProject = async theProject => {
         const numberOfYes =
           recallGrades["1st"] && recallGrades["1st"][pCIdx]
             ? recallGrades["1st"][pCIdx]?.phrases.filter(
-                p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
+                p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted && p.satisfied
               ).length
             : 0;
         const totalNumberOfPhrases =
@@ -400,7 +400,7 @@ const processProject = async theProject => {
             const numberOfYes =
               recallGrades["2nd"] && recallGrades["2nd"][pCIdx]
                 ? recallGrades["2nd"][pCIdx]?.phrases.filter(
-                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
+                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted && p.satisfied
                   ).length
                 : 0;
             const totalNumberOfPhrases =
@@ -481,7 +481,7 @@ const processProject = async theProject => {
             const numberOfYes =
               recallGrades["3rd"] && recallGrades["3rd"][pCIdx]
                 ? recallGrades["3rd"][pCIdx]?.phrases.filter(
-                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
+                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted && p.satisfied
                   ).length
                 : 0;
             const totalNumberOfPhrases =
