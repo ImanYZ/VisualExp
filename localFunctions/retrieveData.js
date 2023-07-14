@@ -159,7 +159,7 @@ const processProject = async theProject => {
 
   const recallGradesPerUser = {};
 
-  const recallGradesDocs = await db.collection("recallGradesV2").get();
+  const recallGradesDocs = await db.collection("recallGradesV2").where("project", "==", theProject).get();
 
   for (let recallGradesDoc of recallGradesDocs.docs) {
     const recallGradesData = recallGradesDoc.data();
@@ -202,7 +202,7 @@ const processProject = async theProject => {
     }
   }
 
-  usersDocs = await db.collection("users").get();
+  usersDocs = await db.collection("users").where("project", "==", theProject).get();
   let userIndex = 0;
   for (let userDoc of usersDocs.docs) {
     userData = userDoc.data();
