@@ -45,16 +45,14 @@ const verifyUserTestPerSession = userData => {
   for (let condition of userData.pConditions) {
     if (skipSessions.includes("1st")) continue;
     if (condition.hasOwnProperty("test")) {
-      console.log("condition.test", condition.test, condition.test.filter(a => a !== "").length);
       if (condition.test.filter(a => a !== "").length === 0) {
         skipSessions.push("1st");
       }
     } else {
       skipSessions.push("1st");
     }
-    if (skipSessions.includes("2nd")) {
+    if (!skipSessions.includes("2nd")) {
       if (condition.hasOwnProperty("test3Days")) {
-        console.log("condition.test3Days", condition.test3Days, condition.test3Days.filter(a => a !== "").length);
         if (condition.test3Days.filter(a => a !== "").length === 0) {
           skipSessions.push("2nd");
         }
@@ -63,9 +61,8 @@ const verifyUserTestPerSession = userData => {
       }
     }
 
-    if (skipSessions.includes("3rd")) {
+    if (!skipSessions.includes("3rd")) {
       if (condition.hasOwnProperty("test1Week")) {
-        console.log("condition.test1Week", condition.test1Week, condition.test1Week.filter(a => a !== "").length);
         if (condition.test1Week.filter(a => a !== "").length === 0) {
           skipSessions.push("3rd");
         }
@@ -77,7 +74,7 @@ const verifyUserTestPerSession = userData => {
   return skipSessions;
 };
 const processProject = async theProject => {
-  console.log("called theProject", theProject);
+  console.log(theProject);
   const rowsData = [
     [
       // "fullname",
