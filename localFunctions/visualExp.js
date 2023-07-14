@@ -1973,7 +1973,7 @@ exports.convertRsearchersProject = async (req, res) => {
   }
 };
 
-exports.generateTheCSVfileChatGTP = async (req, res) => {
+exports.generateTheCSVfileChatGTP = async () => {
   try {
     console.log("generateTheCSVfileChatGTP");
     const gptResearcher = "Iman YeckehZaare";
@@ -2130,9 +2130,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       });
   } catch (err) {
     console.log({ err });
-    return res.status(400).json({ err });
   }
-  return res.status(200).json({ done: true });
 };
 
 exports.generateCSVChatGTPNotSatisfied = async (req, res) => {
