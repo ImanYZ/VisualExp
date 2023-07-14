@@ -701,6 +701,13 @@ const eventNotificationEmail = async (
   project
 ) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("sent", "==", false)
+      .where("reason", "==", "eventNotificationEmail")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     const nameString = await getNameFormatted(email, firstname);
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const mailOptions = {
@@ -764,7 +771,7 @@ const eventNotificationEmail = async (
       mailOptions,
       createdAt: Timestamp.fromDate(new Date()),
       email,
-      reason: "researcherEventNotificationEmail",
+      reason: "eventNotificationEmail",
       urgent: true,
       sent: false
     });
@@ -787,6 +794,14 @@ exports.researcherEventNotificationEmail = async (
   project
 ) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("sent", "==", false)
+      .where("participant", "==", participant)
+      .where("reason", "==", "researcherEventNotificationEmail")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     const nameString = await getNameFormatted(email, fullname);
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const mailOptions = {
@@ -846,6 +861,7 @@ exports.researcherEventNotificationEmail = async (
       email,
       reason: "researcherEventNotificationEmail",
       urgent: true,
+      participant,
       sent: false
     });
   } catch (err) {
@@ -855,6 +871,14 @@ exports.researcherEventNotificationEmail = async (
 
 exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, order) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("sent", "==", false)
+      .where("order", "==", order)
+      .where("reason", "==", "notAttendedEmail")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     const nameString = await getNameFormatted(email, firstname);
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -887,6 +911,7 @@ exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, ord
       email,
       reason: "notAttendedEmail",
       urgent: true,
+      order,
       sent: false
     });
   } catch (err) {
@@ -1170,15 +1195,17 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
 <p>Best regards,</p>
 ` + signatureHTML
     };
-    const urgetEmail = db.collection("emails").doc();
-    await urgetEmail.set({
-      mailOptions,
-      createdAt: Timestamp.fromDate(new Date()),
-      email,
-      reason: "emailApplicationStatus",
-      urgent: true,
-      sent: false
-    });
+    if (email) {
+      const urgetEmail = db.collection("emails").doc();
+      await urgetEmail.set({
+        mailOptions,
+        createdAt: Timestamp.fromDate(new Date()),
+        email,
+        reason: "emailApplicationStatus",
+        urgent: true,
+        sent: false
+      });
+    }
   } catch (err) {
     console.log({ err });
   }
@@ -1239,10 +1266,12 @@ exports.sendingEmails = async context => {
       ...emails.filter(e => e.reason === "administrator")
     ];
     for (let emailData of emails) {
-      const { documentId, mailOptions, reason, city, stateInfo, country, id, email } = emailData;
+      const emailDoc = await db.collection("emails").doc(emailData.id).get();
+      const _emailData = emailDoc.data();
+      const { documentId, mailOptions, reason, city, stateInfo, country, id, email, sent } = _emailData;
       const isInstAdmin = reason === "instructor" || reason === "administrator";
-      if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin)) {
-        console.log("sending email to", email);
+      if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin) && email && sent === false) {
+        console.log("sending email to", email, "for", reason);
         transporter.sendMail(mailOptions, async (error, data) => {
           if (error) {
             console.log("sendMail", { error });
