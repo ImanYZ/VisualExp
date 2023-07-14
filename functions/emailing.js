@@ -1268,15 +1268,15 @@ exports.sendingEmails = async context => {
     for (let emailData of emails) {
       const emailDoc = await db.collection("emails").doc(emailData.id).get();
       const _emailData = emailDoc.data();
-      const { documentId, mailOptions, reason, city, stateInfo, country, id, email, sent } = _emailData;
+      const { documentId, mailOptions, reason, city, stateInfo, country, email, sent } = _emailData;
       const isInstAdmin = reason === "instructor" || reason === "administrator";
       if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin) && email && sent === false) {
-        console.log("sending email to", email, "for", reason);
+        console.log("sending email to", email, "for", reason, "with id", emailData.id);
         transporter.sendMail(mailOptions, async (error, data) => {
           if (error) {
             console.log("sendMail", { error });
           } else {
-            const emailRef = db.collection("emails").doc(id);
+            const emailRef = db.collection("emails").doc(emailData.id);
             if (reason === "instructor") {
               const instructorRef = db.collection("instructors").doc(documentId);
               await instructorRef.update({
