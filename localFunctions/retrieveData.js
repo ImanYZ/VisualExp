@@ -38,7 +38,43 @@ const getPassageType = passageTitle => {
     ? "ACT Prose Fiction/Literary Narrative"
     : "";
 };
+
+const verifyUserTestPerSession = userData => {
+  if (!userData.pConditions) return [];
+  const skipSessions = [];
+  for (let condition of userData.pConditions) {
+    if (skipSessions.includes("1st")) continue;
+    if (condition.hasOwnProperty("test")) {
+      if (condition.test.filter(a => a !== "").length === 0) {
+        skipSessions.push("1st");
+      }
+    } else {
+      skipSessions.push("1st");
+    }
+    if (!skipSessions.includes("2nd")) {
+      if (condition.hasOwnProperty("test3Days")) {
+        if (condition.test3Days.filter(a => a !== "").length === 0) {
+          skipSessions.push("2nd");
+        }
+      } else {
+        skipSessions.push("2nd");
+      }
+    }
+
+    if (!skipSessions.includes("3rd")) {
+      if (condition.hasOwnProperty("test1Week")) {
+        if (condition.test1Week.filter(a => a !== "").length === 0) {
+          skipSessions.push("3rd");
+        }
+      } else {
+        skipSessions.push("3nd");
+      }
+    }
+  }
+  return skipSessions;
+};
 const processProject = async theProject => {
+  console.log(theProject);
   const rowsData = [
     [
       // "fullname",
@@ -166,10 +202,12 @@ const processProject = async theProject => {
     }
   }
 
-  usersDocs = await db.collection("users").where("project", "==", theProject).get();
+  usersDocs = await db.collection("users").get();
   let userIndex = 0;
   for (let userDoc of usersDocs.docs) {
     userData = userDoc.data();
+    const skipSessions = verifyUserTestPerSession(userData);
+    if (skipSessions.includes("1st")) continue;
     if (
       Array.isArray(userData.pConditions) &&
       userData.pConditions.length === 2 &&
@@ -272,7 +310,7 @@ const processProject = async theProject => {
             if (pCond.test) {
               rowLong = row.slice(0, 12);
               rowLong.push("Immediately");
-              rowLong.push(pCond.passage + "Q" + idx);
+              rowLong.push(pCond.passage + " Q" + idx);
               rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
               rowLong.push(
                 pCond.pretest && pCond.pretest.length > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
@@ -284,7 +322,7 @@ const processProject = async theProject => {
               if (pCond.test3Days) {
                 rowLong = row.slice(0, 12);
                 rowLong.push("After 3 Days");
-                rowLong.push(pCond.passage + "Q" + idx);
+                rowLong.push(pCond.passage + " Q" + idx);
                 rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                 rowLong.push(
                   pCond.pretest && pCond.pretest.length > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
@@ -301,7 +339,7 @@ const processProject = async theProject => {
                     rowLong.push("After 10 Days");
                   }
 
-                  rowLong.push(pCond.passage + "Q" + idx);
+                  rowLong.push(pCond.passage + " Q" + idx);
                   rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                   rowLong.push(
                     pCond.pretest && pCond.pretest.length > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
@@ -339,7 +377,7 @@ const processProject = async theProject => {
           rowsData.push(row);
         }
         // The particinapt has finished the second session:
-        if (userData.post3DaysQsEnded) {
+        if (userData.post3DaysQsEnded && !skipSessions.includes("2nd")) {
           row = [...commonFields];
           let secondDuration =
             "post3DaysQsEnded" in userData && "recall3DaysStart" in userData.pConditions[0]
@@ -412,7 +450,7 @@ const processProject = async theProject => {
             rowsData.push(row);
           }
         }
-        if (userData.post1WeekQsEnded) {
+        if (userData.post1WeekQsEnded && !skipSessions.includes("3rd")) {
           row = [...commonFields];
           let thirdDuration =
             "post1WeekQsEnded" in userData && "recall1WeekStart" in userData.pConditions[0]
@@ -423,7 +461,7 @@ const processProject = async theProject => {
           if (thirdDuration && thirdDuration > 5) {
             if (theProject === "H2K2") {
               row.push("After 1 Week");
-            }else{
+            } else {
               row.push("After 10 Days");
             }
             // row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
