@@ -264,8 +264,7 @@ const processProject = async theProject => {
                 p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
               ).length
             : 0;
-        const totalNumberOfPhrases = passages[pCond.passage].phrases.length;
-        console.log(numberOfYes);
+        const totalNumberOfPhrases = passages[pCond.passage].phrases.filter(p => !p.deleted).length;
         row.push(numberOfYes);
         row.push(roundNum(numberOfYes / totalNumberOfPhrases));
         // row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
@@ -400,7 +399,7 @@ const processProject = async theProject => {
                     p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
                   ).length
                 : 0;
-            const totalNumberOfPhrases = passages[pCond.passage].phrases.length;
+            const totalNumberOfPhrases = passages[pCond.passage].phrases.filter(p => !p.deleted).length;
             row.push(numberOfYes);
             row.push(roundNum(numberOfYes / totalNumberOfPhrases));
             // row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
@@ -478,7 +477,7 @@ const processProject = async theProject => {
                     p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
                   ).length
                 : 0;
-            const totalNumberOfPhrases = passages[pCond.passage].phrases.length;
+            const totalNumberOfPhrases = passages[pCond.passage].phrases.filter(p => !p.deleted).length;
             row.push(numberOfYes);
             row.push(roundNum(numberOfYes / totalNumberOfPhrases));
             // row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
@@ -550,6 +549,7 @@ const processProject = async theProject => {
     await processProject("H1L2");
     await processProject("H2K2");
     console.log("Done");
+    process.exit();
   } catch (err) {
     console.log({ err });
   }
