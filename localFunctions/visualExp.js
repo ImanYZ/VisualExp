@@ -1975,6 +1975,7 @@ exports.convertRsearchersProject = async (req, res) => {
 
 exports.generateTheCSVfileChatGTP = async (req, res) => {
   try {
+    console.log("generateTheCSVfileChatGTP");
     const gptResearcher = "Iman YeckehZaare";
     let columns = [
       "Passage_id",
@@ -2026,9 +2027,9 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
     for (let recallDoc of recallGradesV2Docs.docs) {
       const recallData = recallDoc.data();
       for (let session in recallData.sessions) {
-        for (conditionItem of recallData.sessions[session]) {
+        for (let conditionItem of recallData.sessions[session]) {
           for (let phrase of conditionItem.phrases) {
-            if (!phrase.hasOwnProperty("GPT-4-Mentioned")) continue;
+            if (!phrase.hasOwnProperty("GPT4-jun")) continue;
             const researcherIdx = phrase.researchers.indexOf(gptResearcher);
             let otherResearchers = phrase.researchers.slice();
             let otherGrades = phrase.grades.slice();
@@ -2121,7 +2122,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       }
     }
     csv
-      .writeToPath("chatGPTRecallGrades.csv", [...rowData], {
+      .writeToPath("csv/chatGPTRecallGrades.csv", [...rowData], {
         headers: true,
       })
       .on("finish", () => {
@@ -2157,7 +2158,7 @@ exports.generateCSVChatGTPNotSatisfied = async (req, res) => {
     for (let recallDoc of recallGradesV2Docs.docs) {
       const recallData = recallDoc.data();
       for (let session in recallData.sessions) {
-        for (conditionItem of recallData.sessions[session]) {
+        for (let conditionItem of recallData.sessions[session]) {
           for (let phrase of conditionItem.phrases) {
             row = [
               conditionItem.passage,
