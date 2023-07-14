@@ -264,9 +264,13 @@ const processProject = async theProject => {
                 p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
               ).length
             : 0;
-        const totalNumberOfPhrases = passages[pCond.passage].phrases.filter(p => !p.deleted).length;
-        row.push(numberOfYes);
-        row.push(roundNum(numberOfYes / totalNumberOfPhrases));
+        const totalNumberOfPhrases =
+          recallGrades["1st"] && recallGrades["1st"][pCIdx]
+            ? recallGrades["1st"][pCIdx]?.phrases.filter(p => !p.deleted && p.hasOwnProperty("GPT4-jun")).length
+            : 0;
+
+        row.push(numberOfYes === 0 ? " " : numberOfYes);
+        row.push(numberOfYes === 0 ? " " : roundNum(numberOfYes / totalNumberOfPhrases));
         // row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
         // let itemScore = 0;
         // let isGraded = false;
@@ -399,9 +403,12 @@ const processProject = async theProject => {
                     p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
                   ).length
                 : 0;
-            const totalNumberOfPhrases = passages[pCond.passage].phrases.filter(p => !p.deleted).length;
-            row.push(numberOfYes);
-            row.push(roundNum(numberOfYes / totalNumberOfPhrases));
+            const totalNumberOfPhrases =
+              recallGrades["2nd"] && recallGrades["2nd"][pCIdx]
+                ? recallGrades["2nd"][pCIdx]?.phrases.filter(p => !p.deleted && p.hasOwnProperty("GPT4-jun")).length
+                : 0;
+            row.push(numberOfYes === 0 ? " " : numberOfYes);
+            row.push(numberOfYes === 0 ? " " : roundNum(numberOfYes / totalNumberOfPhrases));
             // row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
             // itemScore = 0;
             // isGraded = false;
@@ -477,9 +484,12 @@ const processProject = async theProject => {
                     p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
                   ).length
                 : 0;
-            const totalNumberOfPhrases = passages[pCond.passage].phrases.filter(p => !p.deleted).length;
-            row.push(numberOfYes);
-            row.push(roundNum(numberOfYes / totalNumberOfPhrases));
+            const totalNumberOfPhrases =
+              recallGrades["3rd"] && recallGrades["3rd"][pCIdx]
+                ? recallGrades["3rd"][pCIdx]?.phrases.filter(p => !p.deleted && p.hasOwnProperty("GPT4-jun")).length
+                : 0;
+            row.push(numberOfYes === 0 ? " " : numberOfYes);
+            row.push(numberOfYes === 0 ? " " : roundNum(numberOfYes / totalNumberOfPhrases));
             // row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
             // itemScore = 0;
             // isGraded = false;
@@ -537,10 +547,18 @@ const processProject = async theProject => {
     .on("finish", () => {
       console.log("Created the CSV file!");
       console.log(JSON.stringify(choiceCounts));
+    })
+    .on("error", error => {
+      console.log("An error occurred while writing the CSV file:", error);
     });
-  csv.writeToPath("csv/dataPerQuestion" + theProject + ".csv", rowsLongData, { headers: true }).on("finish", () => {
-    console.log("Created the Long CSV file!");
-  });
+  csv
+    .writeToPath("csv/dataPerQuestion" + theProject + ".csv", rowsLongData, { headers: true })
+    .on("finish", () => {
+      console.log("Created the Long CSV file!");
+    })
+    .on("error", error => {
+      console.log("An error occurred while writing the CSV file:", error);
+    });
 };
 
 (async () => {
