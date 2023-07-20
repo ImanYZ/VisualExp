@@ -1973,8 +1973,9 @@ exports.convertRsearchersProject = async (req, res) => {
   }
 };
 
-exports.generateTheCSVfileChatGTP = async (req, res) => {
+exports.generateTheCSVfileChatGTP = async () => {
   try {
+    console.log("generateTheCSVfileChatGTP");
     const gptResearcher = "Iman YeckehZaare";
     let columns = [
       "Passage_id",
@@ -2026,9 +2027,9 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
     for (let recallDoc of recallGradesV2Docs.docs) {
       const recallData = recallDoc.data();
       for (let session in recallData.sessions) {
-        for (conditionItem of recallData.sessions[session]) {
+        for (let conditionItem of recallData.sessions[session]) {
           for (let phrase of conditionItem.phrases) {
-            if (!phrase.hasOwnProperty("GPT-4-Mentioned")) continue;
+            if (!phrase.hasOwnProperty("GPT4-jun")) continue;
             const researcherIdx = phrase.researchers.indexOf(gptResearcher);
             let otherResearchers = phrase.researchers.slice();
             let otherGrades = phrase.grades.slice();
@@ -2054,8 +2055,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                 recallDoc.id,
                 conditionItem.response,
                 phrase.phrase,
-                phrase.hasOwnProperty("GPT-4-Mentioned")
-                  ? phrase["GPT-4-Mentioned"]
+                phrase.hasOwnProperty("GPT4-jun")
+                  ? phrase["GPT4-jun"]
                     ? "YES"
                     : "NO"
                   : "",
@@ -2121,7 +2122,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       }
     }
     csv
-      .writeToPath("chatGPTRecallGrades.csv", [...rowData], {
+      .writeToPath("csv/chatGPTRecallGrades.csv", [...rowData], {
         headers: true,
       })
       .on("finish", () => {
@@ -2129,9 +2130,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       });
   } catch (err) {
     console.log({ err });
-    return res.status(400).json({ err });
   }
-  return res.status(200).json({ done: true });
 };
 
 exports.generateCSVChatGTPNotSatisfied = async (req, res) => {
@@ -2157,7 +2156,7 @@ exports.generateCSVChatGTPNotSatisfied = async (req, res) => {
     for (let recallDoc of recallGradesV2Docs.docs) {
       const recallData = recallDoc.data();
       for (let session in recallData.sessions) {
-        for (conditionItem of recallData.sessions[session]) {
+        for (let conditionItem of recallData.sessions[session]) {
           for (let phrase of conditionItem.phrases) {
             row = [
               conditionItem.passage,

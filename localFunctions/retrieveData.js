@@ -38,7 +38,43 @@ const getPassageType = passageTitle => {
     ? "ACT Prose Fiction/Literary Narrative"
     : "";
 };
+
+const verifyUserTestPerSession = userData => {
+  if (!userData.pConditions) return [];
+  const skipSessions = [];
+  for (let condition of userData.pConditions) {
+    if (skipSessions.includes("1st")) continue;
+    if (condition.hasOwnProperty("test")) {
+      if (condition.test.filter(a => a !== "").length === 0) {
+        skipSessions.push("1st");
+      }
+    } else {
+      skipSessions.push("1st");
+    }
+    if (!skipSessions.includes("2nd")) {
+      if (condition.hasOwnProperty("test3Days")) {
+        if (condition.test3Days.filter(a => a !== "").length === 0) {
+          skipSessions.push("2nd");
+        }
+      } else {
+        skipSessions.push("2nd");
+      }
+    }
+
+    if (!skipSessions.includes("3rd")) {
+      if (condition.hasOwnProperty("test1Week")) {
+        if (condition.test1Week.filter(a => a !== "").length === 0) {
+          skipSessions.push("3rd");
+        }
+      } else {
+        skipSessions.push("3nd");
+      }
+    }
+  }
+  return skipSessions;
+};
 const processProject = async theProject => {
+  console.log(theProject);
   const rowsData = [
     [
       // "fullname",
@@ -123,7 +159,7 @@ const processProject = async theProject => {
 
   const recallGradesPerUser = {};
 
-  const recallGradesDocs = await db.collection("recallGradesV2").get();
+  const recallGradesDocs = await db.collection("recallGradesV2").where("project", "==", theProject).get();
 
   for (let recallGradesDoc of recallGradesDocs.docs) {
     const recallGradesData = recallGradesDoc.data();
@@ -170,6 +206,8 @@ const processProject = async theProject => {
   let userIndex = 0;
   for (let userDoc of usersDocs.docs) {
     userData = userDoc.data();
+    const skipSessions = verifyUserTestPerSession(userData);
+    if (skipSessions.includes("1st")) continue;
     if (
       Array.isArray(userData.pConditions) &&
       userData.pConditions.length === 2 &&
@@ -223,13 +261,16 @@ const processProject = async theProject => {
         const numberOfYes =
           recallGrades["1st"] && recallGrades["1st"][pCIdx]
             ? recallGrades["1st"][pCIdx]?.phrases.filter(
-                p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
+                p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted && p.satisfied
               ).length
             : 0;
-        const totalNumberOfPhrases = passages[pCond.passage].phrases.length;
-        console.log(numberOfYes);
-        row.push(numberOfYes);
-        row.push(roundNum(numberOfYes / totalNumberOfPhrases));
+        const totalNumberOfPhrases =
+          recallGrades["1st"] && recallGrades["1st"][pCIdx]
+            ? recallGrades["1st"][pCIdx]?.phrases.filter(p => !p.deleted && p.hasOwnProperty("GPT4-jun")).length
+            : 0;
+
+        row.push(numberOfYes === 0 ? " " : numberOfYes);
+        row.push(numberOfYes === 0 ? " " : roundNum(numberOfYes / totalNumberOfPhrases));
         // row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
         // let itemScore = 0;
         // let isGraded = false;
@@ -272,7 +313,7 @@ const processProject = async theProject => {
             if (pCond.test) {
               rowLong = row.slice(0, 12);
               rowLong.push("Immediately");
-              rowLong.push(pCond.passage + "Q" + idx);
+              rowLong.push(pCond.passage + " Q" + idx);
               rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
               rowLong.push(
                 pCond.pretest && pCond.pretest.length > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
@@ -284,7 +325,7 @@ const processProject = async theProject => {
               if (pCond.test3Days) {
                 rowLong = row.slice(0, 12);
                 rowLong.push("After 3 Days");
-                rowLong.push(pCond.passage + "Q" + idx);
+                rowLong.push(pCond.passage + " Q" + idx);
                 rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                 rowLong.push(
                   pCond.pretest && pCond.pretest.length > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
@@ -301,7 +342,7 @@ const processProject = async theProject => {
                     rowLong.push("After 10 Days");
                   }
 
-                  rowLong.push(pCond.passage + "Q" + idx);
+                  rowLong.push(pCond.passage + " Q" + idx);
                   rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                   rowLong.push(
                     pCond.pretest && pCond.pretest.length > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
@@ -339,7 +380,7 @@ const processProject = async theProject => {
           rowsData.push(row);
         }
         // The particinapt has finished the second session:
-        if (userData.post3DaysQsEnded) {
+        if (userData.post3DaysQsEnded && !skipSessions.includes("2nd")) {
           row = [...commonFields];
           let secondDuration =
             "post3DaysQsEnded" in userData && "recall3DaysStart" in userData.pConditions[0]
@@ -359,12 +400,15 @@ const processProject = async theProject => {
             const numberOfYes =
               recallGrades["2nd"] && recallGrades["2nd"][pCIdx]
                 ? recallGrades["2nd"][pCIdx]?.phrases.filter(
-                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
+                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted && p.satisfied
                   ).length
                 : 0;
-            const totalNumberOfPhrases = passages[pCond.passage].phrases.length;
-            row.push(numberOfYes);
-            row.push(roundNum(numberOfYes / totalNumberOfPhrases));
+            const totalNumberOfPhrases =
+              recallGrades["2nd"] && recallGrades["2nd"][pCIdx]
+                ? recallGrades["2nd"][pCIdx]?.phrases.filter(p => !p.deleted && p.hasOwnProperty("GPT4-jun")).length
+                : 0;
+            row.push(numberOfYes === 0 ? " " : numberOfYes);
+            row.push(numberOfYes === 0 ? " " : roundNum(numberOfYes / totalNumberOfPhrases));
             // row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
             // itemScore = 0;
             // isGraded = false;
@@ -412,7 +456,7 @@ const processProject = async theProject => {
             rowsData.push(row);
           }
         }
-        if (userData.post1WeekQsEnded) {
+        if (userData.post1WeekQsEnded && !skipSessions.includes("3rd")) {
           row = [...commonFields];
           let thirdDuration =
             "post1WeekQsEnded" in userData && "recall1WeekStart" in userData.pConditions[0]
@@ -423,7 +467,7 @@ const processProject = async theProject => {
           if (thirdDuration && thirdDuration > 5) {
             if (theProject === "H2K2") {
               row.push("After 1 Week");
-            }else{
+            } else {
               row.push("After 10 Days");
             }
             // row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
@@ -437,12 +481,15 @@ const processProject = async theProject => {
             const numberOfYes =
               recallGrades["3rd"] && recallGrades["3rd"][pCIdx]
                 ? recallGrades["3rd"][pCIdx]?.phrases.filter(
-                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted
+                    p => p.hasOwnProperty("GPT4-jun") && p["GPT4-jun"] && !p.deleted && p.satisfied
                   ).length
                 : 0;
-            const totalNumberOfPhrases = passages[pCond.passage].phrases.length;
-            row.push(numberOfYes);
-            row.push(roundNum(numberOfYes / totalNumberOfPhrases));
+            const totalNumberOfPhrases =
+              recallGrades["3rd"] && recallGrades["3rd"][pCIdx]
+                ? recallGrades["3rd"][pCIdx]?.phrases.filter(p => !p.deleted && p.hasOwnProperty("GPT4-jun")).length
+                : 0;
+            row.push(numberOfYes === 0 ? " " : numberOfYes);
+            row.push(numberOfYes === 0 ? " " : roundNum(numberOfYes / totalNumberOfPhrases));
             // row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
             // itemScore = 0;
             // isGraded = false;
@@ -500,10 +547,18 @@ const processProject = async theProject => {
     .on("finish", () => {
       console.log("Created the CSV file!");
       console.log(JSON.stringify(choiceCounts));
+    })
+    .on("error", error => {
+      console.log("An error occurred while writing the CSV file:", error);
     });
-  csv.writeToPath("csv/dataPerQuestion" + theProject + ".csv", rowsLongData, { headers: true }).on("finish", () => {
-    console.log("Created the Long CSV file!");
-  });
+  csv
+    .writeToPath("csv/dataPerQuestion" + theProject + ".csv", rowsLongData, { headers: true })
+    .on("finish", () => {
+      console.log("Created the Long CSV file!");
+    })
+    .on("error", error => {
+      console.log("An error occurred while writing the CSV file:", error);
+    });
 };
 
 (async () => {
@@ -512,6 +567,7 @@ const processProject = async theProject => {
     await processProject("H1L2");
     await processProject("H2K2");
     console.log("Done");
+    process.exit();
   } catch (err) {
     console.log({ err });
   }
