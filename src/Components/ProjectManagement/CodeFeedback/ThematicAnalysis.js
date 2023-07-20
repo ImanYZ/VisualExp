@@ -74,6 +74,7 @@ const ThematicAnalysis = props => {
   const [addCodeFor, setAddCodeFor] = useState("");
   const [transcriptId, setTranscriptId] = useState(null);
 
+
   const [codesBook, setCodesBook] = useState({});
   const [previousTranscipt, setPreviousTranscipt] = useState([]);
 
@@ -572,6 +573,19 @@ const ThematicAnalysis = props => {
       setOpenEditAdminModal(false);
       setSubmittingUpdate(false);
       setMergeCode(null);
+      const _listOfTranscript = [...listOfTranscript].filter(transcript => transcript.id !== transcriptId);
+      setListOfTranscript(_listOfTranscript);
+      if (_listOfTranscript.length !== 0) {
+        setTranscriptId(_listOfTranscript[0].id);
+        setConversation(_listOfTranscript[0].conversation);
+        setSurveyType(_listOfTranscript[0].surveyType);
+        setCodesBook({});
+      } else {
+        setTranscriptId("");
+        setConversation([]);
+        setCodesBook({});
+        setSurveyType("");
+      }
       setSnackbarMessage("Uptaded successful!");
     } catch (err) {
       setSnackbarMessage("There is some error while updating your code, please try after some time!");
@@ -637,7 +651,7 @@ const ThematicAnalysis = props => {
           <Grid item xs={6}>
             <h2 style={{ alignSelf: "center" }}> Conversation : </h2>
             <Box height={600} overflow="auto">
-              {converstaion.length > 0 ? (
+              {converstaion && converstaion.length > 0 ? (
                 <ConversationList />
               ) : (
                 <Alert severity="info" variant="outlined" className="VoteActivityAlert">
