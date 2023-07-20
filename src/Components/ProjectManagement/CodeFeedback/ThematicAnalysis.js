@@ -202,7 +202,7 @@ const ThematicAnalysis = props => {
       const transcriptDocs = await firebase.db.collection("transcript").get();
       for (let doc of transcriptDocs.docs) {
         const data = doc.data();
-        if (data.ignore) continue;
+        if (data.ignore || !data.hasOwnProperty("conversation")) continue;
         if (!data.coders || !data.coders.includes(fullname)) {
           _listOfTranscript.push({ id: doc.id, ...data });
         }
@@ -573,19 +573,6 @@ const ThematicAnalysis = props => {
       setOpenEditAdminModal(false);
       setSubmittingUpdate(false);
       setMergeCode(null);
-      const _listOfTranscript = [...listOfTranscript].filter(transcript => transcript.id !== transcriptId);
-      setListOfTranscript(_listOfTranscript);
-      if (_listOfTranscript.length !== 0) {
-        setTranscriptId(_listOfTranscript[0].id);
-        setConversation(_listOfTranscript[0].conversation);
-        setSurveyType(_listOfTranscript[0].surveyType);
-        setCodesBook({});
-      } else {
-        setTranscriptId("");
-        setConversation([]);
-        setCodesBook({});
-        setSurveyType("");
-      }
       setSnackbarMessage("Uptaded successful!");
     } catch (err) {
       setSnackbarMessage("There is some error while updating your code, please try after some time!");
@@ -691,7 +678,7 @@ const ThematicAnalysis = props => {
             </Box>
           </Grid>
           <Grid item xs={12} style={{ display: "flex", justifyContent: "left" }}>
-            {converstaion.length > 0 && (
+            {converstaion && converstaion.length > 0 && (
               <Button
                 variant="contained"
                 onClick={handleSubmit}
