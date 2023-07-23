@@ -32,7 +32,7 @@ const getPassageType = passageTitle => {
     : passageTitle === "Conservationist  and Diplomat: The Grey Areas of Panda Conservation" ||
       passageTitle === "How to Watch Television"
     ? "ACT Social Sciences"
-    : passageTitle === "The Buzz in Our Pockets"
+    : passageTitle === "The Buzz in Our Pockets" || passageTitle === "The Quiet Sideman"
     ? "ACT Humanities"
     : passageTitle === "Prima Ballerina" || passageTitle === "Reena"
     ? "ACT Prose Fiction/Literary Narrative"
