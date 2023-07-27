@@ -1875,15 +1875,15 @@ exports.updatePhraseForPassage = async (req, res) => {
               needUpdate = true;
               phraseItem.phrase = newPhrase;
               if (resetGrades) {
-                phraseItem = {
-                  phrase: newPhrase,
-                  researchers: [],
-                  grades: []
-                };
-              }
-              if (phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
-                delete phraseItem["GPT-4-Mentioned"];
-                conditionItem.doneGPT4Mentioned = false;
+                conditionItem.done = false;
+                conditionItem.reaserchers = [];
+                phraseItem.researchers = [];
+                phraseItem.grades = [];
+                for (let key of Object.keys(phraseItem)) {
+                  if (!["phrase", "researchers", "grades"].includes(key)) {
+                    delete phraseItem[key];
+                  }
+                }
               }
             }
           }
