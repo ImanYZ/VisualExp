@@ -70,6 +70,7 @@ const {
   checkEntreviewStatus
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
+const { saveGradesLogs } = require("./recallGradesAI");
 
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
@@ -167,6 +168,7 @@ app.post("/addNewPhraseForPassage", addNewPhraseForPassage);
 app.post("/calcultesRecallGradesRecords", calcultesRecallGradesRecords);
 app.post("/deletePhraseFromPassage", deletePhraseFromPassage);
 app.get("/loadRecallGradesNumbers", loadRecallGradesNumbers);
+app.post("/saveGradesLogs", saveGradesLogs);
 // Knowledge endpoints
 
 // Misinformation Experiment
