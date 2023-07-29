@@ -7,8 +7,9 @@ exports.saveGradesLogs = async (req, res) => {
     const bucket = storage.bucket("gs://visualexp-5d2c6.appspot.com");
     const filePath = `gradesLogs/${req.body.fileName}`;
     await bucket.file(filePath).save(JSON.stringify(req.body.responseLogs));
-    console.log(req.body.data);
+    return res.status(200).send("success");
   } catch (error) {
     console.log(error);
+    return res.status(500).send("error");
   }
 };
