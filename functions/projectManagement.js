@@ -1847,7 +1847,7 @@ exports.submitThematic = async (req, res) => {
 
 exports.updatePhraseForPassage = async (req, res) => {
   try {
-    const { passagTitle, selectedPhrase, newPhrase } = req.body;
+    const { passagTitle, selectedPhrase, newPhrase, resetGrades } = req.body;
     const passageQuery = db.collection("passages").where("title", "==", passagTitle);
     const passageSnapshot = await passageQuery.get();
     const passageDoc = passageSnapshot.docs[0];
@@ -1874,9 +1874,16 @@ exports.updatePhraseForPassage = async (req, res) => {
             if (phraseItem.phrase === selectedPhrase) {
               needUpdate = true;
               phraseItem.phrase = newPhrase;
-              if (phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
-                delete phraseItem["GPT-4-Mentioned"];
-                conditionItem.doneGPT4Mentioned = false;
+              if (resetGrades) {
+                conditionItem.done = false;
+                conditionItem.reaserchers = [];
+                phraseItem.researchers = [];
+                phraseItem.grades = [];
+                for (let key of Object.keys(phraseItem)) {
+                  if (!["phrase", "researchers", "grades"].includes(key)) {
+                    delete phraseItem[key];
+                  }
+                }
               }
             }
           }
@@ -1916,6 +1923,7 @@ exports.addNewPhraseForPassage = async (req, res) => {
       for (const session in recallData.sessions) {
         for (const conditionItem of recallData.sessions[session]) {
           if (conditionItem.passage === passageDoc.id) {
+            conditionItem.reaserchers = [];
             conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
             needUpdate = true;
           }

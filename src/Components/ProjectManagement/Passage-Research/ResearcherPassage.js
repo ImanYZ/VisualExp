@@ -19,6 +19,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import { Switch } from "@mui/material";
 
 const ResearcherPassage = () => {
   const firebase = useRecoilValue(firebaseState);
@@ -55,6 +56,7 @@ const ResearcherPassage = () => {
   const [updatingPhrase, setUpdatingPhrase] = useState(false);
   const [deletingPhrase, setDeletingPhrase] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
+  const [resetGrades, setResetGrades] = useState(false);
   const email = useRecoilValue(emailState);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -159,15 +161,17 @@ const ResearcherPassage = () => {
   const hundleUpdatePhrase = async event => {
     try {
       setUpdatingPhrase(true);
-      await axios.post("/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase });
+      await axios.post("/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase, resetGrades });
       handleCloseEditModal();
       setPassagesLoaded(false);
       setUpdatingPhrase(false);
+      setResetGrades(false);
       setSnackbarMessage("Phrase updated successfully");
     } catch (error) {
       handleCloseEditModal();
       setPassagesLoaded(false);
       setUpdatingPhrase(false);
+      setResetGrades(false);
       console.log(error);
       window.alert("There was an error updating the phrase");
     }
@@ -265,6 +269,7 @@ const ResearcherPassage = () => {
     setOpenEditModal(false);
     setNewPhrase("");
     setUpdatingPhrase(false);
+    setResetGrades(false);
   };
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
@@ -281,6 +286,8 @@ const ResearcherPassage = () => {
             rows={3}
             sx={{ width: "95%", m: 0.5 }}
           />
+          <Switch checked={resetGrades} onChange={() => setResetGrades(previous => !previous)} color="secondary" />{" "}
+          Delete Recall Grades
         </DialogContent>
         <DialogActions>
           <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
