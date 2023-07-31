@@ -292,7 +292,7 @@ const ResearcherPassage = () => {
             sx={{ width: "95%", m: 0.5 }}
           />
           <Switch checked={resetGrades} onChange={() => setResetGrades(previous => !previous)} color="secondary" />{" "}
-          Toggle This if you think theis Phrase needs to be graded again.
+          Toggle This if you think this Phrase needs to be graded again.
         </DialogContent>
         <DialogActions>
           <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
