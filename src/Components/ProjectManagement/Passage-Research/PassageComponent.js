@@ -165,27 +165,29 @@ const PassageComponent = props => {
                     >
                       <DeleteIcon />
                     </IconButton>
-                    <List>
-                      {["Inference", "memory"].map(type => (
-                        <ListItem disablePadding>
-                          <ListItemButton
-                            onClick={() => {
-                              props.handleTypeOfPhrase(type, props.passage.title, index);
-                            }}
-                            dense
-                          >
-                            <ListItemIcon>
-                              <Checkbox
-                                edge="start"
-                                checked={props.passage.phrasesTypes && props.passage?.phrasesTypes[index] === type}
-                                disableRipple
-                              />
-                            </ListItemIcon>
-                            <ListItemText id={type} primary={`${type}`} />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
+                    {props.email === "oneweb@umich.edu" && (
+                      <List>
+                        {["Inference", "memory"].map(type => (
+                          <ListItem disablePadding>
+                            <ListItemButton
+                              onClick={() => {
+                                props.handleTypeOfPhrase(type, props.passage.title, index);
+                              }}
+                              dense
+                            >
+                              <ListItemIcon>
+                                <Checkbox
+                                  edge="start"
+                                  checked={props.passage.phrasesTypes && props.passage?.phrasesTypes[index] === type}
+                                  disableRipple
+                                />
+                              </ListItemIcon>
+                              <ListItemText id={type} primary={`${type}`} />
+                            </ListItemButton>
+                          </ListItem>
+                        ))}
+                      </List>
+                    )}
                   </Box>
                 )}
               </li>
