@@ -46,7 +46,6 @@ const ResearcherPassage = () => {
   const handleCloseAddPhraseModal = () => setOpenAddPhraseModal(false);
   const handleOpenddPhraseModal = () => setOpenAddPhraseModal(true);
   const [passagesChanges, setPassagesChanges] = useState([]);
-  const [passagesLoaded, setPassagesLoaded] = useState(false);
   const [passagesLoadedUse, setPassagesLoadedUse] = useState(false);
   const [numberRecorded, setNumberRecorded] = useState(0);
   const [newPhraseAdded, setNewPhraseAdded] = useState();
@@ -59,8 +58,18 @@ const ResearcherPassage = () => {
   const [resetGrades, setResetGrades] = useState(false);
   const email = useRecoilValue(emailState);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [editor, setEditor] = useState(false);
 
-  const editor = email === "oneweb@umich.edu";
+  useEffect(() => {
+    const checkEditor = async () => {
+      const researcherDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
+      if (researcherDoc.docs.length > 0) {
+        const researcherData = researcherDoc.docs[0].data();
+        setEditor(researcherData?.passageEditor || false);
+      }
+    };
+    if (email && firebase) checkEditor();
+  }, [email, firebase]);
 
   useEffect(() => {
     if (firebase) {
@@ -163,13 +172,11 @@ const ResearcherPassage = () => {
       setUpdatingPhrase(true);
       await axios.post("/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase, resetGrades });
       handleCloseEditModal();
-      setPassagesLoaded(false);
       setUpdatingPhrase(false);
       setResetGrades(false);
       setSnackbarMessage("Phrase updated successfully");
     } catch (error) {
       handleCloseEditModal();
-      setPassagesLoaded(false);
       setUpdatingPhrase(false);
       setResetGrades(false);
       console.log(error);
@@ -199,7 +206,6 @@ const ResearcherPassage = () => {
           passageId: passageDoc.docs[0].id,
           selectedPhrase
         });
-        setPassagesLoaded(false);
         handleCloseDeleteModal();
         setSnackbarMessage("Phrase deleted successfully");
       }
@@ -216,7 +222,6 @@ const ResearcherPassage = () => {
     try {
       await axios.post("/addNewPhraseForPassage", { chosenPassage, newPhraseAdded });
       handleCloseAddPhraseModal();
-      setPassagesLoaded(false);
       setSubmtingNewPhrase(false);
       setNewPhraseAdded("");
       setSnackbarMessage("Phrase added successfully");
@@ -287,7 +292,7 @@ const ResearcherPassage = () => {
             sx={{ width: "95%", m: 0.5 }}
           />
           <Switch checked={resetGrades} onChange={() => setResetGrades(previous => !previous)} color="secondary" />{" "}
-          Delete Recall Grades
+          Toggle This if you think Phrase needs to be graded again.
         </DialogContent>
         <DialogActions>
           <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
@@ -382,6 +387,7 @@ const ResearcherPassage = () => {
         <Box style={{ display: "flex", height: "100%" }}>
           <PassageComponent
             editor={editor}
+            email={email}
             passage={passage1}
             handleTypeOfQuestion={handleTypeOfQuestion}
             handleOpenddPhraseModal={handleOpenddPhraseModal}
@@ -402,6 +408,7 @@ const ResearcherPassage = () => {
           />
           <PassageComponent
             editor={editor}
+            email={email}
             passage={passage2}
             handleTypeOfQuestion={handleTypeOfQuestion}
             handleOpenddPhraseModal={handleOpenddPhraseModal}
