@@ -567,7 +567,7 @@ const processProject = async theProject => {
     await processProject("H1L2");
     await processProject("H2K2");
     console.log("Done");
-    process.exit();
+    // process.exit();
   } catch (err) {
     console.log({ err });
   }
