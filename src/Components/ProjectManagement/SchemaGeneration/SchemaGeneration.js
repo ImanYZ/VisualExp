@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
@@ -55,7 +55,6 @@ export const SchemaGeneration = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   const [passages, setPassages] = useState([]);
-  const [phrases, setSelectedPhrases] = useState([]);
   const [selectedPassage, setSelectedPassage] = useState({});
   const [selectedPhrase, setSelectedPhrase] = useState(null);
   const [schema, setSchema] = useState(temp_schema);
@@ -67,14 +66,14 @@ export const SchemaGeneration = () => {
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
   const project = useRecoilValue(projectState);
-  const [selectedPassageTitle, setSelectedPassageTitle] = useState("");
   const [allTheResponses, setAllTheResponses] = useState({});
   const [highlightedWords, setHighlightedWords] = useState([]);
   const [notSatisfiedResponses, setNotSatisfiedResponses] = useState([]);
   const [tryout, setTryout] = useState(false);
+  const [passageChanges, setPassageChanges] = useState([]);
+  const [passgesLoaded, setPassgesLoaded] = useState(false);
 
   useEffect(() => {
-    console.log("loadSchema");
     const retrieveResponses = async () => {
       try {
         setSearching(true);
@@ -98,43 +97,64 @@ export const SchemaGeneration = () => {
   }, [firebase, allTheResponses, selectedPassage, selectedPhrase]);
 
   useEffect(() => {
+    setHighlightedWords([]);
+    setNotSatisfiedResponses([]);
+    setSchemasBoolean([]);
+    setTryout(false);
+    if (firebase) {
+      const passageQuery = firebase.db.collection("passages");
+      const passageSnapshot = passageQuery.onSnapshot(snapshot => {
+        const docChanges = snapshot.docChanges();
+        setPassageChanges(oldSchmasChanges => {
+          return [...oldSchmasChanges, ...docChanges];
+        });
+        setPassgesLoaded(true);
+      });
+      return () => {
+        setPassgesLoaded(false);
+        setPassageChanges([]);
+        passageSnapshot();
+      };
+    }
+  }, [firebase]);
+
+  useEffect(() => {
     const retrievePassages = async () => {
-      const passagesDocs = await firebase.db.collection("passages").get();
-      let passages = [];
-      passages = passagesDocs.docs
-        .map(x => {
-          const data = x.data();
-          if (data?.phrases?.length > 0) {
-            return { ...data, id: x.id };
-          }
-          return null;
-        })
-        .filter(x => x !== null);
-      setPassages(passages);
+      let _passages = [...passages];
+      const tempPassageChanges = [...passageChanges];
+      setSchmaChanges([]);
+      for (let change of tempPassageChanges) {
+        const passageData = change.doc.data();
+        let passageProjects = Object.keys(passageData.projects);
+        if (passageProjects.length === 0) continue;
+
+        const index = _passages.findIndex(elm => elm.id === change.doc.id);
+        if (index === -1) {
+          _passages.push({ id: change.doc.id, ...passageData });
+        } else {
+          _passages[index] = { id: change.doc.id, ...passageData };
+        }
+      }
+      setPassages(_passages);
       const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
       if (booleanLogsDoc.exists) {
         const booleanLogsData = booleanLogsDoc.data();
-        const passage = passages.find(elem => elem.title === booleanLogsData.passage);
-        setSelectedPassageTitle(passage.title);
+        const passage = _passages.find(elem => elem.title === booleanLogsData.passage);
         setSelectedPassage(passage);
-        const phrases = passage.phrases;
-        setSelectedPhrases(phrases);
         setSelectedPhrase(booleanLogsData.selectedPhrase);
         setSchema(booleanLogsData.schema);
       } else {
-        setSelectedPassage(passages[0]);
-        const phrases = passages[0].phrases;
-        setSelectedPhrases([...phrases]);
-        setSelectedPhrase(phrases[0]);
+        setSelectedPassage(_passages[0]);
+        setSelectedPhrase(_passages[0].phrases[0]);
       }
       setHighlightedWords([]);
       setSchemasBoolean([]);
       setNotSatisfiedResponses([]);
     };
-    if (firebase && fullname) {
+    if (firebase && fullname && passageChanges.length > 0 && passgesLoaded) {
       retrievePassages();
     }
-  }, [firebase, fullname]);
+  }, [firebase, fullname, passageChanges, passgesLoaded]);
 
   useEffect(() => {
     const recordLogs = async () => {
@@ -215,17 +235,15 @@ export const SchemaGeneration = () => {
     setHighlightedWords([]);
   }, [firebase, schmaLoaded]);
 
-  useEffect(() => {
-    if (selectedPassageTitle !== "" && !passages.length) return;
-    const passageIdx = passages.findIndex(i => i.title === selectedPassageTitle);
+  const handleSelectedPassage = newPassageTitle => {
+    const passageIdx = passages.findIndex(i => i.title === newPassageTitle);
     if (passageIdx === -1) return;
     const passage = passages[passageIdx];
     setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
     setSelectedPhrase(passage.phrases[0]);
     setHighlightedWords([]);
     setNotSatisfiedResponses([]);
-  }, [selectedPassageTitle]);
+  };
 
   const handleSubmit = () => {
     const _schema = [];
@@ -394,31 +412,27 @@ export const SchemaGeneration = () => {
   };
 
   const previousPhrase = () => {
-    const indexPhrase = phrases.indexOf(selectedPhrase);
-    setSelectedPhrase(phrases[indexPhrase - 1]);
+    const indexPhrase = selectedPassage.phrases.indexOf(selectedPhrase);
+    setSelectedPhrase(selectedPassage.phrases[indexPhrase - 1]);
   };
 
   const nextPhrase = () => {
-    const indexPhrase = phrases.indexOf(selectedPhrase);
-    setSelectedPhrase(phrases[indexPhrase + 1]);
+    const indexPhrase = selectedPassage.phrases.indexOf(selectedPhrase);
+    setSelectedPhrase(selectedPassage.phrases[indexPhrase + 1]);
   };
 
   const previousPassage = () => {
-    const indexPassage = passages.findIndex(i => i.title === selectedPassageTitle);
+    const indexPassage = passages.findIndex(i => i.title === selectedPassage?.title);
     const passage = passages[indexPassage - 1];
     setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
     setSelectedPhrase(passage.phrases[0]);
-    setSelectedPassageTitle(passage.title);
   };
 
   const nextPassage = () => {
-    const indexPassage = passages.findIndex(i => i.title === selectedPassageTitle);
+    const indexPassage = passages.findIndex(i => i.title === selectedPassage?.title);
     const passage = passages[indexPassage + 1];
     setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
     setSelectedPhrase(passage.phrases[0]);
-    setSelectedPassageTitle(passage.title);
   };
 
   const filterParagraphs = (responses, rules) => {
@@ -605,9 +619,9 @@ export const SchemaGeneration = () => {
           <Box sx={{ width: "55%" }}>
             <Select
               id="demo-simple-select-helper"
-              value={selectedPassageTitle}
+              value={selectedPassage?.title || ""}
               onChange={(_, value) => {
-                setSelectedPassageTitle(value.props.value);
+                handleSelectedPassage(value.props.value);
               }}
               sx={{ width: "100%", color: "white", border: "1px", borderColor: "white" }}
             >
@@ -639,7 +653,7 @@ export const SchemaGeneration = () => {
               <Button
                 sx={{ color: "black", alignItems: "center" }}
                 variant="text"
-                disabled={phrases.indexOf(selectedPhrase) === 0}
+                disabled={(selectedPassage?.phrases || []).indexOf(selectedPhrase) === 0}
                 onClick={previousPhrase}
               >
                 {`< Prev `}
@@ -657,7 +671,7 @@ export const SchemaGeneration = () => {
               <Autocomplete
                 id="key-phrase"
                 value={selectedPhrase}
-                options={phrases}
+                options={selectedPassage?.phrases || []}
                 onChange={(_, value) => setSelectedPhrase(value || null)}
                 renderInput={params => <TextField {...params} value={selectedPhrase} />}
                 getOptionLabel={phrase => (phrase ? phrase : "")}
@@ -675,7 +689,10 @@ export const SchemaGeneration = () => {
               <Button
                 sx={{ color: "black", border: "none" }}
                 variant="text"
-                disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
+                disabled={
+                  (selectedPassage?.phrases || []).indexOf(selectedPhrase) ===
+                  (selectedPassage?.phrases || []).length - 1
+                }
                 onClick={nextPhrase}
               >{`NEXT >`}</Button>
             </Box>
