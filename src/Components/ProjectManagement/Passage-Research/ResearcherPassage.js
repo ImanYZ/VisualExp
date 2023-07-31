@@ -352,8 +352,7 @@ const ResearcherPassage = () => {
               value={chosenPassage}
               onChange={event => setChosenPassage(event.target.value || "")}
             >
-              <MenuItem value={passage1.title}>{passage1.title}</MenuItem>
-              <MenuItem value={passage2.title}>{passage2.title}</MenuItem>
+              <MenuItem value={chosenPassage}>{chosenPassage}</MenuItem>
             </Select>
           </Box>
         </DialogContent>
