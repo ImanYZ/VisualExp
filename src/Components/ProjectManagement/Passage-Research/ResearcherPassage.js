@@ -90,44 +90,46 @@ const ResearcherPassage = () => {
   }, [firebase]);
 
   useEffect(() => {
-    let passags = passages;
+    let _passages = [...passages];
     if (passagesLoadedUse) {
       const tempPassagesChanges = [...passagesChanges];
       setPassagesChanges([]);
-      let titls = titles;
+      let _titles = titles;
 
       for (let change of tempPassagesChanges) {
         const pasageData = change.doc.data();
         let passageProjects = Object.keys(pasageData.projects);
         if (passageProjects.length !== 0) {
           if (change.type === "modified") {
-            passags[titls.indexOf(pasageData.title)] = { ...pasageData };
+            const passageIdx = _passages.findIndex(p => p.id === change.doc.id);
+            _passages[passageIdx] = { ...pasageData, id: change.doc.id };
           } else {
-            passags.push({
-              ...pasageData
+            _passages.push({
+              ...pasageData,
+              id: change.doc.id
             });
-            titls.push(pasageData.title);
+            _titles.push(pasageData.title);
           }
         }
       }
 
-      setPassages(passags);
+      setPassages(_passages);
       if (firstLoad) {
-        setTitles(titls);
+        setTitles(_titles);
         setUserCondition(titles[0]);
         setPassageCondition("H2");
-        setPConURL(passags[0]["linkH2"]);
+        setPConURL(_passages[0]["linkH2"]);
         setUserCondition2(titles[0]);
         setPassageCondition2("K2");
-        setPConURL2(passags[0]["linkK2"]);
-        setPassage2(passags[0]);
-        setPassage1(passags[0]);
+        setPConURL2(_passages[0]["linkK2"]);
+        setPassage2(_passages[0]);
+        setPassage1(_passages[0]);
         setFirstLoad(false);
       } else {
-        const index1 = titles.indexOf(passage1.title);
-        const index2 = titles.indexOf(passage2.title);
-        setPassage1(passags[index1]);
-        setPassage2(passags[index2]);
+        const index1 = _passages.findIndex(p => p.id === passage1.id);
+        const index2 = _passages.findIndex(p => p.id === passage2.id);
+        setPassage1(_passages[index1]);
+        setPassage2(_passages[index2]);
       }
       setPassagesLoadedUse(false);
     }
@@ -197,7 +199,6 @@ const ResearcherPassage = () => {
         });
         numberRecord = response.data.numberRecord;
         setNumberRecorded(numberRecord);
-        console.log(numberRecord);
         allowDelete = numberRecord === 0;
       }
       if (allowDelete) {
@@ -254,7 +255,6 @@ const ResearcherPassage = () => {
         );
       }
       newPhrasesTypes[phraseIndex] = type;
-      console.log(newPhrasesTypes);
       passageDoc.docs[0].ref.update({
         phrasesTypes: newPhrasesTypes
       });
@@ -276,8 +276,24 @@ const ResearcherPassage = () => {
     setUpdatingPhrase(false);
     setResetGrades(false);
   };
+
+  const savePhrasesOrder = async ({ passageId, phrasesOrder, passageNum }) => {
+    if (!editor) return;
+    const passageIdx = passages.findIndex(p => p.id === passageId);
+    const passage = passages[passageIdx];
+    passage.phrases = phrasesOrder;
+    if (passageNum === 1) {
+      setPassage1(passage);
+    } else {
+      setPassage2(passage);
+    }
+    const passageRef = firebase.db.collection("passages").doc(passageId);
+    await passageRef.update({
+      phrases: phrasesOrder
+    });
+  };
   return (
-    <Paper sx={{ m: "10px 10px 100px 10px" }}>
+    <Paper sx={{ m: "10px 10px 0px 10px" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
         <DialogTitle sx={{ fontSize: "15px" }}> Update the phrase below:</DialogTitle>
         <DialogContent sx={{ width: "500px", mt: "5px" }}>
@@ -404,6 +420,8 @@ const ResearcherPassage = () => {
             setSelectedPhrase={setSelectedPhrase}
             handleOpenDeleteModal={handleOpenDeleteModal}
             handleTypeOfPhrase={handleTypeOfPhrase}
+            savePhrasesOrder={savePhrasesOrder}
+            passageNum={1}
           />
           <PassageComponent
             editor={editor}
@@ -425,6 +443,8 @@ const ResearcherPassage = () => {
             setSelectedPhrase={setSelectedPhrase}
             handleOpenDeleteModal={handleOpenDeleteModal}
             handleTypeOfPhrase={handleTypeOfPhrase}
+            savePhrasesOrder={savePhrasesOrder}
+            passageNum={2}
           />
         </Box>
         <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
