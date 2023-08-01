@@ -54,9 +54,9 @@ module.exports = async (req, res) => {
       const researchers = await t.get(db.collection("researchers"));
       let researchersUpdates = {};
       let updatedResearchers = [];
-      for (const researcher of researchers.docs) {
-        const researcherData = researcher.data();
-        researchersUpdates[researcher.id] = researcherData;
+      for (const _researcher of researchers.docs) {
+        const researcherData = _researcher.data();
+        researchersUpdates[_researcher.id] = researcherData;
       }
       // adding gradingNum
 
@@ -346,20 +346,6 @@ module.exports = async (req, res) => {
         updateObj: recallGradeData
       });
 
-      // updating points for researchers if required
-      for (const researcherId in researchersUpdates) {
-        if (!updatedResearchers.includes(researcherId)) {
-          continue;
-        }
-
-        const researcherRef = db.collection("researchers").doc(researcherId);
-        transactionWrites.push({
-          type: "update",
-          refObj: researcherRef,
-          updateObj: researchersUpdates[researcherId]
-        });
-      }
-
       // updating participant points if required
       if (userUpdated) {
         const userRef = db.collection("users").doc(recallGradeData.user);
@@ -390,14 +376,27 @@ module.exports = async (req, res) => {
       }
       if (readyRecalls) {
         await assignExpPoints({
-          researcher: fullname,
+          researcher,
           participant: recallGradeData.user,
           session,
           project: voterProject,
           recallGradeData,
           feedbackCodeData: null,
           transactionWrites: transactionWrites,
+          researchersUpdates,
           t
+        });
+      }
+      // updating points for researchers if required
+      for (const researcherId in researchersUpdates) {
+        if (!updatedResearchers.includes(researcherId)) {
+          continue;
+        }
+        const researcherRef = db.collection("researchers").doc(researcherId);
+        transactionWrites.push({
+          type: "update",
+          refObj: researcherRef,
+          updateObj: researchersUpdates[researcherId]
         });
       }
 
