@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -18,10 +18,22 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 const PassageComponent = props => {
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+
+  const handleSorting = () => {
+    const _phrases = [...props.passage.phrases];
+    const dragItemContent = _phrases[dragItem.current];
+    _phrases.splice(dragItem.current, 1);
+    _phrases.splice(dragOverItem.current, 0, dragItemContent);
+    props.savePhrasesOrder({ passageId: props.passage.id, phrasesOrder: _phrases, passageNum: props.passageNum });
+  };
+
   return (
-    <Box style={{ width: "70%", margin: "15px 0px 0px 20px", overflow: "scroll", height: "90vh" }}>
+    <Box style={{ width: "70%", margin: "15px 0px 25px 20px", overflow: "scroll", height: "90vh" }}>
       <Box style={{ display: "flex", marginBottom: "5px" }}>
         <Box style={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
           <Typography variant="h6" component="Box">
@@ -134,12 +146,25 @@ const PassageComponent = props => {
         </Box>
       )}
       <Box>
-        {props.passage &&
-          props.passage?.phrases?.length > 0 &&
-          props.passage?.phrases?.map((phrase, index) => (
-            <ul key={index}>
-              <li>
-                <Box>{phrase}</Box>
+        {props.passage && props.passage?.phrases?.length > 0 && (
+          <List>
+            {props.passage?.phrases?.map((phrase, index) => (
+              <ListItem
+                draggable
+                onDragStart={e => {
+                  dragItem.current = index;
+                }}
+                onDragEnter={e => {
+                  dragOverItem.current = index;
+                }}
+                onDragEnd={handleSorting}
+                style={{ borderBottom: "1px solid black" }}
+              >
+                <ListItemIcon>
+                  <DragIndicatorIcon />
+                  {index + 1}
+                </ListItemIcon>
+                <ListItemText id="switch-list-label-wifi" primary={phrase} style={{ userSelect: "text" }} />
                 {props.editor && (
                   <Box>
                     <IconButton
@@ -190,9 +215,10 @@ const PassageComponent = props => {
                     )}
                   </Box>
                 )}
-              </li>
-            </ul>
-          ))}
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Box>
     </Box>
   );
