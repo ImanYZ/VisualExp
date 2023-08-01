@@ -1766,14 +1766,14 @@ exports.submitThematic = async (req, res) => {
       const transcriptDoc = await t.get(trabscriptionRef);
       const transcriptData = transcriptDoc.data();
       const themathicDocs = await t.get(db.collection("thematicAnalysis").where("transcriptId", "==", transcriptId));
-      const reaserchers = {};
+      const researchers = {};
       const reaserchersDocs = await t.get(db.collection("researchers"));
       const thematicDocs = await t.get(
         db.collection("thematicAnalysis").where("transcriptId", "==", transcriptId).where("researcher", "==", fullname)
       );
       reaserchersDocs.docs.forEach(doc => {
         if (doc.data().projects && doc.data().projects.hasOwnProperty(project)) {
-          reaserchers[doc.id] = doc.data();
+          researchers[doc.id] = doc.data();
         }
       });
       for (let doc of themathicDocs.docs) {
@@ -1804,16 +1804,16 @@ exports.submitThematic = async (req, res) => {
         if (reaserchersPoints[code].length >= 3) {
           for (let researcher of reaserchersPoints[code]) {
             const resRef = db.collection("researchers").doc(researcher);
-            reaserchers[researcher].projects[project].positiveCodingPoints += 0.4;
-            t.update(resRef, reaserchers[researcher]);
+            researchers[researcher].projects[project].positiveCodingPoints += 0.4;
+            t.update(resRef, researchers[researcher]);
           }
         }
       }
       if (!transcriptData.hasOwnProperty("coders") || !transcriptData.coders.includes(fullname)) {
-        if (reaserchers[fullname].projects[project].hasOwnProperty("codingNum")) {
-          reaserchers[fullname].projects[project].codingNum += 1;
+        if (researchers[fullname].projects[project].hasOwnProperty("codingNum")) {
+          researchers[fullname].projects[project].codingNum += 1;
         } else {
-          reaserchers[fullname].projects[project].codingNum = 1;
+          researchers[fullname].projects[project].codingNum = 1;
         }
       }
       if (thematicDocs.docs.length > 0) {
@@ -1876,7 +1876,7 @@ exports.updatePhraseForPassage = async (req, res) => {
               phraseItem.phrase = newPhrase;
               if (resetGrades) {
                 conditionItem.done = false;
-                conditionItem.reaserchers = [];
+                conditionItem.researchers = [];
                 phraseItem.researchers = [];
                 phraseItem.grades = [];
                 for (let key of Object.keys(phraseItem)) {
@@ -1923,7 +1923,7 @@ exports.addNewPhraseForPassage = async (req, res) => {
       for (const session in recallData.sessions) {
         for (const conditionItem of recallData.sessions[session]) {
           if (conditionItem.passage === passageDoc.id) {
-            conditionItem.reaserchers = [];
+            conditionItem.researchers = [];
             conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
             needUpdate = true;
           }

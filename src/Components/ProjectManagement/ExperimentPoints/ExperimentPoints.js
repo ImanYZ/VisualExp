@@ -77,6 +77,7 @@ const participantsColumns = [
 const expSessionsColumns = [
   { field: "start", headerName: "Start", type: "dateTime", width: 190 },
   { field: "end", headerName: "End", type: "dateTime", width: 190 },
+  { field: "participant", headerName: "Participant", width: 130 },
   {
     field: "attendees",
     headerName: "Attendees",
@@ -132,30 +133,29 @@ const ExperimentPoints = props => {
           eSessions = eSessions.filter(eSe => eSe.id !== change.doc.id);
         } else {
           const eSessionData = change.doc.data();
-          if (eSessionData.attendees.includes(email)) {
-            const eSessionObj = {
-              id: change.doc.id,
-              start: eSessionData.sTime.toDate(),
-              end: eSessionData.eTime.toDate(),
-              attendees: eSessionData.attendees.join(", "),
-              points: eSessionData.points
-            };
-            const eSessionIdx = eSessions.findIndex(eSe => eSe.id === change.doc.id);
-            if (eSessionIdx === -1) {
-              eSessions.push(eSessionObj);
-            } else {
-              eSessions[eSessionIdx] = eSessionObj;
-            }
-            const theDate = getISODateString(eSessionData.sTime.toDate());
-            const dPointIdx = dPoints.findIndex(eSe => eSe.day === theDate);
-            if (dPointIdx === -1) {
-              dPoints.push({
-                day: theDate,
-                value: eSessionData.points
-              });
-            } else {
-              dPoints[dPointIdx].value += eSessionData.points;
-            }
+          const eSessionObj = {
+            id: change.doc.id,
+            start: eSessionData.sTime.toDate(),
+            end: eSessionData.eTime.toDate(),
+            attendees: eSessionData.attendees.filter(email => email !== "ouhrac@gmail.com").join(", "),
+            points: eSessionData.points,
+            participant: eSessionData?.user || ""
+          };
+          const eSessionIdx = eSessions.findIndex(eSe => eSe.id === change.doc.id);
+          if (eSessionIdx === -1) {
+            eSessions.push(eSessionObj);
+          } else {
+            eSessions[eSessionIdx] = eSessionObj;
+          }
+          const theDate = getISODateString(eSessionData.sTime.toDate());
+          const dPointIdx = dPoints.findIndex(eSe => eSe.day === theDate);
+          if (dPointIdx === -1) {
+            dPoints.push({
+              day: theDate,
+              value: eSessionData.points
+            });
+          } else {
+            dPoints[dPointIdx].value += eSessionData.points;
           }
         }
       }
@@ -167,7 +167,10 @@ const ExperimentPoints = props => {
 
   useEffect(() => {
     if (project && fullname) {
-      const expSessionsQuery = firebase.db.collection("expSessions").where("project", "==", project);
+      const expSessionsQuery = firebase.db
+        .collection("expSessions")
+        .where("project", "==", project)
+        .where("attendees", "array-contains", email);
       const expSessionsSnapshot = expSessionsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setExpSessionsChanges(oldExpSessionsChanges => {
@@ -185,60 +188,62 @@ const ExperimentPoints = props => {
     if (!(project && fullname)) {
       return;
     }
-    setScheduleLoaded(false)
+    setScheduleLoaded(false);
     const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
-    const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
-    if(!scheduleMonths.includes(scheduleEnd)) {
+    const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD");
+    if (!scheduleMonths.includes(scheduleEnd)) {
       scheduleMonths.push(scheduleEnd);
     }
 
-    return firebase.db.collection("resSchedule")
+    console.log(expSessions);
+
+    return firebase.db
+      .collection("resSchedule")
       .where("project", "==", project)
       .where("month", "in", scheduleMonths)
-      .onSnapshot(async (snapshot) => {
-      if(snapshot.docs.length === 0) {
-        setScheduleError(true);
-        setSchedule([])
-        setScheduleLoaded(true)
-        return;
-      }
-
-      let schedules = [];
-      for(const resSchedule of snapshot.docs) {
-        const resScheduleData = resSchedule.data();
-        // scheduled
-        const { schedules: resSchedules } = resScheduleData;
-        const _schedules = resSchedules[fullname] || [];
-        console.log("resSchedules", fullname, _schedules)
-        schedules = schedules.concat(_schedules)
-      }
-
-      // console.log(schedules);
-      // const _scheduled = scheduled[fullname] || {};
-      // const scheduledFullnames = Object.keys(_scheduled);
-      // const scheduledSlots = [];
-      // for(const scheduledFullname of scheduledFullnames) {
-      //   const sessionIndexes = Object.keys(_scheduled[scheduledFullname])
-      //   for(const sessionIndex of sessionIndexes) {
-      //     scheduledSlots.push(..._scheduled[scheduledFullname][sessionIndex])
-      //   }
-      // }
-      // const availableSchedules = _schedules.filter((scheduleSlot) => !!~scheduledSlots.indexOf(scheduleSlot));
-
-      const schedule = schedules.map((_schedule) => moment(_schedule).utcOffset(-4, true).toDate());
-      setSchedule(schedule)
-      setScheduleLoaded(true)
-
-      let lastSession = new Date();
-      for (let session of schedule) {
-        if (session > lastSession) {
-          lastSession = session;
+      .onSnapshot(async snapshot => {
+        if (snapshot.docs.length === 0) {
+          setScheduleError(true);
+          setSchedule([]);
+          setScheduleLoaded(true);
+          return;
         }
-      }
-      if(moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
-        setScheduleError(true);
-      }
-    });
+
+        let schedules = [];
+        for (const resSchedule of snapshot.docs) {
+          const resScheduleData = resSchedule.data();
+          // scheduled
+          const { schedules: resSchedules } = resScheduleData;
+          const _schedules = resSchedules[fullname] || [];
+          schedules = schedules.concat(_schedules);
+        }
+
+        // console.log(schedules);
+        // const _scheduled = scheduled[fullname] || {};
+        // const scheduledFullnames = Object.keys(_scheduled);
+        // const scheduledSlots = [];
+        // for(const scheduledFullname of scheduledFullnames) {
+        //   const sessionIndexes = Object.keys(_scheduled[scheduledFullname])
+        //   for(const sessionIndex of sessionIndexes) {
+        //     scheduledSlots.push(..._scheduled[scheduledFullname][sessionIndex])
+        //   }
+        // }
+        // const availableSchedules = _schedules.filter((scheduleSlot) => !!~scheduledSlots.indexOf(scheduleSlot));
+
+        const schedule = schedules.map(_schedule => moment(_schedule).utcOffset(-4, true).toDate());
+        setSchedule(schedule);
+        setScheduleLoaded(true);
+
+        let lastSession = new Date();
+        for (let session of schedule) {
+          if (session > lastSession) {
+            lastSession = session;
+          }
+        }
+        if (moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
+          setScheduleError(true);
+        }
+      });
   }, [project, fullname]);
 
   const submitData = async () => {
@@ -251,16 +256,18 @@ const ExperimentPoints = props => {
         }
       }
       setIsSubmitting(false);
-      if(moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
+      if (moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
         setScheduleError(true);
         setSnackbarMessage(
-          `Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their ${project ==="OnlineCommunities" ? "interview session" : "3rd session"}`
+          `Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their ${
+            project === "OnlineCommunities" ? "interview session" : "3rd session"
+          }`
         );
       } else {
         setScheduleError(false);
         setSnackbarMessage("Your availability is successfully saved in the database!");
       }
-      await firebase.idToken()
+      await firebase.idToken();
       await axios.post("/researchers/schedule", {
         fullname,
         project,
@@ -293,10 +300,10 @@ const ExperimentPoints = props => {
         </p>
         <p>Don't forget to click the "Submit" button after specifying your availability.</p>
         {scheduleError && (
-
           <h2>
             Please specify your availability for at least the next 10 days, otherwise there will not be enough available
-            sessions for the participants to schedule their {project ==="OnlineCommunities" ? "interview session" : "3rd session"}!
+            sessions for the participants to schedule their{" "}
+            {project === "OnlineCommunities" ? "interview session" : "3rd session"}!
           </h2>
         )}
       </Alert>
