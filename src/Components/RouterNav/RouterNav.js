@@ -1324,8 +1324,8 @@ const RouterNav = props => {
                       ) : null}
                     </Box>
                     <Tooltip title="Additional Resources">
-                      <IconButton>
-                        <ArrowDropDownIcon onClick={handleOtherPagesMenuOpen} />
+                      <IconButton onClick={handleOtherPagesMenuOpen}>
+                        <ArrowDropDownIcon />
                       </IconButton>
                     </Tooltip>
                   </>

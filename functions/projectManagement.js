@@ -1286,9 +1286,13 @@ exports.retreiveFeedbackcodes = async (req, res) => {
 exports.loadResponses = async (req, res) => {
   try {
     const _all = {};
-    const { researcher } = req.body;
+    const { researcher, selectedPassage } = req.body;
     console.log(researcher);
-    const recallGradesDocs = await db.collection("recallGradesV2").select("sessions").get();
+    const recallGradesDocs = await db
+      .collection("recallGradesV2")
+      .where("passages", "array-contains", selectedPassage.id)
+      .select("sessions")
+      .get();
     console.log("Done Loading");
     const promises = recallGradesDocs.docs.map(async recallDoc => {
       const recallData = recallDoc.data();
@@ -1296,7 +1300,7 @@ exports.loadResponses = async (req, res) => {
         Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
           await Promise.all(
             conditionItems.map(async conditionItem => {
-              if (conditionItem.response !== "") {
+              if (conditionItem.response !== "" && conditionItem.passage === selectedPassage.id) {
                 const votes = {};
                 await Promise.all(
                   conditionItem.phrases.map(async phrase => {
