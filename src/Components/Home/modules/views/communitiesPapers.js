@@ -2376,6 +2376,367 @@ const communitiesPapers = {
       }
     }
   },
+  AI_Language_Models_in_Education: {
+    Hyperfocus_the_forgotten_frontier_of_attention: {
+      title: `Exploring the potential of using an AI language model for automated essay scoring`,
+      url: `https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FExploring%20the%20potential%20of%20using%20an%20AI%20language%20model%20for%20automated%20essay%20scoring.pdf?alt=media&token=96025a28-a940-49f2-9989-b72f0c707638`,
+      questions: {
+        What_differentiates_ChatGPT_from_OpenAI_previous_GPT_language_model: {
+          stem: "1. What differentiates ChatGPT from OpenAI's previous GPT language model?",
+          answers: ["c"],
+          choices: {
+            a: "ChatGPT allows users to use Python for asking questions.",
+            b: "OpenAI's GPT was limited to English language processing.",
+            c: "ChatGPT allows users to ask questions on a browser and presents answers in multiple languages.",
+            d: "OpenAI's GPT had limited application in the field of natural language processing."
+          }
+        },
+        What_is_the_main_focus_of_the_paper: {
+          stem: "2. What is the main focus of the paper?",
+          answers: ["c"],
+          choices: {
+            a: "Investigating the potential of AI language models for natural language processing tasks.",
+            b: "Comparing different versions of GPT-3 language models for text generation.",
+            c: "Evaluating the effectiveness of GPT-3 text-davinci-003 model for automated essay scoring (AES).",
+            d: "Analyzing the historical development of artificial intelligence (AI) language models."
+          }
+        },
+        "What_is_the_primary_advantage_of_using_AI-based_language_models_in_AES": {
+          stem: "3. What is the primary advantage of using AI-based language models in Automated Essay Scoring (AES)?",
+          answers: ["d"],
+          choices: {
+            a: "Increasing the word count of student essays.",
+            b: "Providing feedback on grammar and punctuation errors.",
+            c: "Gaining popularity among students for AES tasks.",
+            d: "Accurately assessing the quality of student writing."
+          }
+        },
+        What_is_the_primary_objective_of_the_study: {
+          stem: "4. What is the primary objective of the study?",
+          answers: ["d"],
+          choices: {
+            a: "Analyzing the historical development of AI language models.",
+            b: "Investigating the implications of using linguistic features in AES.",
+            c: "Exploring the potential role of AES in language model development.",
+            d: "Examining the implications of using an AI language model for AES and the potential role of linguistic features in improving AES accuracy."
+          }
+        },
+        "Background_-_Automated_Essay_Scoring_(AES)": {
+          stem: "5. What is the main advantage of AES over human scoring according to the text?",
+          answers: ["a"],
+          choices: {
+            a: "It can avoid the risks associated with human scoring, such as the time-consuming and inaccurate scoring of essays.",
+            b: "It can use computer programs to analyze and score written work based on predefined criteria.",
+            c: "It can use NLP to simulate human intellectual abilities.",
+            d: "It can provide automatic feedback on errors."
+          }
+        },
+        What_is_the_main_criticism_of_early_AES_systems_such_as_PEG_according_to_the_text: {
+          stem: "6. What is the main criticism of early AES systems, such as PEG, according to the text?",
+          answers: ["a"],
+          choices: {
+            a: "They solely focused on surface structures and neglected features pertaining to the content.",
+            b: "They used multiple regression analysis to predict the scores of essays.",
+            c: "They compared the scores of essays to the scores given by human raters on similar topics.",
+            d: "They used measurable text characteristics, such as the average sentence length and number of commas."
+          }
+        },
+        What_is_the_term_used_to_describe_the_use_of_AES_systems_to_provide_automatic_feedback_on_errors_for_student_writing_in_the_classroom:
+          {
+            stem: "7. What is the term used to describe the use of AES systems to provide automatic feedback on errors for student writing in the classroom?",
+            answers: ["a"],
+            choices: {
+              a: "Automated Writing Evaluation",
+              b: "Neural Machine Translation",
+              c: "Machine Learning",
+              d: "Natural Language Processing"
+            }
+          },
+        "What_is_the_name_of_the_web-based_AWE_tool_that_uses_e-rater_as_its_AES_system": {
+          stem: "8. What is the name of the web-based AWE tool that uses e-rater as its AES system?",
+          answers: ["b"],
+          choices: {
+            a: "PEG",
+            b: "Criterion",
+            c: "IntelliMetric",
+            d: "MY Access!"
+          }
+        },
+        What_is_the_branch_of_AI_that_uses_computer_programming_to_simulate_human_intellectual_abilities: {
+          stem: "9. What is the branch of AI that uses computer programming to simulate human intellectual abilities, which allowed for more accurate scoring using not only superficial linguistic features but also deeper ones?",
+          answers: ["c"],
+          choices: {
+            a: "Support vector machines",
+            b: "Convolutional neural networks",
+            c: "Natural Language Processing",
+            d: "Neural Machine Translation"
+          }
+        },
+        Machine_learning_and_deep_learning: {
+          stem: "10. Which of the following is a sub-discipline of AI that is used to construct different automated scoring models and cross-validate them?",
+          answers: ["a"],
+          choices: {
+            a: "Machine learning",
+            b: "Deep learning",
+            c: "Natural language processing",
+            d: "Neural networks"
+          }
+        },
+        What_is_the_ultimate_goal_of_machine_learning_in_an_AES_system: {
+          stem: "11. What is the ultimate goal of machine learning in an AES system?",
+          answers: ["a"],
+          choices: {
+            a: "To make accurate predictions that align with the scores given by human raters.",
+            b: "To select critical features that yield better results and reduce the risk of using irrelevant or noisy features.",
+            c: "To train a model on a large corpus of essays scored by human expert raters.",
+            d: "To use various features of the text to automatically extract linguistic features such as text cohesion, syntactic complexity, lexical sophistication, etc."
+          }
+        },
+        What_is_the_difference_between_deep_learning_and_other_machine_learning_techniques: {
+          stem: "12. What is the difference between deep learning and other machine learning techniques?",
+          answers: ["c"],
+          choices: {
+            a: "Deep learning uses multiple layers to learn and make decisions, whereas other machine learning techniques typically use a single layer.",
+            b: "Deep learning uses structured and unstructured data, whereas other machine learning techniques only use structured data.",
+            c: "Deep learning extracts features directly from raw data by itself, whereas features are often handcrafted by domain expert humans in other machine learning techniques.",
+            d: "All of the above"
+          }
+        },
+        What_is_the_advantage_of_using_deep_learning_approaches_in_modern_AES: {
+          stem: "13. What is the advantage of using deep learning approaches in modern AES?",
+          answers: ["a"],
+          choices: {
+            a: "The model can take the content of the essay, inducing syntactic and semantic features, into account, in addition to the surface features.",
+            b: "The model can use a large corpus of essays scored by human expert raters to train itself.",
+            c: "The model can select critical features that yield better results and reduce the risk of using irrelevant or noisy features.",
+            d: "The model can automatically extract linguistic features such as text cohesion, syntactic complexity, lexical sophistication, etc."
+          }
+        },
+        Transformers: {
+          stem: "14. What distinguishes Transformers from previous neural network architectures, such as CNNs and RNNs?",
+          answers: ["c"],
+          choices: {
+            a: "Transformers achieve better results in computer vision tasks.",
+            b: "Transformers can process non-sequential data more efficiently.",
+            c: "Transformers are an evolution of CNNs and RNNs, combining their benefits.",
+            d: "Transformers have a simpler architecture than CNNs and RNNs."
+          }
+        },
+        In_applied_linguistics_research_how_did_the_use_of_BERT_in_creating_lexical_sophistication_measures_compare_to_traditional_methods:
+          {
+            stem: "15. In applied linguistics research, how did the use of BERT in creating lexical sophistication measures compare to traditional methods?",
+            answers: ["b"],
+            choices: {
+              a: "BERT measures showed a weaker correlation with L2 English writing quality.",
+              b: "BERT measures correlated more strongly with L2 English writing quality.",
+              c: "Traditional methods were found to be more accurate in measuring lexical sophistication.",
+              d: "BERT was solely used for contextualized word embeddings without any significant findings."
+            }
+          },
+        "What_approach_leads_to_the_current_state-of-the-art_performance_in_Automated_Essay_Scoring_AES": {
+          stem: "16. What approach leads to the current state-of-the-art performance in Automated Essay Scoring (AES)?",
+          answers: ["b"],
+          choices: {
+            a: "Using BERT in isolation without any additional features.",
+            b: "Combining BERT with other transformer-based models.",
+            c: "Utilizing handcrafted features without BERT.",
+            d: "Combining BERT with handcrafted features."
+          }
+        },
+        How_are_BERT_and_GPT_typically_utilized_in_the_field_of_natural_language_processing_NLP: {
+          stem: "17. How are BERT and GPT typically utilized in the field of natural language processing (NLP)?",
+          answers: ["b"],
+          choices: {
+            a: "BERT is used for natural language generation tasks, and GPT is used for natural language understanding tasks.",
+            b: "BERT is used for both natural language understanding and natural language generation tasks.",
+            c: "GPT is used for both natural language understanding and natural language generation tasks.",
+            d: "BERT and GPT are exclusively used for text summarization tasks."
+          }
+        },
+        Why_has_BERT_been_applied_to_Automated_Essay_Scoring_AES: {
+          stem: "18. Why has BERT been applied to Automated Essay Scoring (AES)?",
+          answers: ["a"],
+          choices: {
+            a: "BERT is primarily designed for natural language understanding tasks.",
+            b: "BERT is capable of generating coherent and fluent language.",
+            c: "BERT has demonstrated efficiency in tasks like sentiment analysis and text classification, which are similar to AES.",
+            d: "BERT has a prompt-based learning approach for diverse task performance."
+          }
+        },
+        The_present_study: {
+          stem: "19. What is the goal of this study?",
+          answers: ["a"],
+          choices: {
+            a: "To explore the potential use of prompt-based GPT for AES and compare it with research-based linguistic features.",
+            b: "To explore the potential use of prompt-based GPT for AES and compare it with human raters.",
+            c: "To explore the potential use of prompt-based GPT for AES and compare it with other machine learning techniques.",
+            d: "To explore the potential use of prompt-based GPT for AES and compare it with natural language processing tools."
+          }
+        },
+        Which_of_the_following_are_the_two_research_questions_used_in_this_study: {
+          stem: "20. Which of the following are the two research questions used in this study? (Select all that apply)",
+          answers: ["a", "b"],
+          choices: {
+            a: "To what extent is AES by GPT reliable?",
+            b: "To what extent does AES by GPT predict benchmark essay scores relative to a set of research-based linguistic features?",
+            c: "To what extent does AES by GPT align with the scores given by human raters?",
+            d: "To what extent does AES by GPT extract linguistic features directly from raw data by itself?"
+          }
+        },
+        "Methods_-_Dataset": {
+          stem: "21. How are the essays scored in the corpus?",
+          answers: ["c"],
+          choices: {
+            a: "Low, Medium, High",
+            b: "Beginner, Intermediate, Advanced",
+            c: "A, B, C, D, F",
+            d: "1, 2, 3, 4, 5"
+          }
+        },
+        "Methods_-_Types_of_GPT": {
+          stem: "22. What is the name of the technique that ChatGPT used to improve its functionality as a chatbot?",
+          answers: ["a"],
+          choices: {
+            a: "Reinforcement Learning from Human Feedback",
+            b: "Generative Pre-training from Text and Code",
+            c: "Fine-tuning on a Specific Task",
+            d: "Misalignment Correction and Optimization"
+          }
+        },
+        "What_is_the_main_difference_between_text-davinci-003_model_and_ChatGPT_in_terms_of_training": {
+          stem: "23. What is the main difference between text-davinci-003 model and ChatGPT in terms of training?",
+          answers: ["c"],
+          choices: {
+            a: "text-davinci-003 model was trained on a blend of text and code, while ChatGPT was trained only on text",
+            b: "text-davinci-003 model was trained on a larger dataset than ChatGPT",
+            c: "text-davinci-003 model did not undergo any additional training, while ChatGPT underwent additional training using RLHF",
+            d: "text-davinci-003 model was trained on a specific task, while ChatGPT was trained on a general domain"
+          }
+        },
+        "Methods_-_Prompt": {
+          stem: "24. How many points are in the scale of the rubric?",
+          answers: ["c"],
+          choices: {
+            a: "5",
+            b: "9",
+            c: "10",
+            d: "12"
+          }
+        },
+        "Methods_-_Stratified_sampling": {
+          stem: "25. What was the main finding of the re-scoring process?",
+          answers: ["b"],
+          choices: {
+            a: "There were statistically significant differences between the mean scores of the three levels in the randomly sampled essays and those of the three levels in the original 12,100 essays",
+            b: "There were no statistically significant differences between the mean scores of the three levels in the randomly sampled essays and those of the three levels in the original 12,100 essays",
+            c: "There were statistically significant differences between the mean scores of each level in the randomly sampled essays and those of each level in the original 12,100 essays",
+            d: "There were no statistically significant differences between the mean scores of each level in the randomly sampled essays and those of each level in the original 12,100 essays"
+          }
+        },
+        Statistical_Analysis: {
+          stem: "26. What statistical methods did the researchers employ to address Research Question 1 and assess intra-rater reliability in the study?",
+          answers: ["b"],
+          choices: {
+            a: "Descriptive statistics and effect sizes",
+            b: "Quadratic Weighted Kappa and Cohen's Kappa",
+            c: "Inferential statistics and effect sizes",
+            d: "Inferential statistics and Quadratic Weighted Kappa"
+          }
+        },
+        What_statistical_method_did_the_researchers_use_to_assess_the_ability_of_AES_by_GPT_to_reproduce_the_benchmark_levels_in_Research_Question_2:
+          {
+            stem: "27. What statistical method did the researchers use to assess the ability of AES by GPT to reproduce the benchmark levels in Research Question 2?",
+            answers: ["c"],
+            choices: {
+              a: "Multiple regression",
+              b: "Ordinal regressions",
+              c: "Model comparison approach",
+              d: "Inferential statistics"
+            }
+          },
+        Results: {
+          stem: "28. What was the name of the information criterion that the authors used to compare the model fit of different regression models?",
+          answers: ["c"],
+          choices: {
+            a: "Akaike Information Criterion (AIC)",
+            b: "Bayesian Information Criterion (BIC)",
+            c: "Leave-One-Out cross-validation Information Criterion (LOOIC)",
+            d: "Deviance Information Criterion (DIC)"
+          }
+        },
+        Discussion: {
+          stem: "29. What was the outcome of the second research question regarding Automated Essay Scoring (AES) by GPT and linguistic features?",
+          answers: ["c"],
+          choices: {
+            a: "The addition of linguistic features had no impact on predicting benchmark levels.",
+            b: "AES by GPT without linguistic features outperformed all other models.",
+            c: "The combination of GPT and linguistic features improved the prediction of benchmark levels.",
+            d: "Research-based linguistic features did not contribute to the accuracy of AES by GPT."
+          }
+        },
+        What_are_some_benefits_of_employing_AES_with_GPT: {
+          stem: "30. What are some benefits of employing AES with GPT?",
+          answers: ["a"],
+          choices: {
+            a: "Increased consistency in scoring and reduced evaluation bias.",
+            b: "Augmented feedback on writing quality and improved linguistic features.",
+            c: "Longer rating times and immediate scoring capabilities.",
+            d: "Focus on linguistic features and alignment with specific criteria."
+          }
+        },
+        How_does_AES_with_GPT_differ_from_Automated_Writing_Evaluation_AWE: {
+          stem: "31. How does AES with GPT differ from Automated Writing Evaluation (AWE)?",
+          answers: ["c"],
+          choices: {
+            a: "AES provides detailed feedback to learners, while AWE only gives scores.",
+            b: "AES is more suitable for teachers, while AWE is designed for learners.",
+            c: "AES gives scores and detailed feedback to both learners and teachers.",
+            d: "AWE is a separate technology and not related to AES with GPT."
+          }
+        },
+        What_advantage_does_AES_using_GPT_offer_over_AES_systems_like_Criterion: {
+          stem: "32. What advantage does AES using GPT offer over AES systems like Criterion?",
+          answers: ["b"],
+          choices: {
+            a: "AES using GPT provides more accurate scoring aligned with large-scale tests.",
+            b: "AES using GPT allows for the incorporation of rubrics used in instruction.",
+            c: "AES using GPT can be used exclusively in out-of-class writing settings.",
+            d: "AES using GPT eliminates the need for written corrective feedback."
+          }
+        },
+        What_are_the_future_research_possibilities_regarding_AES_with_GPT: {
+          stem: "33. What are the future research possibilities regarding AES with GPT?",
+          answers: ["a"],
+          choices: {
+            a: "Comparing the GPT model without fine-tuning with other language models.",
+            b: "Integrating linguistic features to enhance the performance of AES with GPT.",
+            c: "Focusing on syntactic dependency measures to predict essay quality.",
+            d: "Refining the GPT model through fine-tuning for comparison with ChatGPT."
+          }
+        },
+        "What_aspect_of_AI-based_automated_essay_scoring_does_this_study_primarily_focus_on": {
+          stem: "34. What aspect of AI-based automated essay scoring does this study primarily focus on?",
+          answers: ["c"],
+          choices: {
+            a: "The impact of AI-generated scores on student motivation and engagement.",
+            b: "Ethical considerations related to using AI technologies in education.",
+            c: "The wider educational implications of AI-based automated essay scoring.",
+            d: "The potential benefits and drawbacks of AI-based automated essay scoring for foreign language education."
+          }
+        },
+        What_is_the_role_of_AI_language_models_like_GPT_in_the_field_of_applied_linguistics: {
+          stem: "35. What is the role of AI language models like GPT in the field of applied linguistics?",
+          answers: ["c"],
+          choices: {
+            a: "They are intended to replace human expertise entirely.",
+            b: 'They are a form of "high-tech plagiarism," as claimed by Chomsky.',
+            c: "They can be used as logical assistants to complement human expertise.",
+            d: "They have limited potential utility and are not beneficial for non-native English speakers."
+          }
+        }
+      }
+    }
+  },
   Liaison_Librarians: {}
 };
 export default communitiesPapers;
