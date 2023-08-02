@@ -66,7 +66,6 @@ export const SchemaGeneration = () => {
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
   const project = useRecoilValue(projectState);
-  const [allTheResponses, setAllTheResponses] = useState({});
   const [highlightedWords, setHighlightedWords] = useState([]);
   const [notSatisfiedResponses, setNotSatisfiedResponses] = useState([]);
   const [tryout, setTryout] = useState(false);
@@ -77,24 +76,24 @@ export const SchemaGeneration = () => {
     const retrieveResponses = async () => {
       try {
         setSearching(true);
-        const response = await axios.post("/loadResponses", { researcher: fullname });
-        setAllTheResponses(response.data.responses);
+        setRecallResponses([]);
+        setSearchResules([]);
+        const response = await axios.post("/loadResponses", { researcher: fullname, selectedPassage });
+        const allTheResponses = response.data.responses;
+        if (Object.keys(allTheResponses).length === 0 || !selectedPassage.id) {
+          setSearching(false);
+          return;
+        }
+        const recallTexts = allTheResponses[selectedPassage.id];
+        setRecallResponses(recallTexts);
+        setSearchResules(recallTexts);
+        setSearching(false);
       } catch (error) {
         console.log(error);
       }
     };
     retrieveResponses();
-  }, [fullname]);
-
-  useEffect(() => {
-    if (Object.keys(allTheResponses).length === 0) return;
-    if (selectedPassage.id === undefined) return;
-    setSearching(true);
-    const recallTexts = allTheResponses[selectedPassage.id];
-    setRecallResponses(recallTexts);
-    setSearching(false);
-    setSearchResules(recallTexts);
-  }, [firebase, allTheResponses, selectedPassage, selectedPhrase]);
+  }, [fullname, selectedPassage]);
 
   useEffect(() => {
     setHighlightedWords([]);
@@ -481,7 +480,7 @@ export const SchemaGeneration = () => {
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            mb: "20px",
+            mb: index === searchResules.length - 1 ? "100px" : "20px",
             p: "10px"
           }}
         >
@@ -504,6 +503,7 @@ export const SchemaGeneration = () => {
       );
     });
   }, [searchResules]);
+
 
   const notSatisfiedResponsesRD = useMemo(() => {
     return (notSatisfiedResponses || []).map((r, index) => {
@@ -783,7 +783,7 @@ export const SchemaGeneration = () => {
         </Box>
         <Box className="blocks result-box">
           <Box sx={{ padding: "15px" }}>
-            {notSatisfiedResponses.length > 0 ? (
+            {notSatisfiedResponses?.length ? (
               <span className="header">Response that satisfy the Boolean expression </span>
             ) : (
               <span className="header">All Responses</span>
@@ -791,13 +791,45 @@ export const SchemaGeneration = () => {
             <br />
             <span className="subtitle">The highlighted sentences satisfy your keyword rules</span>
           </Box>
+
           <Box
             style={{
+              flex: "1",
+              background: "#F8F8F8",
+              borderRadius: "10px",
+              overflow: "auto",
+              padding: "15px",
+              maxHeight: "90vh",
               display: "flex",
-              flexDirection: "column",
-              minHeight: "0px"
+              flexDirection: "column"
             }}
           >
+            {searchResules?.length ? (
+              searchResultsRD
+            ) : searching ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <CircularProgress color="warning" size="50px" />
+              </Box>
+            ) : (
+              <Typography variant="h6" component="Box" align="center">
+                No data Found!
+              </Typography>
+            )}
+          </Box>
+          {notSatisfiedResponses.length > 0 ? (
+            <Box sx={{ padding: "15px" }}>
+              <span className="header">Responses that do not satisfy the Boolean expression </span>
+              <br />
+            </Box>
+          ) : null}
+
+          {notSatisfiedResponses.length > 0 ? (
             <Box
               style={{
                 flex: "1",
@@ -805,41 +837,12 @@ export const SchemaGeneration = () => {
                 borderRadius: "10px",
                 overflow: "auto",
                 padding: "15px",
-                height: "50%"
+                maxHeight: "50vh"
               }}
             >
-              {searchResules.length > 0 ? (
-                searchResultsRD
-              ) : searching ? (
-                <CircularProgress color="warning" size="50px" />
-              ) : (
-                <Typography variant="h6" component="Box" align="center">
-                  No data Found!
-                </Typography>
-              )}
+              {notSatisfiedResponsesRD}{" "}
             </Box>
-            {notSatisfiedResponses.length > 0 ? (
-              <Box sx={{ padding: "15px" }}>
-                <span className="header">Responses that do not satisfy the Boolean expression </span>
-                <br />
-              </Box>
-            ) : null}
-
-            {notSatisfiedResponses.length > 0 ? (
-              <Box
-                style={{
-                  flex: "1",
-                  background: "#F8F8F8",
-                  borderRadius: "10px",
-                  overflow: "auto",
-                  padding: "15px",
-                  maxHeight: "50vh"
-                }}
-              >
-                {notSatisfiedResponsesRD}{" "}
-              </Box>
-            ) : null}
-          </Box>
+          ) : null}
         </Box>
       </Box>
     </Box>
