@@ -56,7 +56,6 @@ export const SchemaGeneration = () => {
   const fullname = useRecoilValue(fullnameState);
   const [passages, setPassages] = useState([]);
   const [selectedPassage, setSelectedPassage] = useState({});
-  const [selectedPassageId, setSelectedPassageId] = useState(null);
   const [selectedPhrase, setSelectedPhrase] = useState(null);
   const [schema, setSchema] = useState(temp_schema);
   const email = useRecoilValue(emailState);
@@ -78,26 +77,29 @@ export const SchemaGeneration = () => {
       setSearching(true);
       setRecallResponses([]);
       setSearchResules([]);
-      const response = await axios.post("/loadResponses", { researcher: fullname, selectedPassageId });
+      const response = await axios.post("/loadResponses", {
+        researcher: fullname,
+        selectedPassageId: selectedPassage.id
+      });
       const allTheResponses = response.data.responses;
-      if (Object.keys(allTheResponses).length === 0 || !selectedPassageId) {
+      if (Object.keys(allTheResponses).length === 0 || !selectedPassage.id) {
         setSearching(false);
         return;
       }
-      const recallTexts = allTheResponses[selectedPassageId];
+      const recallTexts = allTheResponses[selectedPassage.id];
       setRecallResponses(recallTexts);
       setSearchResules(recallTexts);
       setSearching(false);
     } catch (error) {
       console.log(error);
     }
-  }, [fullname, selectedPassageId]);
+  }, [fullname, selectedPassage.id]);
 
   useEffect(() => {
-    if (selectedPassageId) {
+    if (selectedPassage.id) {
       retrieveResponses();
     }
-  }, [retrieveResponses, selectedPassageId]);
+  }, [retrieveResponses, selectedPassage.id]);
 
   useEffect(() => {
     setHighlightedWords([]);
@@ -144,12 +146,10 @@ export const SchemaGeneration = () => {
         const booleanLogsData = booleanLogsDoc.data();
         const passage = _passages.find(elem => elem.title === booleanLogsData.passage);
         setSelectedPassage(passage);
-        setSelectedPassageId(passage.id);
         setSelectedPhrase(booleanLogsData.selectedPhrase);
         setSchema(booleanLogsData.schema);
       } else {
         setSelectedPassage(_passages[0]);
-        setSelectedPassageId(_passages[0].id);
         setSelectedPhrase(_passages[0].phrases[0]);
       }
       setHighlightedWords([]);
@@ -244,7 +244,6 @@ export const SchemaGeneration = () => {
     const passageIdx = passages.findIndex(i => i.title === newPassageTitle);
     if (passageIdx === -1) return;
     const passage = passages[passageIdx];
-    setSelectedPassageId(passage.id);
     setSelectedPassage(passage);
     setSelectedPhrase(passage.phrases[0]);
     setHighlightedWords([]);
