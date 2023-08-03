@@ -1080,8 +1080,8 @@ export default [
     tags: [
       {
         title: "Attention-Deficit Hyperactivity Disorder (ADHD)",
-        node: "HJq7AEyAXkO3Kp3ft2o7",
-      },
+        node: "HJq7AEyAXkO3Kp3ft2o7"
+      }
     ],
     allTime: [],
     weekly: [],
@@ -1096,10 +1096,10 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/eleanore-pavelle-73642b199/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/eleanore-pavelle-73642b199/"
+          }
+        ]
+      }
     ],
     YouTube: "jFBeYsMNbY4",
     description: `
@@ -1119,7 +1119,7 @@ export default [
       `Gain valuable research experience such as paper summarization, topic organization, paper analysis, and making connections between disciplines/topics`,
       "Work towards publishing papers about ADHD and ASD",
       "Be able to collaborate with others to review, summarize, and analyze existing research and examine future research topics",
-      "Work remotely with all task fulfillment, interactions, and communications (about 5-10 hours per week)",
+      "Work remotely with all task fulfillment, interactions, and communications (about 5-10 hours per week)"
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
@@ -1131,7 +1131,7 @@ export default [
       `Fluency in reading and writing in English (will have to summarize research articles)`,
       `Submit most current resume and unofficial transcripts, indicating a GPA above 3.4/4 `,
       `Explain in a few paragraphs why you are interested and want to apply to this specific community`,
-      `Complete our community-specific quiz by answering a set of questions about a provided book chapter or research paper and get a satisfactory score (strive for the best score possible!)`,
+      `Complete our community-specific quiz by answering a set of questions about a provided book chapter or research paper and get a satisfactory score (strive for the best score possible!)`
     ],
     responsibilities: [
       `Read and summarize textbook chapters and scientific journal articles`,
@@ -1139,8 +1139,8 @@ export default [
       `Contribute concise summaries of information to the 1Cademy platform`,
       `Attend weekly online meetings`,
       `Contribute to meetings by presenting findings and participating in group discussions`,
-      `All interactions, task fulfillment, and communications will be remote`,
-    ],
+      `All interactions, task fulfillment, and communications will be remote`
+    ]
   },
   {
     id: "Liaison_Librarians",
@@ -1275,8 +1275,8 @@ export default [
     link: "ai-language-models-in-education",
     tags: [
       {
-        title: "Disability Studies",
-        node: "Y4HihWopCsKNaVZSr6s0"
+        title: "Natural language processing",
+        node: "khCWqIXa9xQiojnEqHCT"
       }
     ],
     allTime: [],
