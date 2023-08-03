@@ -1286,11 +1286,11 @@ exports.retreiveFeedbackcodes = async (req, res) => {
 exports.loadResponses = async (req, res) => {
   try {
     const _all = {};
-    const { researcher, selectedPassage } = req.body;
+    const { researcher, selectedPassageId } = req.body;
     console.log(researcher);
     const recallGradesDocs = await db
       .collection("recallGradesV2")
-      .where("passages", "array-contains", selectedPassage.id)
+      .where("passages", "array-contains", selectedPassageId)
       .select("sessions")
       .get();
     console.log("Done Loading");
@@ -1300,7 +1300,7 @@ exports.loadResponses = async (req, res) => {
         Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
           await Promise.all(
             conditionItems.map(async conditionItem => {
-              if (conditionItem.response !== "" && conditionItem.passage === selectedPassage.id) {
+              if (conditionItem.response !== "" && conditionItem.passage === selectedPassageId) {
                 const votes = {};
                 await Promise.all(
                   conditionItem.phrases.map(async phrase => {
