@@ -293,7 +293,7 @@ const ResearcherPassage = () => {
     });
   };
   return (
-    <Paper sx={{ m: "10px 10px 0px 10px" }}>
+    <Box>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
         <DialogTitle sx={{ fontSize: "15px" }}> Update the phrase below:</DialogTitle>
         <DialogContent sx={{ width: "500px", mt: "5px" }}>
@@ -397,7 +397,6 @@ const ResearcherPassage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Box style={{ background: "#e2e2e2" }}>
         <Box style={{ display: "flex", height: "100%" }}>
           <PassageComponent
@@ -449,7 +448,7 @@ const ResearcherPassage = () => {
         </Box>
         <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       </Box>
-    </Paper>
+    </Box>
   );
 };
 
