@@ -23,6 +23,7 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 const PassageComponent = props => {
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
+  const containerRef = useRef(null);
 
   const handleSorting = () => {
     const _phrases = [...props.passage.phrases];
@@ -32,25 +33,53 @@ const PassageComponent = props => {
     props.savePhrasesOrder({ passageId: props.passage.id, phrasesOrder: _phrases, passageNum: props.passageNum });
   };
 
-  return (
-    <Box style={{ width: "70%", margin: "15px 0px 25px 20px", overflow: "scroll", height: "90vh" }}>
-      <Box style={{ display: "flex", marginBottom: "5px" }}>
-        <Box style={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-          <Typography variant="h6" component="Box">
-            Passage
-          </Typography>
+  const handleDragOver = e => {
+    e.preventDefault();
 
-          <Select value={props.userCondition} onChange={props.handlePassageChange}>
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const mouseY = e.clientY;
+
+    const distanceFromTop = mouseY - containerRect.top;
+    const distanceFromBottom = containerRect.bottom - mouseY;
+
+    const scrollSpeed = 15;
+
+    const scrollThreshold = 100;
+
+    const scrollAreaHeight = 100;
+
+    if (distanceFromTop < scrollAreaHeight) {
+      const scrollAmount = scrollSpeed * (1 - distanceFromTop / scrollAreaHeight);
+
+      container.scrollTop -= scrollAmount;
+    } else if (distanceFromTop < scrollThreshold) {
+      container.scrollTop -= scrollSpeed;
+    } else if (distanceFromBottom < scrollThreshold) {
+      container.scrollTop += scrollSpeed;
+    }
+  };
+
+  return (
+    <Box ref={containerRef} style={{ width: "70%", overflow: "scroll", height: "90vh" }}>
+      <Box
+        sx={{ position: "sticky", top: 0, zIndex: 999, backgroundColor: "white", display: "flex", marginBottom: "5px" }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "row", mr: "20px", ml: "20px" }}>
+          <Box style={{ flex: "1", display: "flex", alignItems: "center", fontWeight: "bold" }}>Passage:</Box>
+          <Select value={props.userCondition} onChange={props.handlePassageChange} style={{ marginLeft: "10px" }}>
             {props.passages &&
               props.passages?.length > 0 &&
               props.passages.map(doc => <MenuItem value={doc.title}>{doc.title}</MenuItem>)}
           </Select>
         </Box>
-        <Box style={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="h6" component="Box">
-            Passage Condition
-          </Typography>
-          <Select value={props.passageCondition} onChange={props.handlePassageConditionChange}>
+        <Box style={{ display: "flex", flexDirection: "row" }}>
+          <Box style={{ flex: "1", display: "flex", alignItems: "center", fontWeight: "bold" }}>Condition:</Box>
+          <Select
+            value={props.passageCondition}
+            onChange={props.handlePassageConditionChange}
+            style={{ marginLeft: "10px" }}
+          >
             {props.optionsConditions.map(option => {
               return (
                 <MenuItem key={option} value={option}>
@@ -61,10 +90,7 @@ const PassageComponent = props => {
           </Select>
         </Box>
       </Box>
-      <iframe id="PassageFrame" frameBorder="0" src={props.pConURL} />
-      <Typography variant="h5" gutterBottom component="Box">
-        Questions and Answers
-      </Typography>
+      <iframe id="PassageFrame" frameborder="0" src={props.pConURL} title={props.passage.title} />
       {props.passage &&
         props.passage?.questions?.length > 0 &&
         props.passage.questions.map((question, index) => {
@@ -124,102 +150,92 @@ const PassageComponent = props => {
             </Accordion>
           );
         })}
-      {props.passage?.phrases?.length > 0 && (
-        <Box>
-          <Box sx={{ mt: "15px", mb: "15px" }}>
-            <Typography variant="h5" gutterBottom component="Box">
-              Phrases :
-            </Typography>
-          </Box>
-          <Box>
-            {props.editor && (
-              <Button
-                onClick={() => {
-                  props.handleOpenddPhraseModal();
-                  props.setChosenPassage(props.passage.title);
-                }}
-              >
-                <AddIcon /> add New Phrase
-              </Button>
-            )}
-          </Box>
-        </Box>
+      {props.editor && (
+        <Button
+          onClick={() => {
+            props.handleOpenddPhraseModal();
+            props.setChosenPassage(props.passage.title);
+          }}
+          sx={{ mt: "15px" }}
+        >
+          <AddIcon /> add New Phrase
+        </Button>
       )}
-      <Box>
-        {props.passage && props.passage?.phrases?.length > 0 && (
-          <List>
-            {props.passage?.phrases?.map((phrase, index) => (
-              <ListItem
-                draggable
-                onDragStart={e => {
-                  dragItem.current = index;
-                }}
-                onDragEnter={e => {
-                  dragOverItem.current = index;
-                }}
-                onDragEnd={handleSorting}
-                style={{ borderBottom: "1px solid black" }}
-              >
-                <ListItemIcon>
-                  <DragIndicatorIcon />
-                  {index + 1}
-                </ListItemIcon>
-                <ListItemText id="switch-list-label-wifi" primary={phrase} style={{ userSelect: "text" }} />
-                {props.editor && (
-                  <Box>
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      onClick={() => {
-                        props.setPassagTitle(props.passage.title);
-                        props.setNewPhrase(phrase);
-                        props.setSelectedPhrase(phrase);
-                        props.handleOpenEditModal(phrase);
-                      }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => {
-                        props.setPassagTitle(props.passage.title);
-                        props.setSelectedPhrase(phrase);
-                        props.handleOpenDeleteModal();
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                    {props.email === "oneweb@umich.edu" && (
-                      <List>
-                        {["Inference", "memory"].map(type => (
-                          <ListItem disablePadding>
-                            <ListItemButton
-                              onClick={() => {
-                                props.handleTypeOfPhrase(type, props.passage.title, index);
-                              }}
-                              dense
-                            >
-                              <ListItemIcon>
-                                <Checkbox
-                                  edge="start"
-                                  checked={props.passage.phrasesTypes && props.passage?.phrasesTypes[index] === type}
-                                  disableRipple
-                                />
-                              </ListItemIcon>
-                              <ListItemText id={type} primary={`${type}`} />
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                  </Box>
-                )}
-              </ListItem>
-            ))}
-          </List>
-        )}
-      </Box>
+
+      {props.passage && props.passage?.phrases?.length > 0 && (
+        <List>
+          {props.passage?.phrases?.map((phrase, index) => (
+            <ListItem
+              draggable
+              onDragStart={e => {
+                dragItem.current = index;
+              }}
+              onDragEnter={e => {
+                dragOverItem.current = index;
+              }}
+              onDragOver={handleDragOver}
+              onDragEnd={handleSorting}
+              style={{ borderBottom: "1px solid black" }}
+            >
+              <ListItemIcon>
+                <DragIndicatorIcon />
+                {index + 1}
+              </ListItemIcon>
+              <ListItemText id="switch-list-label-wifi" primary={phrase} style={{ userSelect: "text" }} />
+              {props.editor && (
+                <Box>
+                  <IconButton
+                    edge="end"
+                    aria-label="edit"
+                    onClick={() => {
+                      props.setPassagTitle(props.passage.title);
+                      props.setNewPhrase(phrase);
+                      props.setSelectedPhrase(phrase);
+                      props.handleOpenEditModal(phrase);
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => {
+                      props.setPassagTitle(props.passage.title);
+                      props.setSelectedPhrase(phrase);
+                      props.handleOpenDeleteModal();
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                  {props.email === "oneweb@umich.edu" && (
+                    <List>
+                      {["Inference", "memory"].map(type => (
+                        <ListItem disablePadding>
+                          <ListItemButton
+                            onClick={() => {
+                              props.handleTypeOfPhrase(type, props.passage.title, index);
+                            }}
+                            dense
+                          >
+                            <ListItemIcon>
+                              <Checkbox
+                                edge="start"
+                                checked={props.passage.phrasesTypes && props.passage?.phrasesTypes[index] === type}
+                                disableRipple
+                              />
+                            </ListItemIcon>
+                            <ListItemText id={type} primary={`${type}`} />
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                </Box>
+              )}
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Box>
   );
 };
