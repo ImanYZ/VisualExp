@@ -42,6 +42,8 @@ participantsRouter.post("/schedule", async (req, res) => {
     let { sessions, project, surveyType, instructorId } = req.body;
 
     const { email } = req.userData;
+
+    console.log("/schedule", email, surveyType);
     const batch = db.batch();
 
     sessions.sort((a, b) => (a < b ? -1 : 1)); // asc sorting
