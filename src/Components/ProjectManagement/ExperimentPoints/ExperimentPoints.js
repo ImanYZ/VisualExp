@@ -170,7 +170,7 @@ const ExperimentPoints = props => {
       const expSessionsQuery = firebase.db
         .collection("expSessions")
         .where("project", "==", project)
-        .where("attendees", "array-contains", email);
+        .where("researcher", "==", fullname);
       const expSessionsSnapshot = expSessionsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setExpSessionsChanges(oldExpSessionsChanges => {
