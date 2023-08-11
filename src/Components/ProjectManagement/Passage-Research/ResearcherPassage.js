@@ -361,6 +361,12 @@ const ResearcherPassage = () => {
             rows={3}
             sx={{ width: "95%", m: 0.5 }}
           />
+          {passages.find(p => p.title === chosenPassage)?.phrases.includes(newPhraseAdded) && (
+            <Alert severity={numberRecorded !== 0 ? "error" : "warning"}>
+              This phrase already exists in this passage.
+              <br />
+            </Alert>
+          )}
           <Box sx={{ display: "flex", alignItems: "center", mt: "15px" }}>
             Add phrase for:
             <Select
@@ -374,7 +380,11 @@ const ResearcherPassage = () => {
         </DialogContent>
         <DialogActions>
           <LoadingButton
-            disabled={!newPhraseAdded || !chosenPassage}
+            disabled={
+              !newPhraseAdded ||
+              !chosenPassage ||
+              passages.find(p => p.title === chosenPassage).phrases.includes(newPhraseAdded)
+            }
             variant="contained"
             loading={submtingNewPhrase}
             onClick={() => {
