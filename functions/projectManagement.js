@@ -1928,7 +1928,12 @@ exports.addNewPhraseForPassage = async (req, res) => {
         for (const conditionItem of recallData.sessions[session]) {
           if (conditionItem.passage === passageDoc.id) {
             conditionItem.researchers = [];
-            conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
+            const phraseIndex = conditionItem.phrases.findIndex(phraseItem => phraseItem.phrase === newPhraseAdded);
+            if (phraseIndex !== -1) {
+              conditionItem.phrases[phraseIndex].deleted = false;
+            } else {
+              conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
+            }
             needUpdate = true;
           }
         }
