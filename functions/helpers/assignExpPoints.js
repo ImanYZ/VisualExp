@@ -56,7 +56,9 @@ exports.assignExpPoints = async obj => {
 
     const event = await getEvent(_eventId);
 
-    const attendees = (event.attendees || []).map(attendee => attendee.email);
+    const attendees = (event.attendees || [])
+      .map(attendee => attendee.email)
+      .filter(email => email !== "ouhrac@gmail.com");
 
     const startTime = moment.tz(event.start.dateTime, event.start.timeZone).toDate();
     const endTime = moment.tz(event.end.dateTime, event.end.timeZone).toDate();

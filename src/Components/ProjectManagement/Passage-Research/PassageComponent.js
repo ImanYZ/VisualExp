@@ -164,7 +164,7 @@ const PassageComponent = props => {
 
       {props.passage && props.passage?.phrases?.length > 0 && (
         <List>
-          {props.passage?.phrases?.map((phrase, index) => (
+          {[...new Set(props.passage?.phrases)].map((phrase, index) => (
             <ListItem
               draggable
               onDragStart={e => {

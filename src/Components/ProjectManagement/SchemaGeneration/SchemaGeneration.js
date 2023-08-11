@@ -676,7 +676,7 @@ export const SchemaGeneration = () => {
               <Autocomplete
                 id="key-phrase"
                 value={selectedPhrase}
-                options={selectedPassage?.phrases || []}
+                options={[...new Set(selectedPassage?.phrases)] || []}
                 onChange={(_, value) => setSelectedPhrase(value || null)}
                 renderInput={params => <TextField {...params} value={selectedPhrase} />}
                 getOptionLabel={phrase => (phrase ? phrase : "")}
