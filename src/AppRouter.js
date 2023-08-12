@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import RecallForIman from "./Components/ProjectManagement/FreeRecallGrading/RecallForIman.js";
 import {
   firebaseState,
@@ -69,7 +69,6 @@ import GDPRPolicy from "./Components/Home/GDPRPolicy";
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
   const { db: dbOne } = firebaseOne;
-  const navigateTo = useNavigate();
 
   // selected theme for authenticated user (dark mode/light mode)
   // const [theme, setTheme] = useRecoilState(themeState);

@@ -22,7 +22,7 @@ import { isEmail } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
-
+import {getFirebaseFriendlyError} from "../../utils/auth-helpers";
 
 const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -60,8 +60,6 @@ const Auth = props => {
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
   const institutions = useRecoilValue(institutionsState);
-
-
 
   useEffect(() => {
     const getCourses = async () => {
@@ -125,7 +123,7 @@ const Auth = props => {
     const checkEmailInstitution = async () => {
       try {
         const domainName = email.match("@(.+)$")?.[0];
-        if(!domainName) return;
+        if (!domainName) return;
         const institutionDoc = await dbOne
           .collection("institutions")
           .where("domains", "array-contains", domainName)
@@ -203,11 +201,8 @@ const Auth = props => {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
       if (err.code !== "auth/user-not-found") {
-        setInvalidAuth(err.message);
+        setInvalidAuth(err);
       } else {
-        // setInvalidAuth(
-        //   "There is no user record corresponding to this email address. Please create a new account!"
-        // );
         setIsSignUp(1);
         if (signUpSubmitable) {
           await axios.post("/signUp", {
@@ -246,6 +241,7 @@ const Auth = props => {
       signUp(event);
     }
   };
+
   return (
     <div id="Auth">
       {/* <img
@@ -400,7 +396,7 @@ const Auth = props => {
                 account with your authentication.
               </div>
             )}
-            {invalidAuth && <div className="Error">{invalidAuth}</div>}
+            {invalidAuth && <div className="Error">{getFirebaseFriendlyError(invalidAuth)}</div>}
             {participatedBefore && (
               <div className="Error">You've participated in this study before and cannot participate again!</div>
             )}
