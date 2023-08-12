@@ -827,10 +827,11 @@ exports.scheduleInstructors = async (req, res) => {
         privacyPolicyAgreement: true,
         cookiesAgreement: true,
         fieldOfInterest: "",
-        course: null
+        course: null, 
+        invitedInstructor: "6L2gj2fvh4ciLnMfqzjD",
       };
       try {
-        await axios.post("http://localhost:3000/api/signup", { data: newUserOneCademy });
+        await axios.post(process.env.ONECADEMY_BASE_URL + "/api/signup", { data: newUserOneCademy });
       } catch {
         console.log("user already exists");
       }
