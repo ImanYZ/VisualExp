@@ -59,7 +59,8 @@ const ScheduleInstructorPage = props => {
   const [firstname, setFirstname] = useState("");
   const [validFirstname, setValidFirstname] = useState(false);
   const [lastname, setLastname] = useState("");
-  const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
+  const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState({});
+  const [institutionExists, setInstitutionExists] = useState(false);
   const institutions = useRecoilValue(institutionsState);
   const validInfo = validFirstname && validlastname && validEmail && nameFromInstitutionSelected;
 
@@ -213,17 +214,20 @@ const ScheduleInstructorPage = props => {
   };
 
   const confirmClose = value => event => {
-    if (value) {
-      if (value === "Confirmed") {
-        submitData();
-      }
-    }
     setOpenConfirm(false);
   };
 
   const submitData = async () => {
     try {
       setIsSubmitting(true);
+      setOpenConfirm(false);
+      if (!institutionExists) {
+        setIsSubmitting(false);
+        alert(
+          "At this point, only members of academic/research institutions can join us. If you've enterred the email address provided by your academic/research institution, but you see this message, contact oneweb@umich.edu."
+        );
+        return;
+      }
       const sessions = selectedSession.map(s => {
         return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
       });
@@ -234,7 +238,7 @@ const ScheduleInstructorPage = props => {
         email,
         firstname,
         lastname,
-        institution: nameFromInstitutionSelected.name,
+        institution: nameFromInstitutionSelected.name
       });
       errorAlert(responseObj.data);
 
@@ -352,9 +356,11 @@ const ScheduleInstructorPage = props => {
         if (institutionDoc && institutionDoc.docs.length > 0) {
           const institutionData = institutionDoc.docs[0].data();
           setNameFromInstitutionSelected(institutionData);
+          setInstitutionExists(true);
           return institutionData;
         } else {
           setNameFromInstitutionSelected({});
+          setInstitutionExists(false);
         }
       } catch (err) {
         console.log("err", err);
@@ -362,7 +368,6 @@ const ScheduleInstructorPage = props => {
     };
     checkEmailInstitution();
   }, [email]);
-
 
   if (isSubmitting) return <LoadingPage project={project} />;
   return (
@@ -437,6 +442,10 @@ const ScheduleInstructorPage = props => {
                   Enter your name and email address below. We will use this information to send you a Google Calendar
                   invitation.
                 </Alert>
+                <Alert severity="error" sx={{ mt: "5px" }}>
+                  Please use an email address provided by your academic/research institution.
+                </Alert>
+
                 <ValidatedInput
                   className="PleaseSpecify"
                   label="Firstname"
@@ -539,7 +548,7 @@ const ScheduleInstructorPage = props => {
           </DialogContent>
           <DialogActions>
             <Button onClick={confirmClose("Cancelled")}>Cancel</Button>
-            <Button onClick={confirmClose("Confirmed")} autoFocus>
+            <Button onClick={submitData} autoFocus>
               Confirm
             </Button>
           </DialogActions>

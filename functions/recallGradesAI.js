@@ -24,7 +24,7 @@ exports.updateASA = async (req, res) => {
       console.log(operation);
       const file = bucket.file(fileName);
       const [content] = await file.download();
-      console.log("File content:", content.toString());
+      console.log("File download successfuly: updateASA");
       return res.status(200).send(content);
     }
     if (operation === "write") {
