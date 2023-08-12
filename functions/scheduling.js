@@ -1,5 +1,7 @@
 const { admin, db } = require("./admin");
+const { db: knowledgeDb } = require("./admin_Knowledge.js");
 const moment = require("moment");
+const axios = require("axios");
 
 require("dotenv").config();
 const { Timestamp } = require("firebase-admin/firestore");
@@ -463,6 +465,26 @@ exports.scheduleLifeLog = async (req, res) => {
   return res.status(400).json({ done: false });
 };
 
+const getAvailableFullnameOneCademy = async (fName, lName) => {
+  let _fullname = fName.trim() + lName.trim();
+  while (true) {
+    let found = false;
+
+    const docRef = await knowledgeDb.collection("users").doc(_fullname).get();
+    if (docRef.exists) {
+      found = true;
+    }
+
+    if (!found) {
+      break;
+    }
+    const randomNum = Math.floor(Math.random() * 10);
+    _fullname += randomNum;
+  }
+  console.log("_fullname", _fullname);
+  return _fullname;
+};
+
 const getAvailableFullname = async fullname => {
   const userCollections = ["users", "usersSurvey"];
 
@@ -480,8 +502,8 @@ const getAvailableFullname = async fullname => {
     if (!found) {
       break;
     }
-
-    _fullname += " ";
+    const randomNum = Math.floor(Math.random() * 10);
+    _fullname += randomNum;
   }
 
   return _fullname;
@@ -740,12 +762,12 @@ exports.scheduleInstructors = async (req, res) => {
         email: email,
         project,
         scheduled: true,
-        institution: institution,
-        instructorId: instructorId,
-        firstname: firstname,
+        institution,
+        instructorId,
+        firstname,
         uid: "",
         surveyType: "instructor",
-        lastname: lastname,
+        lastname,
         noRetaineData: false,
         createdAt: Timestamp.fromDate(new Date())
       });
@@ -754,20 +776,66 @@ exports.scheduleInstructors = async (req, res) => {
         const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
         const userSurevyRef = db.collection("usersSurvey").doc(fullName);
         batch.set(userSurevyRef, {
-          email: email,
+          email,
           project,
           scheduled: true,
-          institution: institution,
-          instructorId: instructorId,
-          firstname: firstname,
+          institution,
+          instructorId,
+          firstname,
           uid: "",
           surveyType: "instructor",
-          lastname: lastname,
+          lastname,
           noRetaineData: false,
           createdAt: Timestamp.fromDate(new Date())
         });
       }
     }
+    const onecademyDocs = await knowledgeDb.collection("users").where("email", "==", email).get();
+    if (onecademyDocs.docs.length === 0) {
+      const newUserOneCademy = {
+        uname: await getAvailableFullnameOneCademy(firstname, lastname),
+        email,
+        fName: firstname,
+        lName: lastname,
+        password: "onecademy",
+        lang: "English",
+        country: "",
+        state: "",
+        city: "",
+        gender: null,
+        birthDate: null,
+        foundFrom: "Instructor invitation",
+        education: null,
+        occupation: "",
+        ethnicity: [],
+        reason: "",
+        chooseUname: false,
+        clickedConsent: false,
+        clickedTOS: false,
+        clickedPP: false,
+        clickedCP: false,
+        clickedGDPR: false,
+        tag: "1Cademy",
+        tagId: "r98BjyFDCe4YyLA3U8ZE",
+        deMajor: null,
+        deInstit: institution,
+        theme: "Dark",
+        background: "Image",
+        consented: true,
+        GDPRPolicyAgreement: true,
+        termsOfServiceAgreement: true,
+        privacyPolicyAgreement: true,
+        cookiesAgreement: true,
+        fieldOfInterest: "",
+        course: null
+      };
+      try {
+        await axios.post("http://localhost:3000/api/signup", { data: newUserOneCademy });
+      } catch {
+        console.log("user already exists");
+      }
+    }
+
     await batch.commit();
     return res.status(200).json({ message: "Sessions successfully scheduled" });
   } catch (err) {

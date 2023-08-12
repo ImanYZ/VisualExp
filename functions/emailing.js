@@ -1270,7 +1270,7 @@ exports.sendingEmails = async context => {
       const _emailData = emailDoc.data();
       const { documentId, mailOptions, reason, city, stateInfo, country, email, sent } = _emailData;
       const isInstAdmin = reason === "instructor" || reason === "administrator";
-      if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin) && email && sent === false) {
+      if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin) && email && sent === false && email !=="ouhrac@gmail.com") {
         console.log("sending email to", email, "for", reason, "with id", emailData.id);
         transporter.sendMail(mailOptions, async (error, data) => {
           if (error) {
