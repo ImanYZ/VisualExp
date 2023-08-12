@@ -20,8 +20,8 @@ const getAvailableFullname = async (fullname) => {
     if(!found) {
       break;
     }
-
-    _fullname += " ";
+    const randomNum = Math.floor(Math.random() * 10);
+    _fullname += randomNum;
   }
 
   return _fullname;
