@@ -31,7 +31,7 @@ const RecallForIman = props => {
 
   useEffect(() => {
     const getRecall = async () => {
-      const response = await axios.get("/loadRecallGradesNumbers");
+      const response = await axios.get("/researchers/loadRecallGradesNumbers");
       console.log(response.data);
       setNoMajority(response.data.noMajority);
       setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);

@@ -77,8 +77,7 @@ export const SchemaGeneration = () => {
       setSearching(true);
       setRecallResponses([]);
       setSearchResules([]);
-      const response = await axios.post("/loadResponses", {
-        researcher: fullname,
+      const response = await axios.post("/researchers/loadResponses", {
         selectedPassageId: selectedPassage.id
       });
       const allTheResponses = response.data.responses;
@@ -594,10 +593,9 @@ export const SchemaGeneration = () => {
       setSearchResules(_searchResules);
       setNotSatisfiedResponses(_notSatisfiedResponses);
       setRecallResponses(_recallResponses);
-      await axios.post("/voteOnSingleRecall", {
+      await axios.post("/researchers/voteOnSingleRecall", {
         session: response.session,
         condition: response.condition,
-        researcher: fullname,
         phrase: selectedPhrase,
         documentId: response.documentId,
         grade: vote

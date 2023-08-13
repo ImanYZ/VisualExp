@@ -171,7 +171,7 @@ const ResearcherPassage = () => {
   const hundleUpdatePhrase = async event => {
     try {
       setUpdatingPhrase(true);
-      await axios.post("/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase, resetGrades });
+      await axios.post("/researchers/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase, resetGrades });
       handleCloseEditModal();
       setUpdatingPhrase(false);
       setResetGrades(false);
@@ -192,7 +192,7 @@ const ResearcherPassage = () => {
       let numberRecord = 0;
       let allowDelete = true;
       if (numberRecorded === 0) {
-        const response = await axios.post("/calcultesRecallGradesRecords", {
+        const response = await axios.post("/researchers/calcultesRecallGradesRecords", {
           passageId: passageDoc.docs[0].id,
           selectedPhrase
         });
@@ -202,7 +202,7 @@ const ResearcherPassage = () => {
       }
       if (allowDelete) {
         setNumberRecorded(0);
-        await axios.post("/deletePhraseFromPassage", {
+        await axios.post("/researchers/deletePhraseFromPassage", {
           passageId: passageDoc.docs[0].id,
           selectedPhrase
         });
@@ -220,7 +220,7 @@ const ResearcherPassage = () => {
 
   const handleAddNewPhrase = async () => {
     try {
-      await axios.post("/addNewPhraseForPassage", { chosenPassage, newPhraseAdded });
+      await axios.post("/researchers/addNewPhraseForPassage", { chosenPassage, newPhraseAdded });
       handleCloseAddPhraseModal();
       setSubmtingNewPhrase(false);
       setNewPhraseAdded("");

@@ -500,10 +500,9 @@ const ThematicAnalysis = props => {
           delete _codesBook[sentence];
         }
       }
-      await axios.post("/submitThematic", {
+      await axios.post("/researchers/submitThematic", {
         codesBook: _codesBook,
         transcriptId,
-        fullname,
         surveyType,
         participant: allOfTranscript.find(transcript => transcript.id === transcriptId).participant,
         project: "OnlineCommunities"
@@ -559,7 +558,7 @@ const ThematicAnalysis = props => {
   const handleAdminEdit = async () => {
     try {
       setSubmittingUpdate(true);
-      await axios.post("/updateThematicCode", {
+      await axios.post("/researchers/updateThematicCode", {
         oldCodeId: adminCodeData.id,
         newCode: code,
         mergeCode,
@@ -584,7 +583,7 @@ const ThematicAnalysis = props => {
   const handleAdminDelete = async () => {
     try {
       setDeleting(true);
-      axios.post("/deleteThematicCode", {
+      axios.post("/researchers/deleteThematicCode", {
         deleteCode: adminCodeData
       });
       setCode("");

@@ -1,79 +1,110 @@
 const express = require("express");
-const moment = require("moment");
 const gradeRecalls = require("../actions/researchers/gradeRecalls");
 const codeFeedback = require("../actions/researchers/codeFeedback");
-const { db } = require("../admin");
+const voteActivities = require("../actions/researchers/voteActivities");
+const schedule = require("../actions/researchers/schedule");
+const voteActivityReset = require("../actions/researchers/voteActivityReset");
+
+const deleteActivity = require("../actions/researchers/deleteActivity");
+
+const voteInstructor = require("../actions/researchers/voteInstructor");
+
+const voteInstructorReset = require("../actions/researchers/voteInstructorReset");
+
+const voteAdministrator = require("../actions/researchers/voteAdministrator");
+
+const voteAdministratorReset = require("../actions/researchers/voteAdministratorReset");
+
+const retreiveFeedbackcodes = require("../actions/researchers/retreiveFeedbackcodes");
+
+const loadResponses = require("../actions/researchers/loadResponses");
+
+const voteOnSingleRecall = require("../actions/researchers/voteOnSingleRecall");
+const loadRecallGrades = require("../actions/researchers/loadRecallGrades");
+
+const updateThematicCode = require("../actions/researchers/updateThematicCode");
+const deleteThematicCode = require("../actions/researchers/deleteThematicCode");
+
+const loadRecallGradesNumbers = require("../actions/researchers/loadRecallGradesNumbers");
+
+const submitThematic = require("../actions/researchers/submitThematic");
+
+const updatePhraseForPassage = require("../actions/researchers/updatePhraseForPassage");
+const addNewPhraseForPassage = require("../actions/researchers/addNewPhraseForPassage");
+const calcultesRecallGradesRecords = require("../actions/researchers/calcultesRecallGradesRecords");
+const deletePhraseFromPassage = require("../actions/researchers/deletePhraseFromPassage");
+
 const firebaseAuth = require("../middlewares/firebaseAuth");
 const isResearcher = require("../middlewares/isResearcher");
 const researchersRouter = express.Router();
 
 researchersRouter.use(firebaseAuth);
-researchersRouter.use(isResearcher)
+researchersRouter.use(isResearcher);
 
 // POST /api/researchers/schedule
-researchersRouter.post("/schedule", async (req, res) => {
-  try {
-    const scheduleIds = [];
-    const batch = db.batch();
-    let { project, schedule: scheduleSlots } = req.body;
-    const fullname = String(req?.userData?.fullname);
-
-    scheduleSlots.sort((s1, s2) => moment(s1).isBefore(s2) ? -1 : 1)
-    const monthlyEntries = {};
-    for(const scheduleSlot of scheduleSlots) {
-      const month = moment(scheduleSlot).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD")
-      if(!monthlyEntries[month]) {
-        monthlyEntries[month] = [];
-      }
-      monthlyEntries[month].push(
-        moment(scheduleSlot).utcOffset(-4, true).format("YYYY-MM-DD HH:mm")
-      )
-    }
-
-    for(const month in monthlyEntries) {
-      const resSchedules = await db.collection("resSchedule").where("project", "==", project).where("month", "==", month).get();
-      const resScheduleExist = resSchedules.docs.length > 0;
-      const resScheduleRef = resScheduleExist ? db.collection("resSchedule").doc(resSchedules.docs[0].id) : db.collection("resSchedule").doc();
-      scheduleIds.push(resScheduleRef.id)
-
-      let scheduleData = resScheduleExist ? resSchedules.docs[0].data() : {
-        researchers: [],
-        project,
-        month,
-        schedules: {},
-      };
-      
-      const schedules = monthlyEntries[month];
-
-      scheduleData.project = project;
-
-      if(!~scheduleData.researchers.indexOf(fullname)) {
-        scheduleData.researchers.push(fullname)
-      }
-      scheduleData.schedules[fullname] = schedules;
-      if(resScheduleExist) {
-        batch.update(resScheduleRef, scheduleData);
-      } else {
-        batch.set(resScheduleRef, scheduleData);
-      }
-    }
-    await batch.commit();
-
-    return res.status(200).send({
-      message: "schedule successfully updated.",
-      scheduleIds
-    })
-
-  } catch(e) {
-    console.log(e)
-    return res.status(500).send({
-      message: "Error occurred, please try later"
-    })
-  }
-})
+researchersRouter.post("/schedule", schedule);
 
 // POST /api/researchers/gradeRecalls
 researchersRouter.post("/gradeRecalls", gradeRecalls);
+
+// POST /api/researchers/codeFeedback
 researchersRouter.post("/codeFeedback", codeFeedback);
+
+// POST /api/researchers/voteActivities
+researchersRouter.post("/voteActivities", voteActivities);
+
+// POST /api/researchers/voteActivityReset
+researchersRouter.post("/voteActivityReset", voteActivityReset);
+
+// POST /api/researchers/deleteActivity
+researchersRouter.post("/deleteActivity", deleteActivity);
+
+// POST /api/researchers/voteInstructor
+researchersRouter.post("/voteInstructor", voteInstructor);
+
+// POST /api/researchers/voteInstructorReset
+researchersRouter.post("/voteInstructorReset", voteInstructorReset);
+
+// POST /api/researchers/voteAdministrator
+researchersRouter.post("/voteAdministrator", voteAdministrator);
+
+// POST /api/researchers/voteAdministratorReset
+researchersRouter.post("/voteAdministratorReset", voteAdministratorReset);
+
+// POST /api/researchers/retreiveFeedbackcodes
+researchersRouter.post("/retreiveFeedbackcodes", retreiveFeedbackcodes);
+
+// POST /api/researchers/loadResponses
+researchersRouter.post("/loadResponses", loadResponses);
+
+// POST /api/researchers/voteOnSingleRecall
+researchersRouter.post("/voteOnSingleRecall", voteOnSingleRecall);
+
+// POST /api/researchers/loadRecallGrades
+researchersRouter.post("/loadRecallGrades", loadRecallGrades);
+
+// POST /api/researchers/updateThematicCode
+researchersRouter.post("/updateThematicCode", updateThematicCode);
+
+// POST /api/researchers/deleteThematicCode
+researchersRouter.post("/deleteThematicCode", deleteThematicCode);
+
+// POST /api/researchers/loadRecallGradesNumbers
+researchersRouter.get("/loadRecallGradesNumbers", loadRecallGradesNumbers);
+
+// POST /api/researchers/submitThematic
+researchersRouter.post("/submitThematic", submitThematic);
+
+// POST /api/researchers/updatePhraseForPassage
+researchersRouter.post("/updatePhraseForPassage", updatePhraseForPassage);
+
+// POST /api/researchers/addNewPhraseForPassage
+researchersRouter.post("/addNewPhraseForPassage", addNewPhraseForPassage);
+
+// POST /api/researchers/calcultesRecallGradesRecords
+researchersRouter.post("/calcultesRecallGradesRecords", calcultesRecallGradesRecords);
+
+// POST /api/researchers/deletePhraseFromPassage
+researchersRouter.post("/deletePhraseFromPassage", deletePhraseFromPassage);
 
 module.exports = researchersRouter;
