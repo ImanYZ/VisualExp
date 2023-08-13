@@ -1,16 +1,9 @@
-const express = require("express");
+const { db } = require("../../admin");
+const { Timestamp } = require("firebase-admin/firestore");
 const { toOrdinal } = require("number-to-words");
 const moment = require("moment");
-const { db } = require("../admin");
-const { Timestamp } = require("firebase-admin/firestore");
-const firebaseAuth = require("../middlewares/firebaseAuth");
-const isAdmin = require("../middlewares/isAdmin");
-const { createExperimentEvent } = require("../scheduling");
-const { deleteEvent } = require("../GoogleCalendar");
-const adminRouter = express.Router();
-
-adminRouter.use(firebaseAuth);
-adminRouter.use(isAdmin);
+const { createExperimentEvent } = require("../../scheduling");
+const { deleteEvent } = require("../../GoogleCalendar");
 
 const scheduleSingleSession = async object => {
   try {
@@ -33,15 +26,22 @@ const scheduleSingleSession = async object => {
     const end = new Date(
       start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[sessionIndex] || 1) * 60000
     );
-    const eventCreated = await createExperimentEvent(email, researcherData.email, order, start, end, projectSpecsData, surveyType);
+    const eventCreated = await createExperimentEvent(
+      email,
+      researcherData.email,
+      order,
+      start,
+      end,
+      projectSpecsData,
+      surveyType
+    );
     return eventCreated;
   } catch (err) {
     console.log({ err });
   }
 };
 
-// POST /api/participants/schedule
-adminRouter.post("/manageevents", async (req, res) => {
+module.exports = async (req, res) => {
   try {
     await db.runTransaction(async t => {
       const { participant, selectedSession, availableSessions, currentProject, events } = req.body;
@@ -131,7 +131,7 @@ adminRouter.post("/manageevents", async (req, res) => {
                 email: participant,
                 session: Timestamp.fromDate(new Date(sessi)),
                 id: eventCreated.data.id,
-                order, 
+                order,
                 project: currentProject
               });
             }
@@ -144,6 +144,4 @@ adminRouter.post("/manageevents", async (req, res) => {
     console.log(err);
     return res.status(400).json({ message: "Error occurred, please try later" });
   }
-});
-
-module.exports = adminRouter;
+};

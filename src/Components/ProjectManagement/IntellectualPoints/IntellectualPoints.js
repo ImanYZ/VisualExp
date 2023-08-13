@@ -612,7 +612,7 @@ const IntellectualPoints = (props) => {
     await firebase.commitBatch();
     if (activityUpdated) {
       await firebase.idToken();
-      await axios.post("/voteActivityReset", { activity: selectedRows[0] });
+      await axios.post("/researchers/voteActivityReset", { activity: selectedRows[0] });
     }
     setSnackbarMessage("You successfully submitted your activity!");
     // }
@@ -655,7 +655,7 @@ const IntellectualPoints = (props) => {
           aActivities.splice(activityIdx, 1);
           setAllActivities(aActivities);
           await firebase.idToken();
-          await axios.post("/deleteActivity", {
+          await axios.post("/researchers/deleteActivity", {
             activity: clickedCell.id,
           });
           setTimeout(() => {
@@ -704,7 +704,7 @@ const IntellectualPoints = (props) => {
       if (!otherVoting) {
         setOtherVoting(true);
         await firebase.idToken();
-        await axios.post("/vote", {
+        await axios.post("/researchers/voteActivities", {
           activity: activityId,
           vote: voteType,
         });

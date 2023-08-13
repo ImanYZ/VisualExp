@@ -163,7 +163,7 @@ const ManageEvents = props => {
   useEffect(() => {
     const notifyApplicationStatus = async () => {
       try {
-        const response = await axios.get("/notifyApplicationStatus");
+        const response = await axios.get("/administrator/notifyApplicationStatus");
         let registered = response.data.registered;
         let completedFirst = response.data.completedFirst;
         let completedSecond = response.data.completedSecond;
@@ -421,7 +421,7 @@ const ManageEvents = props => {
     try {
       setIsSubmitting(true);
       await firebase.idToken();
-      await axios.post("/admin/manageevents", {
+      await axios.post("/administrator/manageevents", {
         participant,
         selectedSession,
         availableSessions,
