@@ -1,4 +1,4 @@
-import { db } from "../admin";
+const { db } = require("../admin");
 
 exports.delay = async time => {
   return new Promise(resolve => {

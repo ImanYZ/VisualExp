@@ -1,4 +1,6 @@
+const { Storage } = require("@google-cloud/storage");
 const storage = new Storage({ projectId: "visualexp-a7d2c" });
+
 const uploadBlobAsAudio = async (blob, filePath) => {
   const bucket = storage.bucket("gs://visualexp-a7d2c.appspot.com");
   await bucket.file(filePath).save(blob.buffer);

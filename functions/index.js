@@ -4,6 +4,7 @@ const functions = require("firebase-functions");
 const remindResearchersForAvailability = require("./pubsub/remindResearchersForAvailability");
 const remindCalendarInvitations = require("./pubsub/remindCalendarInvitations");
 const passagesNumberCorrection = require("./pubsub/passagesNumberCorrection");
+const assignThematicPoints = require("./pubsub/assignThematicPoints");
 
 const { deleteUser, applicationReminder } = require("./users");
 
@@ -86,6 +87,14 @@ exports.sendingEmails = functions
   .pubsub.schedule("*/10 * * * *")
   .timeZone(EST_TIMEZONE)
   .onRun(sendingEmails);
+
+exports.assignThematicPoints = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 1 week")
+  .onRun(assignThematicPoints);
 // Knowledge
 // exports.assignNodeContributorsInstitutionsStats = functions
 //   .runWith({
