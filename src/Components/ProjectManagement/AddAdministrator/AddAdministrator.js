@@ -8,19 +8,11 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
-import MuiTypography from "@mui/material/Typography";
-
 import { DataGrid } from "@mui/x-data-grid";
-
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
 import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import {
@@ -232,7 +224,6 @@ const AddAdministrator = props => {
   const firebase = useRecoilValue(firebaseState);
   // The authenticated researcher fullname
   const fullname = useRecoilValue(fullnameState);
-  const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
   const projectSpecs = useRecoilValue(projectSpecsState);
   const projectPoints = projectSpecs?.points || {};

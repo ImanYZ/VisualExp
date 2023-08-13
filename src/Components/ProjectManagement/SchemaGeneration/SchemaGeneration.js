@@ -77,6 +77,7 @@ export const SchemaGeneration = () => {
       setSearching(true);
       setRecallResponses([]);
       setSearchResules([]);
+      await firebase.idToken();
       const response = await axios.post("/researchers/loadResponses", {
         selectedPassageId: selectedPassage.id
       });

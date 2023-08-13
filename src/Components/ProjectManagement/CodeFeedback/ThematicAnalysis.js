@@ -500,6 +500,7 @@ const ThematicAnalysis = props => {
           delete _codesBook[sentence];
         }
       }
+      await firebase.idToken();
       await axios.post("/researchers/submitThematic", {
         codesBook: _codesBook,
         transcriptId,
@@ -558,6 +559,7 @@ const ThematicAnalysis = props => {
   const handleAdminEdit = async () => {
     try {
       setSubmittingUpdate(true);
+      await firebase.idToken();
       await axios.post("/researchers/updateThematicCode", {
         oldCodeId: adminCodeData.id,
         newCode: code,
@@ -583,6 +585,7 @@ const ThematicAnalysis = props => {
   const handleAdminDelete = async () => {
     try {
       setDeleting(true);
+      await firebase.idToken();
       axios.post("/researchers/deleteThematicCode", {
         deleteCode: adminCodeData
       });
