@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const recordAudio = require("./actions/intreview/recordAudio");
+const assignThematicPoints = require("./pubsub/assignThematicPoints");
 
 const {
   retrieveData,
@@ -51,7 +52,7 @@ const { saveGradesLogs, updateASA } = require("./recallGradesAI");
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
 const participantsRouter = require("./api/participants");
-const adminRouter = require("./api/admin");
+const adminRouter = require("./api/administrator");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -114,7 +115,7 @@ app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
 app.use("/participants", participantsRouter);
 app.post("/recallUpload", recallUpload);
-app.use("/admin", adminRouter);
+app.use("/administrator", adminRouter);
 app.post("/scheduleInstructors", scheduleInstructors);
 app.get("/sendingEmails", sendingEmails);
 app.post("/retrieveEvents", retrieveEvents);
@@ -123,6 +124,7 @@ app.post("/checkEntreviewStatus", checkEntreviewStatus);
 app.post("/recordAudio", recordAudio);
 app.post("/saveGradesLogs", saveGradesLogs);
 app.post("/updateASA", updateASA);
+app.post("/assignThematicPoints", assignThematicPoints);
 // Knowledge endpoints
 
 // Misinformation Experiment
