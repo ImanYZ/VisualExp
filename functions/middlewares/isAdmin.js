@@ -1,5 +1,5 @@
 const isAdmin = async (req, res, next) => {
-    if(!req.researcher) {
+    if(!req.admin) {
       return res.status(401).send({
         message: "Unauthorized"
       })

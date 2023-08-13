@@ -354,9 +354,7 @@ const AddAdministrator = props => {
   // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
     if (firebase && project && fullname && administratorsLoaded) {
-      const administratorVotesQuery = firebase.db
-        .collection("administratorVotes")
-        .where("voter", "==", fullname);
+      const administratorVotesQuery = firebase.db.collection("administratorVotes").where("voter", "==", fullname);
 
       const administratorVotesSnapshot = administratorVotesQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
@@ -737,7 +735,7 @@ const AddAdministrator = props => {
           // backend, we'll retrive the authenticated researcher. This way, we
           // do not let anyone hack the system to vote on their own entries.
           await firebase.idToken();
-          await axios.post("/voteAdministrator", {
+          await axios.post("/researchers/voteAdministrator", {
             administrator: clickedCell.id,
             vote: clickedCell.field,
             voterProject: project
@@ -760,7 +758,7 @@ const AddAdministrator = props => {
         // backend, we'll retrive the authenticated researcher. This way, we
         // do not let anyone hack the system to vote on their own entries.
         await firebase.idToken();
-        await axios.post("/voteAdministrator", {
+        await axios.post("/researchers/voteAdministrator", {
           administrator: administratorId,
           vote: voteType,
           comment,
@@ -1006,7 +1004,7 @@ const AddAdministrator = props => {
         });
         if (gotUpdated) {
           await firebase.idToken();
-          await axios.post("/voteAdministratorReset", {
+          await axios.post("/researchers/voteAdministratorReset", {
             administrator: selectedRows[0]
           });
         }

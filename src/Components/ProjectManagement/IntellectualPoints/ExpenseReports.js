@@ -10,21 +10,18 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import Autocomplete from "@mui/material/Autocomplete";
-import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -34,25 +31,11 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 import { firebaseState } from "../../../store/AuthAtoms";
 
-import {
-  projectState,
-  upVotedTodayState,
-  allTagsState,
-  allActivitiesState,
-  othersActivitiesState,
-  otherActivityState
-} from "../../../store/ProjectAtoms";
+import { projectState, othersActivitiesState } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
 // import AdminIntellectualPoints from "./AdminIntellectualPoints";
 import GridCellToolTip from "../../GridCellToolTip";
-import { isToday, getISODateString } from "../../../utils/DateFunctions";
-import {
-  ActivityInfoAlert,
-  ActivityInstructionsAlert,
-  CalendarVisualizationAlert,
-  IntellectualActivitiesAlert
-} from "./Alerts";
 
 import "./IntellectualPoints.css";
 
@@ -299,7 +282,7 @@ const ExpenseReports = props => {
       try {
         setIsSubmitting(true);
         await firebase.idToken();
-        await axios.post("/markPaid", { activities: shownActivities });
+        await axios.post("/administrator/markAsPaidActivities", { activities: shownActivities });
         setSnackbarMessage("You successfully marked these activities as paid!");
         setIsSubmitting(false);
       } catch (err) {
