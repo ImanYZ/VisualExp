@@ -97,7 +97,7 @@ exports.getEvent = async eventId => {
           email: schedule ? schedule.email : "r3alst@gmail.com" // mock participant
         },
         {
-          email: "ouhrac@gmail.com" // mock researcher
+          email: "ukasha@nowhere.com" // mock researcher
         }
       ],
       start: {

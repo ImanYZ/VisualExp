@@ -157,10 +157,9 @@ const FreeRecallGrading = props => {
     try {
       setProcessing(true);
       const recentParticipants = await fetchRecentParticipants(fullname, project);
+      console.log(recentParticipants);
       setRecentParticipants(recentParticipants);
-      let response = await axios.post("/loadRecallGrades", {
-        fullname
-      });
+      let response = await axios.post("/researchers/loadRecallGrades");
       let _recallGrades = response.data;
       setAllRecallGrades(_recallGrades);
       let __recallGrades = [];

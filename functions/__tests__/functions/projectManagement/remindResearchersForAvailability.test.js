@@ -8,7 +8,6 @@ const {
   mockResSchedule
 } = require("../../../testUtils");
 
-const { Timestamp } = require("firebase-admin/firestore");
 const lodash = require("lodash");
 const moment = require("moment");
 
@@ -34,15 +33,9 @@ jest.mock("../../../helpers/common", () => {
   };
 });
 
-const {
-  expect,
-  describe,
-  beforeAll,
-  afterAll
-} = require('@jest/globals');
-const { remindResearchersForAvailability } = require("../../../../functions/projectManagement");
+const { expect, describe, beforeAll, afterAll } = require("@jest/globals");
+const remindResearchersForAvailability = require("../../../pubsub/remindResearchersForAvailability");
 const { remindResearcherToSpecifyAvailability } = require("../../../emailing");
-const { db } = require("../../../admin");
 
 describe("projectManagement.remindResearchersForAvailability", () => {
   const _mockResearchers = [...mockResearchers.data];
@@ -52,8 +45,8 @@ describe("projectManagement.remindResearchersForAvailability", () => {
   const month = moment().utcOffset(-4).add(10, "days").startOf("month").format("YYYY-MM-DD");
 
   const _mockResSchedules = [...mockResSchedule.data];
-  let resIdx = _mockResSchedules.findIndex((resSchedule) => resSchedule.month === month);
-  if(resIdx === -1) {
+  let resIdx = _mockResSchedules.findIndex(resSchedule => resSchedule.month === month);
+  if (resIdx === -1) {
     _mockResSchedules.push(lodash.cloneDeep(_mockResSchedules[0]));
     resIdx = _mockResSchedules.length - 1;
   }
@@ -61,7 +54,7 @@ describe("projectManagement.remindResearchersForAvailability", () => {
   _mockResSchedule.documentId = month;
   _mockResSchedule.month = month;
   _mockResSchedule.schedules[_mockResearchers[0].documentId] = []; // empty for start
-  
+
   const resSchedulesMock = new MockData(_mockResSchedules, "resSchedule");
 
   const collects = [
@@ -77,7 +70,7 @@ describe("projectManagement.remindResearchersForAvailability", () => {
   beforeAll(async () => {
     await Promise.all(collects.map(collect => collect.populate()));
     return remindResearchersForAvailability({});
-  })
+  });
 
   afterAll(async () => {
     remindResearcherToSpecifyAvailability.mockReset(); // reseting mock
@@ -87,7 +80,7 @@ describe("projectManagement.remindResearchersForAvailability", () => {
   it("remind researcher if their last availability is less than next 10 days", () => {
     expect(remindResearcherToSpecifyAvailability?.mock?.calls?.length).toEqual(1);
     remindResearcherToSpecifyAvailability.mockReset();
-  })
+  });
 
   it("don't remind researcher if their last availability is equal or greater than next 10 days", async () => {
     await resSchedulesMock.clean();
@@ -96,7 +89,6 @@ describe("projectManagement.remindResearchersForAvailability", () => {
     );
     await resSchedulesMock.populate();
     await remindResearchersForAvailability({});
-    expect(remindResearcherToSpecifyAvailability?.mock?.calls?.length).toEqual(0)
-  })
-
-})
+    expect(remindResearcherToSpecifyAvailability?.mock?.calls?.length).toEqual(0);
+  });
+});

@@ -872,7 +872,7 @@ const AddInstructor = props => {
           // backend, we'll retrive the authenticated researcher. This way, we
           // do not let anyone hack the system to vote on their own entries.
           await firebase.idToken();
-          await axios.post("/voteInstructor", {
+          await axios.post("/researchers/voteInstructor", {
             instructor: clickedCell.id,
             vote: clickedCell.field,
             voterProject: project
@@ -895,7 +895,7 @@ const AddInstructor = props => {
         // backend, we'll retrive the authenticated researcher. This way, we
         // do not let anyone hack the system to vote on their own entries.
         await firebase.idToken();
-        await axios.post("/voteInstructor", {
+        await axios.post("/researchers/voteInstructor", {
           instructor: instructorId,
           vote: voteType,
           voterProject: project,
@@ -1172,7 +1172,7 @@ const AddInstructor = props => {
         });
         if (gotUpdated) {
           await firebase.idToken();
-          await axios.post("/voteInstructorReset", {
+          await axios.post("/researchers/voteInstructorReset", {
             instructor: selectedRows[0]
           });
         }

@@ -2,6 +2,9 @@ const cors = require("cors");
 
 require("dotenv").config();
 
+const recordAudio = require("./actions/intreview/recordAudio");
+const assignThematicPoints = require("./pubsub/assignThematicPoints");
+
 const {
   retrieveData,
   questionsData,
@@ -11,32 +14,6 @@ const {
   recallData,
   keyPhrasesData
 } = require("./users");
-const {
-  voteEndpoint,
-  voteActivityReset,
-  deleteActivity,
-  voteInstructorEndpoint,
-  voteInstructorReset,
-  voteAdministratorEndpoint,
-  voteAdministratorReset,
-  // updateNotTakenSessions,
-  markPaidEndpoint,
-  passagesNumberCorrection,
-  retreiveFeedbackcodes,
-  loadResponses,
-  voteOnSingleRecall,
-  loadRecallGrades,
-  updateThematicCode,
-  deleteThematicCode,
-  notifyApplicationStatus,
-  recordAudio,
-  submitThematic,
-  updatePhraseForPassage,
-  addNewPhraseForPassage,
-  calcultesRecallGradesRecords,
-  loadRecallGradesNumbers,
-  deletePhraseFromPassage
-} = require("./projectManagement");
 const {
   loadImageIndividual,
   loadImageProfessor,
@@ -75,7 +52,7 @@ const { saveGradesLogs, updateASA } = require("./recallGradesAI");
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
 const participantsRouter = require("./api/participants");
-const adminRouter = require("./api/admin");
+const adminRouter = require("./api/administrator");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -112,7 +89,6 @@ app.post("/trackStudentInvite", trackStudentInvite);
 app.post("/trackStudentEmailTemplateCopy", trackStudentEmailTemplateCopy);
 app.get("/retrieveData", retrieveData);
 app.get("/questionsData", questionsData);
-app.get("/passagesNumberCorrection", passagesNumberCorrection);
 app.get("/feedbackData", feedbackData);
 app.get("/feedbackCodeData", feedbackCodeData);
 app.get("/quotesData", quotesData);
@@ -120,15 +96,6 @@ app.get("/recallData", recallData);
 app.get("/keyPhrasesData", keyPhrasesData);
 app.get("/assignNodeContributorsInstitutionsStats", assignNodeContributorsInstitutionsStats);
 app.get("/getInstitutions", getInstitutions);
-app.post("/vote", voteEndpoint);
-app.post("/markPaid", markPaidEndpoint);
-app.post("/voteAdministrator", voteAdministratorEndpoint);
-app.post("/voteAdministratorReset", voteAdministratorReset);
-app.post("/voteInstructor", voteInstructorEndpoint);
-app.post("/voteInstructorReset", voteInstructorReset);
-app.post("/voteActivityReset", voteActivityReset);
-app.post("/deleteActivity", deleteActivity);
-app.post("/retreiveFeedbackcodes", retreiveFeedbackcodes);
 app.post("/checkEmailInstitution", checkEmailInstitution);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
@@ -148,28 +115,16 @@ app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
 app.use("/participants", participantsRouter);
 app.post("/recallUpload", recallUpload);
-app.post("/loadResponses", loadResponses);
-app.post("/voteOnSingleRecall", voteOnSingleRecall);
-app.use("/admin", adminRouter);
-app.post("/loadRecallGrades", loadRecallGrades);
+app.use("/administrator", adminRouter);
 app.post("/scheduleInstructors", scheduleInstructors);
 app.get("/sendingEmails", sendingEmails);
-
-app.post("/updateThematicCode", updateThematicCode);
-app.post("/deleteThematicCode", deleteThematicCode);
-app.get("/notifyApplicationStatus", notifyApplicationStatus);
 app.post("/retrieveEvents", retrieveEvents);
 app.post("/markEntreviewAttended", markEntreviewAttended);
 app.post("/checkEntreviewStatus", checkEntreviewStatus);
 app.post("/recordAudio", recordAudio);
-app.post("/submitThematic", submitThematic);
-app.post("/updatePhraseForPassage", updatePhraseForPassage);
-app.post("/addNewPhraseForPassage", addNewPhraseForPassage);
-app.post("/calcultesRecallGradesRecords", calcultesRecallGradesRecords);
-app.post("/deletePhraseFromPassage", deletePhraseFromPassage);
-app.get("/loadRecallGradesNumbers", loadRecallGradesNumbers);
 app.post("/saveGradesLogs", saveGradesLogs);
 app.post("/updateASA", updateASA);
+app.post("/assignThematicPoints", assignThematicPoints);
 // Knowledge endpoints
 
 // Misinformation Experiment
