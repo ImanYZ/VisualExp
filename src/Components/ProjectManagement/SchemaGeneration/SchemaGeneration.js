@@ -593,6 +593,7 @@ export const SchemaGeneration = () => {
       setSearchResules(_searchResules);
       setNotSatisfiedResponses(_notSatisfiedResponses);
       setRecallResponses(_recallResponses);
+      await firebase.idToken();
       await axios.post("/researchers/voteOnSingleRecall", {
         session: response.session,
         condition: response.condition,

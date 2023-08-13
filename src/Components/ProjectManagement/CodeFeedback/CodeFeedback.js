@@ -160,6 +160,7 @@ const CodeFeedback = props => {
         setDoneLoading(false);
         setAllResponsesGraded(true);
         let response = { data: { message: "success" } };
+        await firebase.idToken();
         response = await axios.post("researchers/retreiveFeedbackcodes");
         if (response.data.message === "success") {
           setExplanationIdsList(response.data.codeIds);
