@@ -94,6 +94,7 @@ exports.assignThematicPoints = functions
     timeoutSeconds: 520
   })
   .pubsub.schedule("every 1 week")
+  .timeZone(EST_TIMEZONE)
   .onRun(assignThematicPoints);
 // Knowledge
 // exports.assignNodeContributorsInstitutionsStats = functions
