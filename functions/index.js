@@ -1,20 +1,14 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 const functions = require("firebase-functions");
 
-const {
-  remindCalendarInvitations,
-  passagesNumberCorrection,
-  remindResearchersForAvailability
-} = require("./projectManagement");
+const remindResearchersForAvailability = require("./pubsub/remindResearchersForAvailability");
+const remindCalendarInvitations = require("./pubsub/remindCalendarInvitations");
+const passagesNumberCorrection = require("./pubsub/passagesNumberCorrection");
 
-const {
-  deleteUser,
-  applicationReminder
-} = require("./users");
+const { deleteUser, applicationReminder } = require("./users");
 
-const { inviteAdministrators , inviteInstructors, sendingEmails} = require("./emailing");
+const { inviteAdministrators, inviteInstructors, sendingEmails } = require("./emailing");
 const app = require("./app");
-
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -84,7 +78,7 @@ exports.passagesNumberCorrection = functions
   .pubsub.schedule("every 25 hours")
   .onRun(passagesNumberCorrection);
 
-  exports.sendingEmails = functions
+exports.sendingEmails = functions
   .runWith({
     memory: "1GB",
     timeoutSeconds: 520
