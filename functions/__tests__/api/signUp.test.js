@@ -1,10 +1,10 @@
 const chai = require("chai");
 const http = require("http");
-const chaiHttp = require('chai-http');
+const chaiHttp = require("chai-http");
 const app = require("../../app");
 const { MockData, deleteAllUsers, mockProjectSpecs, mockPassages, mockConditions } = require("../../testUtils");
 const { db } = require("../../admin");
-const {expect, describe, beforeAll, afterAll} = require('@jest/globals');
+const { expect, describe, beforeAll, afterAll } = require("@jest/globals");
 // const { getAuth } = require('firebase-admin/auth');
 
 const server = http.createServer(app);
@@ -24,10 +24,9 @@ describe("POST /api/signUp", () => {
   const email2 = "test2@test.com";
   const password = "password";
 
-
   beforeAll(async () => {
     return Promise.all(collects.map(collect => collect.populate()));
-  })
+  });
 
   afterAll(async () => {
     await deleteAllUsers();
@@ -43,10 +42,10 @@ describe("POST /api/signUp", () => {
       institutionName: "University of Michigan - Ann Arbor",
       projectName: "H1L2"
     });
-    expect(response.status).toEqual(201)
-    const userDoc = await db.collection("users").doc("mock name").get()
+    expect(response.status).toEqual(201);
+    const userDoc = await db.collection("users").doc("mock name").get();
     expect(userDoc.exists).toBeTruthy();
-  })
+  });
 
   it("should return error if email already exists", async () => {
     const response = await chai.request(server).post("/api/signUp").send({
@@ -57,8 +56,8 @@ describe("POST /api/signUp", () => {
       institutionName: "University of Michigan - Ann Arbor",
       projectName: "H1L2"
     });
-    expect(response.status).toEqual(500)
-  })
+    expect(response.status).toEqual(500);
+  });
 
   it("should be able to register as survey  instructor", async () => {
     const response = await chai.request(server).post("/api/signUp").send({
@@ -72,8 +71,8 @@ describe("POST /api/signUp", () => {
       surveyType: "instructor",
       noRetaineData: true
     });
-    expect(response.status).toEqual(201)
-    const userDoc = await db.collection("usersSurvey").doc("mock name ").get()
-    expect(userDoc.exists).toBeTruthy();
-  })
-})
+    expect(response.status).toEqual(201);
+    const userDoc = await db.collection("usersSurvey").where("email", "==", email2).get();
+    expect(userDoc.docs.length).toEqual(1);
+  });
+});

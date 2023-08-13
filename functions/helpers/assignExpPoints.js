@@ -41,12 +41,18 @@ exports.assignExpPoints = async obj => {
     let _eventId = "";
     if (!eventId) {
       // schedule is not available
-      if (!schedules.docs.length) return;
+      if (!schedules.docs.length) {
+        console.log("schedule is not available");
+        return;
+      }
       const schedule = schedules.docs[0];
       scheduleData = schedule.data();
 
       // if google calender event does not exists
-      if (!scheduleData?.id) return;
+      if (!scheduleData?.id) {
+        console.log("google calender event does not exists");
+        return;
+      }
 
       // if schedule wasn't started
       if (!scheduleData?.hasStarted) return;
@@ -73,11 +79,15 @@ exports.assignExpPoints = async obj => {
 
     // if points already distributed for this session we are not going to run this logic
     if (expSessions.docs.length) {
+      console.log("expSessions doc already exists");
       return;
     }
 
     // checking if researcher attended session
-    if (!attendees.includes(researcher.email)) return;
+    if (!attendees.includes(researcher.email)) {
+      console.log("researcher did not attend session");
+      return;
+    }
 
     if (checkRecallgrading) {
       const userRecallGrades = await t.get(
@@ -94,9 +104,10 @@ exports.assignExpPoints = async obj => {
       const userRecallGradeData = recallGradeData !== null ? recallGradeData : userRecallGrades.docs[0].data();
 
       const reacallSession = userRecallGradeData.sessions[session];
-
+    
       for (let recall of reacallSession) {
         if (!recall.researchers.includes(researcher.docId)) {
+          console.log("researcher did not grade recall");
           return;
         }
       }
@@ -106,8 +117,10 @@ exports.assignExpPoints = async obj => {
       }
       for (let feedback of userfeedbacks.docs) {
         let feedbackData = feedback.data();
+        console.log(feedbackData);
         if (feedback.id === currentfeedbackId) feedbackData = feedbackCodeData;
         if (!feedbackData.coders.includes(researcher.docId)) {
+          console.log("researcher did not grade feedback");
           return;
         }
       }
