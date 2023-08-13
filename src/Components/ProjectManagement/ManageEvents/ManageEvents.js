@@ -163,6 +163,7 @@ const ManageEvents = props => {
   useEffect(() => {
     const notifyApplicationStatus = async () => {
       try {
+        await firebase.idToken();
         const response = await axios.get("/administrator/notifyApplicationStatus");
         let registered = response.data.registered;
         let completedFirst = response.data.completedFirst;
