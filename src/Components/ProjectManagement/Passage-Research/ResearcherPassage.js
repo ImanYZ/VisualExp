@@ -171,6 +171,7 @@ const ResearcherPassage = () => {
   const hundleUpdatePhrase = async event => {
     try {
       setUpdatingPhrase(true);
+      await firebase.idToken();
       await axios.post("/researchers/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase, resetGrades });
       handleCloseEditModal();
       setUpdatingPhrase(false);
@@ -188,10 +189,12 @@ const ResearcherPassage = () => {
   const handleDeletePhrase = async event => {
     try {
       setDeletingPhrase(true);
+      await firebase.idToken();
       const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
       let numberRecord = 0;
       let allowDelete = true;
       if (numberRecorded === 0) {
+        await firebase.idToken();
         const response = await axios.post("/researchers/calcultesRecallGradesRecords", {
           passageId: passageDoc.docs[0].id,
           selectedPhrase
@@ -202,6 +205,7 @@ const ResearcherPassage = () => {
       }
       if (allowDelete) {
         setNumberRecorded(0);
+        await firebase.idToken();
         await axios.post("/researchers/deletePhraseFromPassage", {
           passageId: passageDoc.docs[0].id,
           selectedPhrase
@@ -220,6 +224,7 @@ const ResearcherPassage = () => {
 
   const handleAddNewPhrase = async () => {
     try {
+      await firebase.idToken();
       await axios.post("/researchers/addNewPhraseForPassage", { chosenPassage, newPhraseAdded });
       handleCloseAddPhraseModal();
       setSubmtingNewPhrase(false);

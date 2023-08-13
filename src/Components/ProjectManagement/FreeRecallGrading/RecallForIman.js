@@ -19,6 +19,18 @@ const RecallForIman = props => {
   const [doneProcessing, setDoneProcessing] = useState(false);
   const [countPhrases, setCountPhrases] = useState([]);
 
+  const researchers = [
+    "lewisdeantruong@gmail.com",
+    "dahewang0907@gmail.com",
+    "shabanagupta11@gmail.com",
+    "csakurau@ucsc.edu",
+    "tquonwork@gmail.com",
+    "fmabud@bu.edu",
+    "elhiew@ucdavis.edu",
+    "ouhrac@gmail.com",
+    "oneweb@umich.edu"
+  ];
+
   const text = [
     "records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them",
     "number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them",
@@ -31,8 +43,8 @@ const RecallForIman = props => {
 
   useEffect(() => {
     const getRecall = async () => {
+      await firebase.idToken();
       const response = await axios.get("/researchers/loadRecallGradesNumbers");
-      console.log(response.data);
       setNoMajority(response.data.noMajority);
       setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
       setCountPhrases([
@@ -132,7 +144,7 @@ const RecallForIman = props => {
       </Box>
     );
   }
-  if (email !== "oneweb@umich.edu") {
+  if (!researchers.includes(email)) {
     return (
       <div
         style={{
@@ -169,90 +181,92 @@ const RecallForIman = props => {
 
   return (
     <Box sx={{ mb: "15px", ml: "15px", height: "100vh", overflow: "auto" }}>
-      {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot] && (
-        <Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="h5" component="h5">
-              The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
-            </Typography>
-            <br />
+      {majorityDifferentThanBot.length > 0 &&
+        majorityDifferentThanBot[indexOfmajorityDifferentThanBot] &&
+        email === "oneweb@umich.edu" && (
+          <Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              {text.map((meaning, index) => (
-                <Tooltip title={meaning}>
-                  <Box
-                    style={{
-                      fontSize: 25,
-                      overflow: "hidden"
-                    }}
-                  >
-                    {countPhrases[index] + "/"}
-                  </Box>
-                </Tooltip>
-              ))}
+              <Typography variant="h5" component="h5">
+                The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
+              </Typography>
+              <br />
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                {text.map((meaning, index) => (
+                  <Tooltip title={meaning}>
+                    <Box
+                      style={{
+                        fontSize: 25,
+                        overflow: "hidden"
+                      }}
+                    >
+                      {countPhrases[index] + "/"}
+                    </Box>
+                  </Tooltip>
+                ))}
+              </Box>
             </Box>
+            {"\n"}
+            <Box>OriginalPassgae :</Box>
+            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+              {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].originalPassgae}
+            </Paper>
+            <Box>Response :</Box>
+            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+              {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].Response}
+            </Paper>
+            <Box>The key phrase :</Box>
+            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+              {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].phrase}
+            </Paper>
+            <Box>The three of four grades :</Box>
+            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+              {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
+                return <>{grade ? "YES" : "NO"} </>;
+              })}
+            </Paper>
+            <Box>Iman's grade</Box>
+            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+              {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade ? "YES" : "NO"}
+            </Paper>
+            {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length}
+            <Button
+              disabled={indexOfmajorityDifferentThanBot === 0}
+              onClick={previousPhrase}
+              className="Button"
+              variant="contained"
+              id="recall-submit"
+            >
+              Previous
+            </Button>
+            <Button
+              disabled={indexOfmajorityDifferentThanBot + 1 >= majorityDifferentThanBot.length}
+              onClick={nextPhrase}
+              className="Button"
+              variant="contained"
+              id="recall-submit"
+            >
+              Next
+            </Button>
+            <Button
+              onClick={() => voteOnPhraseMajority1("yes")}
+              className="Button"
+              variant="contained"
+              id="recall-submit"
+              sx={{ bgcolor: "#4caf50" }}
+            >
+              YES
+            </Button>
+            <Button
+              onClick={() => voteOnPhraseMajority1("no")}
+              className="Button"
+              variant="contained"
+              id="recall-submit"
+              sx={{ bgcolor: "#f44336" }}
+            >
+              NO
+            </Button>
           </Box>
-          {"\n"}
-          <Box>OriginalPassgae :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].originalPassgae}
-          </Paper>
-          <Box>Response :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].Response}
-          </Paper>
-          <Box>The key phrase :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].phrase}
-          </Paper>
-          <Box>The three of four grades :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
-              return <>{grade ? "YES" : "NO"} </>;
-            })}
-          </Paper>
-          <Box>Iman's grade</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade ? "YES" : "NO"}
-          </Paper>
-          {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length}
-          <Button
-            disabled={indexOfmajorityDifferentThanBot === 0}
-            onClick={previousPhrase}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-          >
-            Previous
-          </Button>
-          <Button
-            disabled={indexOfmajorityDifferentThanBot + 1 >= majorityDifferentThanBot.length}
-            onClick={nextPhrase}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-          >
-            Next
-          </Button>
-          <Button
-            onClick={() => voteOnPhraseMajority1("yes")}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-            sx={{ bgcolor: "#4caf50" }}
-          >
-            YES
-          </Button>
-          <Button
-            onClick={() => voteOnPhraseMajority1("no")}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-            sx={{ bgcolor: "#f44336" }}
-          >
-            NO
-          </Button>
-        </Box>
-      )}
+        )}
       {noMajority.length > 0 && noMajority[indexOfNoMajority] && (
         <Box sx={{ mt: "15px" }}>
           <Typography variant="h5" component="h5">
@@ -276,7 +290,7 @@ const RecallForIman = props => {
               return <>{grade ? "YES" : "NO"} </>;
             })}
           </Paper>
-          {noMajority[indexOfNoMajority].botGrade !== null && (
+          {noMajority[indexOfNoMajority].botGrade !== null && email === "oneweb@umich.edu" && (
             <>
               <Box>Iman's grade</Box>
               <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
