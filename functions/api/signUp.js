@@ -1,31 +1,8 @@
 const { db, admin } = require("../admin");
-const { getAuth } = require('firebase-admin/auth');
+const { getAuth } = require("firebase-admin/auth");
 const { Timestamp } = require("firebase-admin/firestore");
 const { shuffleArray } = require("../helpers");
-
-const getAvailableFullname = async (fullname) => {
-  const userCollections = ["users", "usersSurvey"];
-
-  let _fullname = fullname;
-  while(true) {
-    let found = false;
-
-    for(const userCollection of userCollections) {
-      const docRef = await db.collection(userCollection).doc(_fullname).get();
-      if(docRef.exists) {
-        found = true;
-      }
-    }
-
-    if(!found) {
-      break;
-    }
-    const randomNum = Math.floor(Math.random() * 10);
-    _fullname += randomNum;
-  }
-
-  return _fullname;
-}
+const { getAvailableFullname } = require("../helpers/common");
 
 module.exports = async (req, res) => {
   try {
@@ -38,19 +15,18 @@ module.exports = async (req, res) => {
       projectName,
       surveyType,
       instructorId,
-      noRetaineData,
-
+      noRetaineData
     } = req.body;
 
     const batch = db.batch();
-  
+
     const fullName = await getAvailableFullname(`${firstName} ${lastName}`);
-  
+
     let collectionName = "users";
-    if(surveyType === "student" || surveyType === "instructor") {
+    if (surveyType === "student" || surveyType === "instructor") {
       collectionName = "usersSurvey";
     }
-    
+
     const auth = getAuth(admin);
 
     try {
@@ -58,14 +34,13 @@ module.exports = async (req, res) => {
       return res.status(500).json({
         message: "Email already exists."
       });
-    } catch(e) {}
+    } catch (e) {}
 
     const user = await auth.createUser({
       email,
       password,
       displayName: fullName
-    })
-
+    });
 
     let userData = {
       uid: user.uid,
@@ -73,18 +48,18 @@ module.exports = async (req, res) => {
       firstname: firstName,
       lastname: lastName,
       project: projectName,
-      institution: institutionName,
+      institution: institutionName
     };
-    
-    if(!surveyType) {
+
+    if (!surveyType) {
       await auth.setCustomUserClaims(user.uid, {
         ...user.customClaims,
         participant: true
-      })
+      });
 
       const minPConditions = [];
       const assigned = {};
-  
+
       const projectSpecsDoc = await db.collection("projectSpecs").doc(projectName).get();
       const projectSpecs = projectSpecsDoc.data();
       const conditions = shuffleArray([...projectSpecs.conditions]);
@@ -92,7 +67,7 @@ module.exports = async (req, res) => {
       const passages = await db.collection("passages").where("projectIds", "array-contains", projectName).get();
       // passages that contains the current project
       let passagesDocs = passages.docs.filter(p => projectName in p.data()?.projects);
-  
+
       conditions.forEach(con => {
         // sort the passages in ascending order according to the current pcondition
         const sortedPassages = [...passagesDocs].sort((a, b) => {
@@ -106,7 +81,7 @@ module.exports = async (req, res) => {
           }
         }
       });
-  
+
       // setting up a null passage that is not in minPConditions.
       let nullPassage = "";
       let passIdx = Math.floor(Math.random() * passagesDocs.length);
@@ -119,7 +94,7 @@ module.exports = async (req, res) => {
         passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
       nullPassage = passagesDocs[passIdx]?.id || "";
-      for (let {condition} of minPConditions) {
+      for (let { condition } of minPConditions) {
         // eslint-disable-next-line no-loop-func
         await db.runTransaction(async t => {
           const conditionRef = db.collection("conditions").doc(condition);
@@ -134,7 +109,7 @@ module.exports = async (req, res) => {
           }
         });
       }
-  
+
       const initChoices = new Array(10).fill("");
       userData = {
         ...userData,
@@ -145,20 +120,20 @@ module.exports = async (req, res) => {
         nullPassage,
         choices: initChoices,
         createdAt: new Date()
-      }
+      };
     } else {
       userData = {
         ...userData,
         surveyType,
         noRetaineData,
-        instructorId,
-      }
+        instructorId
+      };
       await auth.setCustomUserClaims(user.uid, {
         ...user.customClaims,
         survey: true
-      })
-    } 
-  
+      });
+    }
+
     const userRef = db.collection(collectionName).doc(fullName);
     batch.set(userRef, userData);
 
@@ -167,15 +142,15 @@ module.exports = async (req, res) => {
       updatedAt: Timestamp.fromDate(new Date()),
       id: userRef.id,
       ...userData
-    })
+    });
 
     await batch.commit();
 
     return res.status(201).json({ success: true });
-  } catch(e) {
-    console.log(e)
+  } catch (e) {
+    console.log(e);
     return res.status(500).json({
       message: e.message
-    })
+    });
   }
-}
+};

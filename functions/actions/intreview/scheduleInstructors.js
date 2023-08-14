@@ -1,27 +1,32 @@
-const express = require("express");
+const { db } = require("../../admin");
 const moment = require("moment");
+const axios = require("axios");
+const { getEvents, deleteEvent } = require("../../GoogleCalendar");
 const { toOrdinal } = require("number-to-words");
-const { db } = require("../admin");
 const { Timestamp } = require("firebase-admin/firestore");
-const firebaseAuth = require("../middlewares/firebaseAuth");
-const isParticipant = require("../middlewares/isParticipant");
-const { createExperimentEvent } = require("../helpers/createExperimentEvent");
-const { deleteEvent } = require("../GoogleCalendar");
-const { futureEvents } = require("../helpers/common");
-const { getAvailableFullname } = require("../helpers/common");
-const participantsRouter = express.Router();
 
-participantsRouter.use(firebaseAuth);
-participantsRouter.use(isParticipant);
+const { getAvailableFullname } = require("../../helpers/common");
 
-// POST /api/participants/schedule
-participantsRouter.post("/schedule", async (req, res) => {
+const { createExperimentEvent } = require("../../helpers/createExperimentEvent");
+
+const getfutureEvents = async nextDays => {
   try {
-    let { sessions, project, surveyType, instructorId } = req.body;
+    // sometimes a user has started the session earlier and the PubSub gets fired
+    // and if the user has not accepted the session, it is going to send them a reminder
+    // to prevent that we start an hour and a half from now.
+    const start = new Date(new Date().getTime() + 90 * 60 * 1000);
+    let end = new Date();
+    end = new Date(end.getTime() + nextDays * 24 * 60 * 60 * 1000);
+    return await getEvents(start, end, "America/Detroit");
+  } catch (err) {
+    console.log({ err });
+    return false;
+  }
+};
 
-    const { email } = req.userData;
-
-    console.log("/schedule", email, surveyType);
+module.exports = async (req, res) => {
+  try {
+    let { sessions, project, surveyType, email, firstname, lastname, institution } = req.body;
     const batch = db.batch();
 
     sessions.sort((a, b) => (a < b ? -1 : 1)); // asc sorting
@@ -38,19 +43,20 @@ participantsRouter.post("/schedule", async (req, res) => {
         "projects" in researcherData &&
         project in researcherData.projects &&
         researcherData.projects[project].active &&
-        researcherData.email !== "oneweb@umich.edu"
+        researcherData.projects[project].scheduleAllowed
       ) {
         researchers[researcherData.email] = researcherDoc.id;
       }
     }
 
-    const events = await futureEvents(40);
+    const events = await getfutureEvents(40);
     const projectSpecs = await db.collection("projectSpecs").doc(project).get();
     if (!projectSpecs.exists) {
       throw new Error("Project Specs not found.");
     }
 
     const projectSpecsData = projectSpecs.data();
+
     // 1 hour / 2 = 30 mins
     const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
@@ -91,6 +97,14 @@ participantsRouter.post("/schedule", async (req, res) => {
       }
       // date time already booked by participants
     }
+    for (let session in availSessions) {
+      const index = availSessions[session].indexOf("Iman YeckehZaare");
+      if (index === -1) {
+        delete availSessions[session];
+      } else {
+        availSessions[session].splice(index, 1);
+      }
+    }
     for (let event of events) {
       // First, we should figure out whether the user participated in the past:
       if (new Date(event.start.dateTime) < new Date()) {
@@ -123,10 +137,12 @@ participantsRouter.post("/schedule", async (req, res) => {
         for (let attendee of event.attendees) {
           if (!researchers[attendee.email]) continue;
           if (availSessions.hasOwnProperty(startTime)) {
-            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+            delete availSessions[startTime];
+            // availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
           }
           if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
-            availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
+            delete availSessions[endTime];
+            // availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
           }
         }
       }
@@ -148,10 +164,7 @@ participantsRouter.post("/schedule", async (req, res) => {
     for (let i = 0; i < sessions.length; ++i) {
       const start = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();
       let availableResearchers = availSessions[start] || [];
-      let sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
-      if (project === "OnlineCommunities" && surveyType === "instructor") {
-        sessionDuration = 1;
-      }
+      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2; //[2,1,1]
       for (let j = 0; j < sessionDuration; j++) {
         const availableSlot = moment(sessions[i])
           .add((j * 60) / projectSpecsData.hourlyChunks, "minutes")
@@ -184,10 +197,7 @@ participantsRouter.post("/schedule", async (req, res) => {
       const rUserData = rUser.data();
 
       const start = moment(sessions[i]).utcOffset(-4, true);
-      let sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
-      if (project === "OnlineCommunities" && surveyType === "instructor") {
-        sessionDuration = 1;
-      }
+      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
       // adding slotDuration * number of slots for the session
       const end = moment(start).add(slotDuration * sessionDuration, "minutes");
       // const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
@@ -210,56 +220,122 @@ participantsRouter.post("/schedule", async (req, res) => {
         id: eventCreated.data.id,
         project
       });
-
-      if (project === "OnlineCommunities") {
-        const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
-        const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
-        if (instructorsDocs.docs.length > 0) {
-          batch.update(instructorsDocs.docs[0].ref, {
-            scheduled: true
-          });
-          if (usersServeyDocs.docs.length === 0) {
-            const instuctorsData = instructorsDocs.docs[0].data();
-            const fullName = await getAvailableFullname(`${instuctorsData.firstname} ${instuctorsData.lastname}`);
-            const userSurevyRef = db.collection("usersSurvey").doc(fullName);
-            batch.set(userSurevyRef, {
-              email: email,
-              project,
-              scheduled: true,
-              institution: instuctorsData.institution,
-              instructorId: instructorId,
-              firstname: instuctorsData.firstname,
-              uid: "",
-              surveyType: "instructor",
-              lastname: instuctorsData.lastname,
-              noRetaineData: false,
-              createdAt: Timestamp.fromDate(new Date())
-            });
-          }
-        }
-
-        if (usersServeyDocs.docs.length === 0 && instructorsDocs.docs.length === 0) {
-          const usersDocs = await db.collection("users").where("email", "==", email).get();
-          if (usersDocs.docs.length > 0) {
-            const userSurevyRef = db.collection("usersSurvey").doc(usersDocs.docs[0].id);
-            const userData = usersDocs.docs[0].data();
-            batch.set(userSurevyRef, {
-              email: email,
-              project,
-              scheduled: true,
-              institution: userData.institution,
-              instructorId: "student",
-              firstname: userData.firstname,
-              uid: userData.uid,
-              surveyType: "student",
-              lastname: userData.lastname,
-              noRetaineData: false,
-              createdAt: Timestamp.fromDate(new Date())
-            });
-          }
-        }
+    }
+    if (project === "OnlineCommunities") {
+      const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
+      let instructorId = "";
+      if (instructorsDocs.docs.length === 0) {
+        const newInstructor = {
+          website: "",
+          prefix: "Prof",
+          firstname,
+          lastname,
+          email,
+          country: "🇺🇸 United States;US",
+          stateInfo: "",
+          city: "",
+          institution,
+          scraped: true,
+          createdAt: new Date(),
+          interestedTopic: "",
+          project: "H1L2",
+          fullname: "Iman YeckehZaare",
+          no: false,
+          yes: false,
+          deleted: false,
+          scheduled: true,
+          reminders: 0
+        };
+        const instructorRef = db.collection("instructors").doc();
+        batch.set(instructorRef, newInstructor);
+        instructorId = instructorRef.id;
+      } else {
+        instructorId = instructorsDocs.docs[0].id;
+        batch.update(instructorsDocs.docs[0].ref, {
+          scheduled: true
+        });
+      }
+      const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
+      const userSurevyRef = db.collection("usersSurvey").doc(fullName);
+      batch.set(userSurevyRef, {
+        email: email,
+        project,
+        scheduled: true,
+        institution,
+        instructorId,
+        firstname,
+        uid: "",
+        surveyType: "instructor",
+        lastname,
+        noRetaineData: false,
+        createdAt: Timestamp.fromDate(new Date())
+      });
+      const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
+      if (usersServeyDocs.docs.length === 0) {
+        const fullName = await getAvailableFullname(`${firstname} ${lastname}`);
+        const userSurevyRef = db.collection("usersSurvey").doc(fullName);
+        batch.set(userSurevyRef, {
+          email,
+          project,
+          scheduled: true,
+          institution,
+          instructorId,
+          firstname,
+          uid: "",
+          surveyType: "instructor",
+          lastname,
+          noRetaineData: false,
+          createdAt: Timestamp.fromDate(new Date())
+        });
       }
     }
+    // const onecademyDocs = await knowledgeDb.collection("users").where("email", "==", email).get();
+    // if (onecademyDocs.docs.length === 0) {
+    const randomNum = Math.floor(Math.random() * 10);
+    const newUserOneCademy = {
+      uname: firstname.trim() + lastname.trim() + randomNum,
+      email,
+      fName: firstname,
+      lName: lastname,
+      password: "onecademy",
+      lang: "English",
+      country: "",
+      state: "",
+      city: "",
+      gender: null,
+      birthDate: null,
+      foundFrom: "Instructor invitation",
+      education: null,
+      occupation: "",
+      ethnicity: [],
+      reason: "",
+      chooseUname: false,
+      clickedConsent: false,
+      clickedTOS: false,
+      clickedPP: false,
+      clickedCP: false,
+      clickedGDPR: false,
+      tag: "1Cademy",
+      tagId: "r98BjyFDCe4YyLA3U8ZE",
+      deMajor: null,
+      deInstit: institution,
+      theme: "Dark",
+      background: "Image",
+      consented: true,
+      GDPRPolicyAgreement: true,
+      termsOfServiceAgreement: true,
+      privacyPolicyAgreement: true,
+      cookiesAgreement: true,
+      fieldOfInterest: "",
+      course: null,
+      invitedInstructor: "6L2gj2fvh4ciLnMfqzjD"
+    };
+    try {
+      await axios.post("https://1cademy.com/api/signup", { data: newUserOneCademy });
+    } catch {
+      console.log("user already exists");
+    }
+    // }
 
     await batch.commit();
     return res.status(200).json({ message: "Sessions successfully scheduled" });
@@ -267,6 +343,4 @@ participantsRouter.post("/schedule", async (req, res) => {
     console.log(err);
     return res.status(400).json({ message: "Error occurred, please try later" });
   }
-});
-
-module.exports = participantsRouter;
+};
