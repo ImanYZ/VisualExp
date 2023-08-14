@@ -2737,6 +2737,88 @@ const communitiesPapers = {
       }
     }
   },
+  Behavioral_Sciences: {
+    Connecting_to_our_future_healthier_selves: {
+      title: `Connecting to our future, healthier selves: Associations between self-continuity measures and eating behaviors in daily life`,
+      url: `https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FConnecting%20to%20our%20future%2C%20healthier%20selves.pdf?alt=media&token=b2d80a65-3f71-4a67-a3cb-1c98dff42e82`,
+      questions: {
+        challenges_healthy_eating: {
+          stem: `1. What are some challenges preventing healthy eating?`,
+          answers: [`a`, `b`, `c`],
+          choices: {
+            a: `The cost of healthy foods compared to unhealthy foods`,
+            b: `The amount of time between healthy eating behaviors and later health benefits`,
+            c: `The instantaneous reward of eating something that tastes good can be perceived as more rewarding than eating healthy`
+          }
+        },
+        type_of_rewards: {
+          stem: `2. Which type of rewards are, on average, temporarily valued as being most rewarding?`,
+          answers: [`b`],
+          choices: {
+            a: `Distal rewards`,
+            b: `Instantaneous rewards`
+          }
+        },
+        self_determination_theory: {
+          stem: `3. What does self-determination theory say aids one’s likelihood to achieve goals?`,
+          answers: [`c`],
+          choices: {
+            a: `Constant reinforcement`,
+            b: `Routine positive punishment`,
+            c: `Autonomous motivation`,
+            d: `Outside coaching`
+          }
+        },
+        self_continuity: {
+          stem: `4. What is self-continuity?`,
+          answers: [`a`],
+          choices: {
+            a: `The subjective identification as being both your past, present, and future self`,
+            b: `The belief that you will never age`,
+            c: `The belief that your behaviors will only impact your present self`,
+            d: `The belief that your current behaviors and mindset will remain fixed for your entire lifespan`
+          }
+        },
+        consideration_of_future_consequences: {
+          stem: `5. True or False: Consideration of Future Consequences was more strongly associated with measures related to healthy foods.`,
+          answers: [`b`],
+          choices: {
+            a: `True`,
+            b: `False`
+          }
+        },
+        study_control_condition: {
+          stem: `6. What was the study’s control condition?`,
+          answers: [`b`],
+          choices: {
+            a: `Cognitive reappraisal`,
+            b: `No training`,
+            c: `Situation selection`,
+            d: `Situation modification`
+          }
+        },
+        affecting_consumption: {
+          stem: `7. Which of these significantly, but indirectly, affected the consumption of both healthy and unhealthy foods?`,
+          answers: [`a`],
+          choices: {
+            a: `Future Self-Connectedness`,
+            b: `Consideration of Future Consequences`,
+            c: `Autonomous motivation`
+          }
+        },
+        study_limitation: {
+          stem: `8. What is the most notable limitation of this study?`,
+          answers: [`b`],
+          choices: {
+            a: `Its causational nature`,
+            b: `Its correlational nature`,
+            c: `Number of participants`,
+            d: `Lack of participants with eating disorders`
+          }
+        }
+      }
+    }
+  },
   Liaison_Librarians: {}
 };
 export default communitiesPapers;

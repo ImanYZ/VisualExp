@@ -54,7 +54,7 @@ module.exports = async (req, res) => {
     for (let researcher in researchersPoints) {
       const researcherUpdate = researchers[researcher];
       if (researcherUpdate.projects.hasOwnProperty(project)) {
-        researcherUpdate.projects[project].positiveCodingPoints += researchersPoints[researcher];
+        researcherUpdate.projects[project].positiveCodingPoints = researchersPoints[researcher];
       }
       await db.collection("researchers").doc(researcher).update(researcherUpdate);
     }

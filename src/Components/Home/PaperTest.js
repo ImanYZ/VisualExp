@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 
 import Box from "@mui/material/Box";
 import Accordion from "@mui/material/Accordion";
@@ -44,7 +44,7 @@ for (let communi in communitiesPapers) {
 const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  const [communiTestsEnded, setCommuniTestsEnded] = useRecoilState(
+  const setCommuniTestsEnded= useSetRecoilState(
     communiTestsEndedState
   );
   const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(
@@ -71,7 +71,7 @@ const PaperTest = (props) => {
       });
     }
     setPapers(paps);
-  }, []);
+  }, [props.communiId]);
 
   useEffect(() => {
     const loadAttempts = async () => {
@@ -503,7 +503,7 @@ const PaperTest = (props) => {
           <Typography variant="h3" gutterBottom marked="center" align="center">
             Community Specific Test
           </Typography>
-          {(!papers.length) ?  <div>we are sorry ,The test will be available soon.</div> : ( <Box sx={{ mb: "10px" }}>
+          {(!papers.length) ?  <div>We are sorry, The test will be available soon.</div> : ( <Box sx={{ mb: "10px" }}>
             <Box>
               Please carefully read the document before answering any of the
               questions, and <strong>select all the choices that apply</strong>.
@@ -551,7 +551,7 @@ const PaperTest = (props) => {
                         <>
                           <Typography>
                             Read{" "}
-                            <a href={paper.url} target="_blank">
+                            <a href={paper.url} target="_blank" rel="noreferrer">
                               the following document
                             </a>{" "}
                             first.
@@ -568,6 +568,7 @@ const PaperTest = (props) => {
                                 paper.url +
                                 "&embedded=true"
                               }
+                              title="pdf"
                             ></iframe>
                           </object>
                         </>
@@ -606,7 +607,7 @@ const PaperTest = (props) => {
                           return (
                             <>
                               <form
-                                key={qIdx}
+                                key={question.stem}
                                 onSubmit={handleSubmit(paper.id, qIdx)}
                               >
                                 <FormControl
