@@ -10,9 +10,9 @@ module.exports = async (req, res) => {
     if (allEvents) {
       return res.status(200).json({ events: allEvents });
     }
+    return res.status(200).json({ message: "Event NOT Retrieved!" });
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
   }
-  return res.status(200).json({ message: "Event NOT Retrieved!" });
 };

@@ -127,6 +127,8 @@ module.exports = async (req, res) => {
       evs.sort((a, b) => b.start - a.start);
       evs.push(event);
     }
-    res.status(200).json({ events: evs });
-  } catch (error) {}
+    return res.status(200).json({ events: evs });
+  } catch (error) {
+    return res.status(500).send({ message: "Something went wrong", error });
+  }
 };
