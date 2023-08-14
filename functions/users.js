@@ -3,12 +3,11 @@ const csv = require("fast-csv");
 require("dotenv").config();
 
 const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin");
-const { getFullname, getDateString, getDateTimeString } = require("./utils");
+const { getFullname, getDateString, getDateTimeString, tokenize, textCosineSimilarity } = require("./utils");
 const { delay } = require("./helpers/common");
 const { emailApplicationStatus, emailCommunityLeader, emailImanToInviteApplicants } = require("./emailing");
 
-
-const { Timestamp ,FieldValue} = require("firebase-admin/firestore");
+const { Timestamp, FieldValue } = require("firebase-admin/firestore");
 
 exports.deleteUser = async (snap, context) => {
   // Get an object representing the document prior to deletion
@@ -46,59 +45,55 @@ exports.recalculateFreeRecall = async (req, res) => {
   try {
     const usersDocs = await db.collection("users").get();
     for (let userD of usersDocs.docs) {
-      try {
-        await db.runTransaction(async t => {
-          const userRef = db.collection("users").doc(userD.id);
-          const userDoc = await t.get(userRef);
-          const userData = userDoc.data();
-          const pConditions = userData.pConditions;
-          for (let pCondIdx = 0; pCondIdx < pConditions.length; pCondIdx++) {
-            const pCond = pConditions[pCondIdx];
-            const reText = pCond.recallreText;
-            const recall3DaysreText = pCond.recall3DaysreText ? pCond.recall3DaysreText : "";
-            const passage = pCond.passage;
-            const passageRef = db.collection("passages").doc(passage);
-            const passageDoc = await t.get(passageRef);
-            const passageData = passageDoc.data();
-            const keywords = passageData.keywords.join(" ");
-            const text = passageData.text;
-            let score = 0;
-            let score3Days = 0;
-            const keywordsText = tokenize(keywords.toLowerCase());
-            const mainText = tokenize(text.toLowerCase());
-            const recalledText = tokenize(reText.toLowerCase());
-            const recalled3DaysText = tokenize(recall3DaysreText.toLowerCase());
-            for (let t1 of keywordsText) {
-              if (recalledText.includes(t1)) {
-                score += 1;
-              }
-              if (recalled3DaysText.includes(t1)) {
-                score3Days += 1;
-              }
+      await db.runTransaction(async t => {
+        const userRef = db.collection("users").doc(userD.id);
+        const userDoc = await t.get(userRef);
+        const userData = userDoc.data();
+        const pConditions = userData.pConditions;
+        for (let pCondIdx = 0; pCondIdx < pConditions.length; pCondIdx++) {
+          const pCond = pConditions[pCondIdx];
+          const reText = pCond.recallreText;
+          const recall3DaysreText = pCond.recall3DaysreText ? pCond.recall3DaysreText : "";
+          const passage = pCond.passage;
+          const passageRef = db.collection("passages").doc(passage);
+          const passageDoc = await t.get(passageRef);
+          const passageData = passageDoc.data();
+          const keywords = passageData.keywords.join(" ");
+          const text = passageData.text;
+          let score = 0;
+          let score3Days = 0;
+          const keywordsText = tokenize(keywords.toLowerCase());
+          const mainText = tokenize(text.toLowerCase());
+          const recalledText = tokenize(reText.toLowerCase());
+          const recalled3DaysText = tokenize(recall3DaysreText.toLowerCase());
+          for (let t1 of keywordsText) {
+            if (recalledText.includes(t1)) {
+              score += 1;
             }
-            pConditions[pCondIdx] = {
-              ...pConditions[pCondIdx],
-              recallScore: score,
-              recallScoreRatio: score / keywordsText.length,
-              recallCosineSim: textCosineSimilarity(mainText, recalledText),
-              recall3DaysScore: score3Days,
-              recall3DaysScoreRatio: score3Days / keywordsText.length,
-              recall3DaysCosineSim: textCosineSimilarity(mainText, recalled3DaysText)
-            };
+            if (recalled3DaysText.includes(t1)) {
+              score3Days += 1;
+            }
           }
-          t.update(userRef, {
-            pConditions
-          });
-          const userLogRef = db.collection("userLogs").doc();
-          t.update(userLogRef, {
-            pConditions,
-            id: userRef.id,
-            updatedAt: Timestamp.fromDate(new Date())
-          });
+          pConditions[pCondIdx] = {
+            ...pConditions[pCondIdx],
+            recallScore: score,
+            recallScoreRatio: score / keywordsText.length,
+            recallCosineSim: textCosineSimilarity(mainText, recalledText),
+            recall3DaysScore: score3Days,
+            recall3DaysScoreRatio: score3Days / keywordsText.length,
+            recall3DaysCosineSim: textCosineSimilarity(mainText, recalled3DaysText)
+          };
+        }
+        t.update(userRef, {
+          pConditions
         });
-      } catch (e) {
-        console.log("Transaction failure:", e);
-      }
+        const userLogRef = db.collection("userLogs").doc();
+        t.update(userLogRef, {
+          pConditions,
+          id: userRef.id,
+          updatedAt: Timestamp.fromDate(new Date())
+        });
+      });
     }
     return res.status(200).json({ done: true });
   } catch (err) {

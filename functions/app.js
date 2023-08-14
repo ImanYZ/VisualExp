@@ -4,6 +4,17 @@ require("dotenv").config();
 
 const recordAudio = require("./actions/intreview/recordAudio");
 const assignThematicPoints = require("./pubsub/assignThematicPoints");
+const scheduleInstructors = require("./actions/intreview/scheduleInstructors");
+const schedule = require("./actions/intreview/schedule");
+const checkEntreviewStatus = require("./actions/intreview/checkEntreviewStatus");
+const markEntreviewAttended = require("./actions/intreview/markEntreviewAttended");
+const retrieveEvents = require("./actions/intreview/retrieveEvents");
+const markAttended = require("./actions/intreview/markAttended");
+const allEvents = require("./actions/intreview/allEvents");
+const getOngoingResearcherEvent = require("./actions/intreview/getOngoingResearcherEvent");
+const ongoingEvents = require("./actions/intreview/ongoingEvents");
+const deleteEvent = require("./actions/intreview/deleteEvent");
+const scheduleLifeLog = require("./actions/intreview/scheduleLifeLog");
 
 const {
   retrieveData,
@@ -32,20 +43,6 @@ const {
   trackStudentEmailTemplateCopy,
   sendingEmails
 } = require("./emailing");
-const {
-  schedule,
-  scheduleSingleSession,
-  allEvents,
-  deleteEvent,
-  scheduleLifeLog,
-  getOngoingResearcherEvent,
-  ongoingEvents,
-  markAttended,
-  scheduleInstructors,
-  retrieveEvents,
-  markEntreviewAttended,
-  checkEntreviewStatus
-} = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 const { saveGradesLogs, updateASA } = require("./recallGradesAI");
 
@@ -103,7 +100,6 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 
 // Schedule UX Research appointments
 app.post("/schedule", schedule);
-app.post("/scheduleSingleSession", scheduleSingleSession);
 app.post("/allEvents", allEvents);
 app.post("/getOngoingResearcherEvent", getOngoingResearcherEvent);
 app.post("/markAttended", markAttended);

@@ -2,44 +2,8 @@ const { db } = require("../../admin");
 const { Timestamp } = require("firebase-admin/firestore");
 const { toOrdinal } = require("number-to-words");
 const moment = require("moment");
-const { createExperimentEvent } = require("../../scheduling");
 const { deleteEvent } = require("../../GoogleCalendar");
-
-const scheduleSingleSession = async object => {
-  try {
-    console.log(object);
-    const { email, researcher, order, session, project, sessionIndex, surveyType } = object;
-    const start = new Date(session);
-
-    const projectSpecs = await db.collection("projectSpecs").doc(project).get();
-    const researcherDoc = await db.collection("researchers").doc(researcher).get();
-    if (!projectSpecs.exists) {
-      throw new Error("Project Specs not found.");
-    }
-    const projectSpecsData = projectSpecs.data();
-    const researcherData = researcherDoc.data();
-    // 1 hour / 2 = 30 mins
-    const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
-    if (surveyType === "instructor") {
-      projectSpecsData.sessionDuration = [1];
-    }
-    const end = new Date(
-      start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[sessionIndex] || 1) * 60000
-    );
-    const eventCreated = await createExperimentEvent(
-      email,
-      researcherData.email,
-      order,
-      start,
-      end,
-      projectSpecsData,
-      surveyType
-    );
-    return eventCreated;
-  } catch (err) {
-    console.log({ err });
-  }
-};
+const { scheduleSingleSession } = require("../../helpers/scheduleSingleSession");
 
 module.exports = async (req, res) => {
   try {
