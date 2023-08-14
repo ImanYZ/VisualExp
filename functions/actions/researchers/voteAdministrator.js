@@ -158,7 +158,9 @@ module.exports = async (req, res) => {
         });
       }
     });
+    return res.status(200).json({});
   } catch (e) {
-    console.log("Transaction failure:", e);
+    console.log("voteAdministrator", e);
+    return res.status(500).json({ errMsg: e });
   }
 };

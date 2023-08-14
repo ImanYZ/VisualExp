@@ -685,7 +685,7 @@ const IntellectualPoints = (props) => {
           };
           setOthersActivities(oActivities);
           await firebase.idToken();
-          await axios.post("/vote", {
+          await axios.post("/researchers/voteActivities", {
             activity: clickedCell.id,
             vote: clickedCell.field,
           });
