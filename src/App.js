@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import { firebaseState, fullnameState, emailState } from "./store/AuthAtoms";

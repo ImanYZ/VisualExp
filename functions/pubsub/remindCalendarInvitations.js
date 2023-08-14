@@ -1,5 +1,5 @@
 const { db } = require("../admin");
-const { futureEvents, pastEvents } = require("../scheduling");
+const { futureEvents, pastEvents } = require("../helpers/common");
 const { FieldValue } = require("firebase-admin/firestore");
 
 const { deleteEvent } = require("../GoogleCalendar");
