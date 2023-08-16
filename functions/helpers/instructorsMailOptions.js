@@ -1,5 +1,5 @@
-const { generateUID, capitalizeFirstLetter } = require("./utils");
-const { ImanSignatureHTML } = require("./emailSignature");
+const { generateUID, capitalizeFirstLetter } = require("../utils");
+const { ImanSignatureHTML } = require("../emailSignature");
 
 exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introducedBy, random) => {
   let emailOptions = {
