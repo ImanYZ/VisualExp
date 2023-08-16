@@ -31,20 +31,16 @@ const {
   loadImageAdministrator,
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
-  inviteAdministrators,
   administratorYes,
   administratorNo,
   administratorLater,
-  inviteInstructors,
   instructorYes,
   instructorNo,
   instructorLater,
   trackStudentInvite,
-  trackStudentEmailTemplateCopy,
-  sendingEmails
+  trackStudentEmailTemplateCopy
 } = require("./emailing");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
-const { saveGradesLogs, updateASA } = require("./recallGradesAI");
 
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
@@ -74,11 +70,9 @@ app.use((req, res, next) => {
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadImage/administrator/:administratorId/:randNum", loadImageAdministrator);
-app.get("/inviteAdministrators", inviteAdministrators);
 app.get("/administratorYes", administratorYes);
 app.post("/administratorLater", administratorLater);
 app.post("/administratorNo", administratorNo);
-app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
@@ -113,13 +107,10 @@ app.use("/participants", participantsRouter);
 app.post("/recallUpload", recallUpload);
 app.use("/administrator", adminRouter);
 app.post("/scheduleInstructors", scheduleInstructors);
-app.get("/sendingEmails", sendingEmails);
 app.post("/retrieveEvents", retrieveEvents);
 app.post("/markEntreviewAttended", markEntreviewAttended);
 app.post("/checkEntreviewStatus", checkEntreviewStatus);
 app.post("/recordAudio", recordAudio);
-app.post("/saveGradesLogs", saveGradesLogs);
-app.post("/updateASA", updateASA);
 app.post("/assignThematicPoints", assignThematicPoints);
 // Knowledge endpoints
 
