@@ -1,18 +1,15 @@
-const { admin, db, storage, batchUpdate, batchSet, commitBatch } = require("./admin");
+const { db, storage, batchSet, commitBatch } = require("./admin");
 const { ImanSignatureHTML } = require("./emailSignature");
 const { Timestamp, FieldValue } = require("firebase-admin/firestore");
-const { delay } = require("./helpers/common");
 const nodemailer = require("nodemailer");
 
 const { deleteEvent } = require("./GoogleCalendar");
 
-const { getFullname, generateUID, nextWeek, capitalizeFirstLetter, capitalizeSentence } = require("./utils");
+const { getFullname, generateUID, nextWeek, capitalizeFirstLetter } = require("./utils");
 
 const { signatureHTML } = require("./emailSignature");
-const cityTimezones = require("city-timezones");
-const moment = require("moment-timezone");
 
-const { instMailOptions } = require("./instructorsMailOptions");
+const { instMailOptions } = require("./helpers/instructorsMailOptions");
 
 require("dotenv").config();
 
@@ -248,137 +245,6 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians"
 };
 
-const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) => {
-  if (ignore) return true;
-  state = state.split(";")[1] || "";
-  country = country.split(";")[1] || "";
-  if (!cityTimezones.lookupViaCity(city) || cityTimezones.lookupViaCity(city).length === 0) {
-    city = "Ann Arbor";
-  }
-  const cityDetails = (cityTimezones.lookupViaCity(city) || []).find(detail => {
-    return (
-      (detail.hasOwnProperty("state_ansi") && detail.state_ansi.toLowerCase() === state.toLowerCase()) ||
-      (detail.hasOwnProperty("iso2") && detail.iso2.toLowerCase() === country.toLowerCase())
-    );
-  });
-
-  const timezone = cityDetails?.timezone;
-  if (timezone) {
-    let hour = moment().tz(timezone).hour();
-    if (hour >= 7 && hour <= 19) {
-      return true;
-    }
-  }
-  return false;
-};
-
-// This should be called by a pubsub scheduler every 25 hours.
-// It reads all the documents from the administrators collection.
-// For each of them that meet the criteria, randomizes them into one of
-// our experimental conditions and sends them personalized invitation
-// and reminder emails.
-// The algorithm is explained at emailing.drawio
-exports.inviteAdministrators = async context => {
-  try {
-    // We don't want to send many emails at once, because it may drive Gmail crazy.
-    // waitTime keeps increasing for every email that should be sent and in a setTimeout
-    // postpones sending the next email until the next waitTime.
-    const administratorDocs = await db.collection("administrators").get();
-    const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
-    const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
-    for (let administratorDoc of administratorDocs.docs) {
-      const administratorData = administratorDoc.data();
-      const { email, city, stateInfo, country } = administratorData;
-      if (
-        // Only those administrators whose information is verified by at least 3 other researchers.
-        (administratorData?.upVotes || 0) - (administratorData?.downVotes || 0) >= 3 &&
-        // We have not sent them any emails or less than 4 reminders
-        (!administratorData.reminders || administratorData.reminders < 4) &&
-        // Their next reminder is not scheduled yet, or it should have been sent before now.
-        (!administratorData.nextReminder || administratorData.nextReminder.toDate().getTime() < new Date().getTime()) &&
-        // They have not already clicked any of the options in their email.
-        !administratorData.yes &&
-        !administratorData.no &&
-        !administratorData.alreadyTalked &&
-        !administratorData.inviteStudents &&
-        administratorData.howToAddress &&
-        !administratorData.explanation.includes("This is ") &&
-        !emails.includes(email)
-      ) {
-        // We don't want to send many emails at once, because it may drive Gmail crazy.
-        // WaitTime keeps increasing for every email that should be sent and in a setTimeout
-        // postpones sending the next email until the next waitTime.
-        const mailOptions = {
-          from: process.env.EMAIL,
-          to: email,
-          subject: `Offering Student Internships for Large-scale Collaborative Learning/Research`,
-          html: `<p>Hello ${(administratorData.howToAddress || "")
-            .split(" ")
-            .map(s => capitalizeFirstLetter(s))
-            .join(" ")},</p>
-              <p></p>
-              <p>We are a research group at the University of Michigan, School of Information. We would like to invite your students to join our online research communities and collaborate with us on research literature review on their desired topics.</p>
-              <p></p>
-              <p>We have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.com" target="_blank">on this page</a>). Since Fall 2020, out of 10,000 students who applied, more than 1,600 talented students from 183 schools have joined 1Cademy to collaboratively summarize, visualize, improve, and present our notes from books and research papers on a weekly basis and get constructive feedback about their research. You can check out <a href="https://1cademy.com/#topics" target="_blank">our existing research communities</a> and search through <a href="https://1cademy.com/search" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students. We also have community leadership opportunities for qualified students to lead our existing communities or establish new research communities.</p>
-              <p></p>
-              <p>${
-                administratorData.country === "🇺🇸 United States;US"
-                  ? "Considering the success we've had with the previous interns who joined our communities from your school, we would like to invite more of your students to join our communities. "
-                  : ""
-              }We would like to ask if you can kindly inform your students about our online research opportunities, so they can apply through <a href="https://1cademy.com" target="_blank">the 1Cademy homepage</a>.</p>
-              <p>Please let us know which action you would like to take:</p>
-              <ul>
-                <li><a href="https://1cademy.us/inviteStudents/administrators/${
-                  administratorDoc.id
-                }" target="_blank">I'd like to invite students to apply.</a></li>${
-            // '<li><a href="https://1cademy.us/administratorYes/' +
-            // administratorDoc.id +
-            // '" target="_blank">' +
-            // "I'd like to schedule a meeting with you.</a></li>" +
-            ""
-          }
-                <li><a href="https://1cademy.us/interestedAdministratorLater/${
-                  // These are all sending requests to the client side.
-                  administratorDoc.id
-                }" target="_blank">Send me a reminder in a few weeks.</a></li>
-                <li><a href="https://1cademy.us/notInterestedAdministrator/${
-                  // These are all sending requests to the client side.
-                  administratorDoc.id
-                }" target="_blank">Do not contact me again.</a></li>
-              </ul>
-              <p>Reply to this email if you have any questions or concerns.</p>
-              <p></p>
-              <p>Best regards,</p>
-              ${signatureHTML}
-              <img src="https://1cademy.us/api/loadImage/administrator/${
-                // For tracking when they open their email.
-                // Note that the email clients that cache emails like those on iPad or Outlook open the content
-                // of the emails without the user's knowlege, so those would be false positives for us.
-                administratorDoc.id + "/" + generateUID()
-              }"
-              data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download" 
-              width="420" height="37"><br></div></div></div>`
-        };
-        const emailRef = db.collection("emails").doc();
-        await batchSet(emailRef, {
-          mailOptions,
-          reason: "administrator",
-          createdAt: Timestamp.fromDate(new Date()),
-          documentId: administratorDoc.id,
-          city,
-          email,
-          stateInfo,
-          country,
-          urgent: false,
-          sent: false
-        });
-      }
-    }
-    await commitBatch();
-  } catch (err) {
-    console.log({ err });
-  }
-};
 
 // Logs that the administrator clicked Yes in their email.
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
@@ -474,64 +340,7 @@ exports.administratorLater = async (req, res) => {
   }
 };
 
-exports.inviteInstructors = async context => {
-  try {
-    const instructorDocs = await db
-      .collection("instructors")
-      .where("no", "==", false)
-      .where("yes", "==", false)
-      .where("scheduled", "==", false)
-      .where("deleted", "==", false)
-      .get();
-    const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
-    const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
-    const instructors = instructorDocs.docs
-      .map(instructorDoc => {
-        return { ...instructorDoc.data(), id: instructorDoc.id };
-      })
-      .filter(
-        inst =>
-          (((inst?.upVotes || 0) >= 1 && (inst?.downVotes || 0) === 0) || inst.scraped) &&
-          (!inst.nextReminder || inst.nextReminder.toDate().getTime() < new Date().getTime()) &&
-          !emails.includes(inst.email) &&
-          inst.interestedTopic &&
-          inst.reminders < 4
-      );
-    for (let instructor of instructors) {
-      const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructor;
-      const topic = interestedTopic
-        .split(" ")
-        .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word))
-        .join(" ");
-      let randomNumber = 0;
-      if (instructor.hasOwnProperty("emailNumber")) {
-        randomNumber = instructor.emailNumber;
-      }
-      let introducedBy = false;
-      if (instructor.hasOwnProperty("introducedBy")) {
-        introducedBy = instructor.introducedBy;
-      }
-      const mailOptions = instMailOptions(email, topic, prefix, lastname, instructor.id, introducedBy, randomNumber);
-      const emailRef = db.collection("emails").doc();
-      await batchSet(emailRef, {
-        mailOptions,
-        reason: "instructor",
-        createdAt: Timestamp.fromDate(new Date()),
-        email,
-        city,
-        stateInfo,
-        country,
-        urgent: false,
-        documentId: instructor.id,
-        sent: false,
-        emailNumber: randomNumber
-      });
-    }
-    await commitBatch();
-  } catch (err) {
-    console.log({ err });
-  }
-};
+
 
 // Logs that the instructor clicked Yes in their email.
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
@@ -1251,77 +1060,5 @@ exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, pr
     });
   } catch (err) {
     console.log({ err });
-  }
-};
-
-exports.sendingEmails = async context => {
-  try {
-    const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
-    let emails = emailsDocs.docs.map(doc => {
-      return { ...doc.data(), id: doc.id };
-    });
-    emails = [
-      ...emails.filter(e => e.urgent),
-      ...emails.filter(e => e.reason === "instructor"),
-      ...emails.filter(e => e.reason === "administrator")
-    ];
-    for (let emailData of emails) {
-      const emailDoc = await db.collection("emails").doc(emailData.id).get();
-      const _emailData = emailDoc.data();
-      const { documentId, mailOptions, reason, city, stateInfo, country, email, sent } = _emailData;
-      const isInstAdmin = reason === "instructor" || reason === "administrator";
-      if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin) && email && sent === false && email !=="ouhrac@gmail.com") {
-        console.log("sending email to", email, "for", reason, "with id", emailData.id);
-        transporter.sendMail(mailOptions, async (error, data) => {
-          if (error) {
-            console.log("sendMail", { error });
-          } else {
-            const emailRef = db.collection("emails").doc(emailData.id);
-            if (reason === "instructor") {
-              const instructorRef = db.collection("instructors").doc(documentId);
-              await instructorRef.update({
-                emailedAt: Timestamp.fromDate(new Date()),
-                reminders: FieldValue.increment(1),
-                nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date()),
-                emailNumber: emailData.emailNumber
-              });
-            } else if (reason === "administrator") {
-              const administratorRef = db.collection("administrators").doc(documentId);
-              await administratorRef.update({
-                emailedAt: Timestamp.fromDate(new Date()),
-                reminders: FieldValue.increment(1),
-                nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date())
-              });
-            } else if (reason === "emailApplicationStatus") {
-              const userQuery = db.collection("users").where("email", "==", email.toLowerCase());
-              let userDoc = await userQuery.get();
-              if (!userDoc.docs.length) {
-                const userQuery = db.collection("usersSurvey").where("email", "==", email.toLowerCase());
-                userDoc = await userQuery.get();
-              }
-              if (userDoc.docs.length > 0) {
-                await userDoc.docs[0].ref.update({
-                  reminders: FieldValue.increment(1),
-                  reminder: Timestamp.fromDate(nextWeek())
-                });
-              }
-            }
-            await emailRef.update({
-              sent: true,
-              sentAt: Timestamp.fromDate(new Date())
-            });
-          }
-        });
-        // We don't want to send many emails at once, because it may drive Gmail crazy.
-        // we have  waitTime by a random integer between 10 to 40 seconds.
-        const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
-        await delay(waitTime);
-      }
-    }
-    console.log("Done");
-  } catch (error) {
-    console.log(error);
   }
 };
