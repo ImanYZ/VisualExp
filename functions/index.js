@@ -4,11 +4,12 @@ const functions = require("firebase-functions");
 const remindResearchersForAvailability = require("./pubsub/remindResearchersForAvailability");
 const remindCalendarInvitations = require("./pubsub/remindCalendarInvitations");
 const passagesNumberCorrection = require("./pubsub/passagesNumberCorrection");
+const sendingEmails = require("./pubsub/sendingEmails");
+const inviteInstructors = require("./pubsub/inviteInstructors");
+const inviteAdministrators = require("./pubsub/inviteAdministrators");
 // const assignThematicPoints = require("./pubsub/assignThematicPoints");
 
 const { deleteUser, applicationReminder } = require("./users");
-
-const { inviteAdministrators, inviteInstructors, sendingEmails } = require("./emailing");
 const app = require("./app");
 
 const EST_TIMEZONE = "America/Detroit";
