@@ -42,18 +42,18 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
     emailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: `Collaborate with an NSF I-Corps Research Team to Optimize Teaching and Learning  ${topic}`,
+      subject: `Offering our AI-Driven Services to Optimize Teaching  ${topic}`,
       html: `
             <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
-              <p>We are a research group at the University of Michigan, School of Information, in an NSF Regional program that is committed to developing learning technologies. Our goal is to help instructors who teach large courses and grade students through text-based assessment (including multiple-choice, fill-in-the-blank, Parson, short-answer, and essay questions). We can help by saving your time and improving your student learning outcomes and satisfaction. We have developed <a href="https://1cademy.com">1Cademy.com</a>, an online platform for collaborative learning. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
-              <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
-              <p>We would like to collaborate with you to provide your courses with 1Cademy Assistant. You can learn about some of its functionalities in the following videos:</p>
+              <p>We are a research team and the University of Michigan, School of Information, and are committed to developing learning technologies that save your time and improve your students’ learning outcomes and satisfaction. We have developed 1Cademy.com, an online platform for collaborative learning. Over the past two years, <a href="https://1cademy.com">1Cademy.com</a> has garnered participation from 1,720 students, representing 210 institutions in online research communities.</p>
+              <p>We would appreciate the opportunity to schedule an hour-long interview at your earliest convenience to receive your feedback on the tools we have developed for students and instructors. We would like to know if you would consider our tools an asset for your students and yourself, and how they could be improved. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing teaching efficacy and creating a more optimized learning environment.</p>
+              <p>Also, we would like to collaborate with you to provide your courses with 1Cademy AI Assistant. You can learn about some of its functionalities in the following videos:</p>
               <ul>
               <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">1Cademy Assistant - Question Answering</a></li>
               <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">1Cademy Assistant - Practice Tool</a></li>
-              <li><a href="https://youtu.be/Un6s1rtfZVA" rel="nofollow">1Cademy Assistant - Voice-based Practice</a></li>
-              <li><a href="https://youtu.be/9vWGSEBf8WQ" rel="nofollow">1Cademy Instructor and Student Dashboards</a></li>
+              <li><a href="https://youtu.be/uj8fqLV-S1M" rel="nofollow">1Cademy AI-Assisted Grading Conceptual & Essay Questions/a></li>
               <li><a href="https://youtu.be/E2ClCIX9g0g" rel="nofollow">1Cademy Auto-graded Assignments and Exams</a></li>
+              <li><a href="https://youtu.be/9vWGSEBf8WQ" rel="nofollow">1Cademy Instructor and Student Dashboards</a></li>
               </ul>
               
               <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
