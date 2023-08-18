@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
       for (let session in sessions) {
         for (let conditionItem of sessions[session]) {
           for (let phraseItem of conditionItem.phrases) {
-            if (phraseItem.phrase === selectedPhrase) {
+            if (phraseItem.phrase === selectedPhrase && !phraseItem.deleted) {
               needUpdate = true;
               phraseItem.phrase = newPhrase;
               if (resetGrades) {
