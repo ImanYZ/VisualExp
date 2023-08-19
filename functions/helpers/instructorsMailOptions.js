@@ -42,10 +42,11 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
     emailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: `Offering our AI-Driven Services to Optimize Teaching  ${topic}`,
+      subject: `Collaboration Proposal to Optimize Teaching ${topic} Through AI Assistance`,
       html: `
-            <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
-              <p>We are a research team and the University of Michigan, School of Information, and are committed to developing learning technologies that save your time and improve your students’ learning outcomes and satisfaction. We have developed 1Cademy.com, an online platform for collaborative learning. Over the past two years, <a href="https://1cademy.com">1Cademy.com</a> has garnered participation from 1,720 students, representing 210 institutions in online research communities.</p>
+            <p>Hello ${prefix + (prefix !== "Professor" ? ". " : " ") + capitalizeFirstLetter(lastname)},</p>
+              <p>We are a research team at the University of Michigan, School of Information, and are committed to developing learning technologies that save your time and improve your students’ learning outcomes and satisfaction.</p>
+              <p>We have developed <a href="https://1cademy.com">1Cademy.com</a>, an online platform for collaborative learning, which has garnered participation, in online research communities, from 1,720 students, representing 210 institutions over the past two years.</p>
               <p>We would appreciate the opportunity to schedule an hour-long interview at your earliest convenience to receive your feedback on the tools we have developed for students and instructors. We would like to know if you would consider our tools an asset for your students and yourself, and how they could be improved. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing teaching efficacy and creating a more optimized learning environment.</p>
               <p>Also, we would like to collaborate with you to provide your courses with 1Cademy AI Assistant. You can learn about some of its functionalities in the following videos:</p>
               <ul>
