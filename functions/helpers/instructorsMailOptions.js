@@ -52,7 +52,7 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, introdu
               <ul>
               <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">1Cademy Assistant - Question Answering</a></li>
               <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">1Cademy Assistant - Practice Tool</a></li>
-              <li><a href="https://youtu.be/uj8fqLV-S1M" rel="nofollow">1Cademy AI-Assisted Grading Conceptual & Essay Questions/a></li>
+              <li><a href="https://youtu.be/uj8fqLV-S1M" rel="nofollow">1Cademy AI-Assisted Grading Conceptual & Essay Questions</a></li>
               <li><a href="https://youtu.be/E2ClCIX9g0g" rel="nofollow">1Cademy Auto-graded Assignments and Exams</a></li>
               <li><a href="https://youtu.be/9vWGSEBf8WQ" rel="nofollow">1Cademy Instructor and Student Dashboards</a></li>
               </ul>
