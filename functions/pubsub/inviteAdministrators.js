@@ -1,4 +1,4 @@
-const { db, Timestamp, batchSet, commitBatch } = require("../admin");
+const { db, batchSet, commitBatch } = require("../admin");
 const { generateUID, capitalizeFirstLetter } = require("../utils");
 const { signatureHTML } = require("../emailSignature");
 
@@ -93,7 +93,7 @@ module.exports = async (req, res) => {
         await batchSet(emailRef, {
           mailOptions,
           reason: "administrator",
-          createdAt: Timestamp.fromDate(new Date()),
+          createdAt: new Date(),
           documentId: administratorDoc.id,
           city,
           email,
