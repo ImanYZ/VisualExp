@@ -1,4 +1,4 @@
-const { db, Timestamp, batchSet, commitBatch } = require("../admin");
+const { db, batchSet, commitBatch } = require("../admin");
 const { instMailOptions } = require("../helpers/instructorsMailOptions");
 
 module.exports = async (req, res) => {
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
       await batchSet(emailRef, {
         mailOptions,
         reason: "instructor",
-        createdAt: Timestamp.fromDate(new Date()),
+        createdAt: new Date(),
         email,
         city,
         stateInfo,
