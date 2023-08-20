@@ -303,7 +303,7 @@ module.exports = async (req, res) => {
       state: "",
       city: "",
       gender: null,
-      birthDate: null,
+      birthDate: new Date(),
       foundFrom: "Instructor invitation",
       education: null,
       occupation: "",
@@ -328,12 +328,12 @@ module.exports = async (req, res) => {
       cookiesAgreement: true,
       fieldOfInterest: "",
       course: null,
-      invitedInstructor: "6L2gj2fvh4ciLnMfqzjD"
+      courseInstructor: "6L2gj2fvh4ciLnMfqzjD"
     };
     try {
       await axios.post("https://1cademy.com/api/signup", { data: newUserOneCademy });
-    } catch {
-      console.log("user already exists");
+    } catch (error) {
+      console.log("error creating a user in 1cademy", error);
     }
     // }
 
