@@ -23,7 +23,7 @@ const { isToday } = require("../utils");
 // For passed Google Calendar events, to:
 // - Reschedule if they have missed or declined them.
 
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     console.log("remindCalendarInvitations");
     // researchers = an object of emails as keys and the corresponding fullnames as values.

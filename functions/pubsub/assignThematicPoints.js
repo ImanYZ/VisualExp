@@ -4,7 +4,7 @@ const { db } = require("../admin");
 //assign points to researchers based on their thematic coding
 //if more than 3 researchers code the same code for a the same transcript, they all get 0.4 points
 
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     const project = "OnlineCommunities";
     const reaserchersDocs = await db.collection("researchers").get();
@@ -59,7 +59,6 @@ module.exports = async (req, res) => {
       await db.collection("researchers").doc(researcher).update(researcherUpdate);
     }
     console.log(researchersPoints);
-    return res.status(200).send({ researchersPoints });
   } catch (err) {
     console.log({ err });
   }
