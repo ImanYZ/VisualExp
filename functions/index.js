@@ -7,7 +7,7 @@ const passagesNumberCorrection = require("./pubsub/passagesNumberCorrection");
 const sendingEmails = require("./pubsub/sendingEmails");
 const inviteInstructors = require("./pubsub/inviteInstructors");
 const inviteAdministrators = require("./pubsub/inviteAdministrators");
-// const assignThematicPoints = require("./pubsub/assignThematicPoints");
+const assignThematicPoints = require("./pubsub/assignThematicPoints");
 
 const { deleteUser, applicationReminder } = require("./users");
 const app = require("./app");
@@ -89,14 +89,15 @@ exports.sendingEmails = functions
   .timeZone(EST_TIMEZONE)
   .onRun(sendingEmails);
 
-// exports.assignThematicPoints = functions
-//   .runWith({
-//     memory: "1GB",
-//     timeoutSeconds: 520
-//   })
-//   .pubsub.schedule("0 22 * * 1-5")
-//   .timeZone(EST_TIMEZONE)
-//   .onRun(assignThematicPoints);
+exports.assignThematicPoints = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("0 22 * * 1-5")
+  .timeZone(EST_TIMEZONE)
+  .onRun(assignThematicPoints);
+
 // Knowledge
 // exports.assignNodeContributorsInstitutionsStats = functions
 //   .runWith({
