@@ -4,7 +4,7 @@ const { delay } = require("../helpers/common");
 
 const { remindResearcherToSpecifyAvailability } = require("../emailing");
 
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
