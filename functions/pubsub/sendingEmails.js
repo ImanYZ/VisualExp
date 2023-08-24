@@ -40,7 +40,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
     let emails = emailsDocs.docs.map(doc => {

@@ -1,7 +1,7 @@
 const { db, batchSet, commitBatch } = require("../admin");
 const { instMailOptions } = require("../helpers/instructorsMailOptions");
 
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     const instructorDocs = await db
       .collection("instructors")
