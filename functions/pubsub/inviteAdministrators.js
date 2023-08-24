@@ -8,7 +8,7 @@ const { signatureHTML } = require("../emailSignature");
 // our experimental conditions and sends them personalized invitation
 // and reminder emails.
 // The algorithm is explained at emailing.drawio
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout

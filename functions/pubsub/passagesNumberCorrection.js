@@ -1,6 +1,6 @@
 const { db } = require("../admin");
 
-module.exports = async (req, res) => {
+module.exports = async context => {
   try {
     const passageNumberOfParticipant = {};
     const usersDocs = await db.collection("users").get();
