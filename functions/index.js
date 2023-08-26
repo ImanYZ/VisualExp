@@ -94,7 +94,7 @@ exports.assignThematicPoints = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("0 22 * * 1-5")
+  .pubsub.schedule("every week")
   .timeZone(EST_TIMEZONE)
   .onRun(assignThematicPoints);
 
