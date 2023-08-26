@@ -6,14 +6,14 @@ const { assignExpPoints } = require("../../helpers/assignExpPoints");
 
 module.exports = async (req, res) => {
   try {
-    const { recallGrade: sessionRecallGrade, voterProject, viewedPhrases } = req.body;
+    const { recallGrade: sessionRecallGrade, voterProject } = req.body;
     const { docId: fullname } = req.researcher;
 
     const gptResearcher = "Iman YeckehZaare";
 
     const { researcher } = req;
 
-    if (!sessionRecallGrade || !voterProject || !viewedPhrases) {
+    if (!sessionRecallGrade || !voterProject) {
       return res.status(500).send({
         message: "some parameters are missing"
       });
@@ -92,16 +92,6 @@ module.exports = async (req, res) => {
         docGrades = docGrades || [];
         docResearchers = docResearchers || [];
 
-        // removing gpt user from docResearchers and docGrades
-        // gpt user should not be counted for approval or for done phrases
-        const gptIdx = docResearchers.indexOf(gptResearcher);
-        let gptGrade = false;
-        if (gptIdx !== -1) {
-          docResearchers.splice(gptIdx, 1);
-          gptGrade = docGrades[gptIdx];
-          docGrades.splice(gptIdx, 1);
-        }
-
         const previousGrades = {
           // sum of previous up votes from all researchers
           upVotes: docGrades.reduce((c, g) => c + (g === true ? 1 : 0), 0),
@@ -123,15 +113,9 @@ module.exports = async (req, res) => {
         } */
 
         // adding values to condition updates
-        const wasPresented = viewedPhrases.includes(phrase.phrase);
+        const wasPresented = sessionRecallGrade.phrases.findIndex(p => p.phrase === phrase.phrase) !== -1;
         phrase.grades = [...docGrades];
         phrase.researchers = [...docResearchers];
-
-        // pushing gpt user after
-        if (gptIdx !== -1) {
-          phrase.grades.push(gptGrade);
-          phrase.researchers.push(gptResearcher);
-        }
 
         if (wasPresented) {
           phrase.grades.push(grade);
@@ -148,8 +132,7 @@ module.exports = async (req, res) => {
             // list of all researchers that voted on this phrase
             researchers: phrase.researchers,
             grades: phrase.grades,
-            previousResearcher: previousGrades.upVotes + previousGrades.downVotes,
-            hasGPTVote: gptIdx !== -1
+            previousResearcher: previousGrades.upVotes + previousGrades.downVotes
           }
         };
       }, {});
@@ -259,7 +242,10 @@ module.exports = async (req, res) => {
                 negativeGradingPoints += Math.abs(upVotePoint);
               }
 
-              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints = gradingPoints;
+              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints = Math.max(
+                gradingPoints,
+                0
+              );
               researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
                 negativeGradingPoints;
             }

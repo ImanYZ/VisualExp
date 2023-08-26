@@ -60,22 +60,11 @@ const FreeRecallGrading = props => {
   const [recallGrades, setRecallGrades] = useState([]);
 
   const [notSatisfiedSelections, setNotSatisfiedSelections] = useState([]);
-  const [randomizedPhrases, setRandomizedPhrases] = useState([]);
   const [recentParticipants, setRecentParticipants] = useState([]);
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
   const setHideLeaderBoard = useSetRecoilState(hideLeaderBoardState);
   const [allRecallGrades, setAllRecallGrades] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const recallGrade = recallGrades?.[0];
-      let phrases = [...recallGrade.phrases].map((phrase, idx) => ({ ...phrase, index: idx }));
-      phrases.sort(() => 0.5 - Math.random());
-      setRandomizedPhrases(phrases);
-      setProcessing(false);
-    })();
-  }, [recallGrades]);
 
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
@@ -159,40 +148,24 @@ const FreeRecallGrading = props => {
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
-  const gradeIt = async newBatch => {
-    let phrases = [];
-
-    if (newBatch?.length) {
-      const phraseStatements = [];
-      phrases = [...newBatch];
-      // need to add missing grades due schema gen recalls
-      for (const phrase of phrases) {
-        phraseStatements.push(phrase.phrase);
-      }
-      const recallPhrases = recallGrades?.[0]?.phrases || [];
-      for (const recallPhrase of recallPhrases) {
-        if (phraseStatements.includes(recallPhrase.phrase)) {
-          continue;
+  const gradeIt = async notSatisfiedSelections => {
+    if (notSatisfiedSelections?.length) {
+      notSatisfiedSelections.forEach(p => {
+        const index = selectedGrade.phrases.findIndex(_p => _p.phrase === p.phrase);
+        if (index !== -1) {
+          selectedGrade.phrases[index].grades = p.grades;
         }
-        phrases.push(recallPhrase);
-      }
-    } else {
-      phrases = [...(recallGrades?.[0]?.phrases || [])];
+      });
     }
-
     setSubmitting(true);
     try {
-      const requestData = {
-        recallGrade: {
-          ...selectedGrade,
-          phrases
-        },
-        voterProject: project,
-        viewedPhrases: randomizedPhrases.map(phrase => phrase.phrase)
+      const postData = {
+        recallGrade: selectedGrade,
+        voterProject: project
       };
 
       await firebase.idToken();
-      await axios.post("/researchers/gradeRecalls", requestData);
+      await axios.post("/researchers/gradeRecalls", postData);
 
       setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
@@ -206,14 +179,9 @@ const FreeRecallGrading = props => {
         );
       });
       _allRecallGrades[selectedGrade.project].splice(index, 1);
-      phrases.sort(
-        [...recallGrades[0].phrases].map((phrase, idx) => ({ ...phrase, index: idx })).sort(() => 0.5 - Math.random())
-      );
-      setRandomizedPhrases(phrases);
       setAllRecallGrades(_allRecallGrades);
       setRecallGrades(_recallGrades);
       setSelectedGrade(_recallGrades[0] || null);
-      setRandomizedPhrases([]);
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
       setHideLeaderBoard(false);
@@ -226,37 +194,44 @@ const FreeRecallGrading = props => {
     }
   };
   const handleGradeChange = index => {
-    const _selectedGrade = { ...selectedGrade };
-    const researchers = [...(_selectedGrade.phrases[index].researchers || [])];
-    let researcherIdx = researchers.indexOf(fullname);
-    if (researcherIdx === -1) {
-      researchers.push(fullname);
-      researcherIdx = researchers.length - 1;
-    }
+    setSelectedGrade(prevSelectedGrade => {
+      const newSelectedGrade = { ...prevSelectedGrade };
+      const newPhrases = [...newSelectedGrade.phrases];
 
-    const grades = [...(_selectedGrade.phrases[index].grades || [])];
-    grades[researcherIdx] = !grades[researcherIdx];
+      const phrase = { ...newPhrases[index] };
+      const researchers = [...(phrase.researchers || [])];
+      const grades = [...(phrase.grades || [])];
 
-    _selectedGrade.phrases[index].researchers = researchers;
-    _selectedGrade.phrases[index].grades = grades;
-    _selectedGrade.phrases[index].grade = grades[researcherIdx];
+      const researcherIdx = researchers.indexOf(fullname);
 
-    setSelectedGrade(_selectedGrade);
+      if (researcherIdx !== -1) {
+        grades[researcherIdx] = !grades[researcherIdx];
+      } else {
+        researchers.push(fullname);
+        grades.push(true);
+      }
+
+      phrase.researchers = researchers;
+      phrase.grades = grades;
+
+      newPhrases[index] = phrase;
+      newSelectedGrade.phrases = newPhrases;
+
+      return newSelectedGrade;
+    });
   };
 
   const handleSubmit = () => {
     const phrases = [...(selectedGrade?.phrases || [])];
-    const notSatisfiedSelections = phrases
-      .filter(_p => {
-        const researchers = _p.researchers || [];
-        const researcherIdx = researchers.indexOf(fullname);
+    const notSatisfiedSelections = phrases.filter(_p => {
+      const researchers = _p.researchers || [];
+      const researcherIdx = researchers.indexOf(fullname);
 
-        const grades = _p.grades || [];
-        const grade = !!grades[researcherIdx];
-        const notSatisfiedIdx = selectedGrade.notSatisfiedphrases.findIndex(p => p.phrase === _p.phrase);
-        return grade && notSatisfiedIdx > 0;
-      })
-      .map(_p => _p.phrase);
+      const grades = _p.grades || [];
+      const grade = !!grades[researcherIdx];
+      const notSatisfiedIdx = selectedGrade.notSatisfiedphrases.findIndex(p => p.phrase === _p.phrase);
+      return grade && notSatisfiedIdx > 0;
+    });
     setNotSatisfiedSelections(notSatisfiedSelections);
 
     if (notSatisfiedSelections.length > 0) {
@@ -271,7 +246,8 @@ const FreeRecallGrading = props => {
     return (
       <SchemaGenRecalls
         recallGrade={recallGrades?.[0]}
-        notSatisfiedPhrases={notSatisfiedSelections}
+        notSatisfiedSelections={notSatisfiedSelections}
+        setNotSatisfiedSelections={setNotSatisfiedSelections}
         gradeIt={gradeIt}
         selectedPassageId={recallGrades?.[0]?.passage}
         projectParticipant={recallGrades?.[0].project}
@@ -364,17 +340,15 @@ const FreeRecallGrading = props => {
           their free-recall response, and then submit your answers:
         </p>
 
-        {(randomizedPhrases || []).map((row, index) => {
-          const phrase = selectedGrade.phrases[row.index];
-
+        {(selectedGrade.phrases || []).map((phrase, index) => {
           const researcherIdx = (phrase?.researchers || []).indexOf(fullname);
-          const grade = researcherIdx !== -1 && phrase?.grades[researcherIdx];
+          const grade = !!phrase?.grades[researcherIdx];
           return (
             <div key={index}>
               <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }} className="recall-phrase">
                 <Box sx={{ display: "inline", mr: "19px" }}>
                   NO
-                  <Switch checked={grade} onChange={() => handleGradeChange(row.index)} color="secondary" />
+                  <Switch checked={grade} onChange={() => handleGradeChange(index)} color="secondary" />
                   YES
                 </Box>
                 <Box sx={{ display: "inline" }}>{phrase?.phrase}</Box>
