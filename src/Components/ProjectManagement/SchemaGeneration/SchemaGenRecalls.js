@@ -26,7 +26,14 @@ const temp_schema = [
 
 // eslint-disable-next-line no-empty-pattern
 export const SchemaGenRecalls = props => {
-  const { notSatisfiedPhrases, recallGrade, gradeIt, selectedPassageId, projectParticipant } = props;
+  const {
+    notSatisfiedSelections,
+    setNotSatisfiedSelections,
+    recallGrade,
+    gradeIt,
+    selectedPassageId,
+    projectParticipant
+  } = props;
 
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -37,14 +44,14 @@ export const SchemaGenRecalls = props => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [wrongRecallVotes, setWrongRecallVotes] = useState([]);
-  const [selectedRecall, setSelectedRecall] = useState();
 
   const [satisfiedRecalls, setSatisfiedRecalls] = useState([]);
   const [schmaLoaded, setSchmaLoaded] = useState(false);
   const [submitButtonLoader, setSubmitButtonLoader] = useState(false);
   const [highlightedWords, setHighlightedWords] = useState([]);
   const [notSatisfiedResponses, setNotSatisfiedResponses] = useState([]);
+
+  const [next, setNext] = useState(0);
 
   const project = useRecoilValue(projectState);
 
@@ -75,16 +82,16 @@ export const SchemaGenRecalls = props => {
     if (firebase && selectedPassageId) {
       retrieveResponses();
     }
-  }, [firebase, selectedPassageId, selectedRecall]);
-
-
+  }, [firebase, selectedPassageId, next]);
 
   useEffect(() => {
     setHighlightedWords([]);
     setNotSatisfiedResponses([]);
     setSchemasBoolean([]);
-    if (firebase && selectedRecall) {
-      const schmaQuery = firebase.db.collection("booleanScratch").where("phrase", "==", selectedRecall.phrase);
+    if (firebase && notSatisfiedSelections[next]) {
+      const schmaQuery = firebase.db
+        .collection("booleanScratch")
+        .where("phrase", "==", notSatisfiedSelections[next].phrase);
       const schmaSnapshot = schmaQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setSchmaChanges(oldSchmasChanges => {
@@ -98,7 +105,7 @@ export const SchemaGenRecalls = props => {
         schmaSnapshot();
       };
     }
-  }, [firebase, selectedRecall]);
+  }, [firebase, next]);
 
   useEffect(() => {
     if (!schmaLoaded) return;
@@ -120,15 +127,13 @@ export const SchemaGenRecalls = props => {
     setHighlightedWords([]);
   }, [firebase, schmaLoaded]);
 
-
-
   const handleSubmit = () => {
     const newbooleanScratch = {
       email,
       fullname,
       schema: schema,
       createdAt: new Date(),
-      phrase: selectedRecall.phrase,
+      phrase: notSatisfiedSelections[next].phrase,
       passage: selectedPassageId,
       upVotes: 0,
       downVotes: 0,
@@ -308,65 +313,30 @@ export const SchemaGenRecalls = props => {
     setHighlightedWords(keywords);
   };
 
-  useEffect(() => {
-    if (!notSatisfiedPhrases.length) return;
-    if (!recallGrade) return;
-    const notSatisfiedRecalls = [];
-    const satisfiedRecalls = [];
-    const seenPhrases = [];
-    const phrases = recallGrade?.phrases || [];
-    for (const phrase of phrases) {
-      if (seenPhrases.includes(phrase.phrase)) {
-        continue;
-      }
-
-      if (notSatisfiedPhrases.includes(phrase.phrase)) {
-        notSatisfiedRecalls.push(phrase);
-      } else {
-        satisfiedRecalls.push(phrase);
-      }
-
-      seenPhrases.push(phrase.phrase);
-    }
-    if (notSatisfiedRecalls.length) {
-      setSatisfiedRecalls(satisfiedRecalls);
-      setWrongRecallVotes(notSatisfiedRecalls);
-      setSelectedRecall(notSatisfiedRecalls[0]);
-    }
-  }, [recallGrade, notSatisfiedPhrases]);
-
   const changeTheVote = () => {
-    const _wrongRecallVotes = wrongRecallVotes.slice();
-    const _index = wrongRecallVotes.findIndex(object => {
-      return selectedRecall.phrase === object.phrase;
-    });
-    const _checked = _wrongRecallVotes[_index].grade;
-    if (_index !== -1) {
-      const researchers = [...(_wrongRecallVotes[_index].researchers || [])];
-      const researcherIdx = researchers.indexOf(fullname);
+    setNotSatisfiedSelections(previousRecall => {
+      const newSelectedGrade = [...previousRecall];
+      const researchers = newSelectedGrade[next].researchers || [];
+      let researcherIdx = researchers.indexOf(fullname);
+      const grades = newSelectedGrade[next].grades || [];
       if (researcherIdx !== -1) {
-        _wrongRecallVotes[_index].grades[researcherIdx] = !_checked;
+        grades[researcherIdx] = !grades[researcherIdx];
+      } else {
+        researchers.push(fullname);
+        grades.push(true);
       }
-      _wrongRecallVotes[_index].grade = !_checked;
-      setWrongRecallVotes(_wrongRecallVotes);
-      setSelectedRecall(_wrongRecallVotes[_index]);
-    }
+      return newSelectedGrade;
+    });
   };
 
   const handleNext = () => {
-    setHighlightedWords([]);
-    setSearchResules(recallResponses);
-    const indexOFthis = wrongRecallVotes.findIndex(object => {
-      return selectedRecall.phrase === object.phrase;
-    });
-    if (indexOFthis + 1 === wrongRecallVotes.length) {
+    if (notSatisfiedSelections.length - 1 === next) {
       setSubmitButtonLoader(true);
-      const requestAnswers = satisfiedRecalls.concat(wrongRecallVotes);
-      gradeIt(requestAnswers);
-      setSubmitButtonLoader(true);
-    } else {
-      setSelectedRecall(wrongRecallVotes[indexOFthis + 1]);
+      gradeIt(notSatisfiedSelections);
+      setSubmitButtonLoader(false);
+      return;
     }
+    setNext(previousNext => previousNext + 1);
   };
 
   const renderResponses = paragraph => {
@@ -393,7 +363,8 @@ export const SchemaGenRecalls = props => {
       );
     });
   }, [searchResules]);
-  if (!selectedRecall) return <></>;
+
+  if (!notSatisfiedSelections[next]) return <></>;
 
   return (
     <Box className="schema-generation">
@@ -430,10 +401,14 @@ export const SchemaGenRecalls = props => {
                   <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
                     <Box sx={{ display: "inline", mr: "19px" }}>
                       NO
-                      <Switch checked={selectedRecall.grade} onChange={changeTheVote} color="secondary" />
+                      <Switch
+                        checked={notSatisfiedSelections[next].grades[notSatisfiedSelections[next].grades.length - 1]}
+                        onChange={changeTheVote}
+                        color="secondary"
+                      />
                       YES
                     </Box>
-                    <Box sx={{ display: "inline" }}>{selectedRecall.phrase}</Box>
+                    <Box sx={{ display: "inline" }}>{notSatisfiedSelections[next].phrase}</Box>
                   </Paper>
                 </Box>
               </Box>
@@ -449,20 +424,13 @@ export const SchemaGenRecalls = props => {
               >
                 {submitButtonLoader ? (
                   <CircularProgress color="warning" size="15px" />
-                ) : wrongRecallVotes.findIndex(object => {
-                    return selectedRecall.phrase === object.phrase;
-                  }) +
-                    1 ===
-                  wrongRecallVotes.length ? (
+                ) : notSatisfiedSelections.length - 1 === next ? (
                   "Submit"
                 ) : (
                   "Next"
                 )}
               </Button>
-              {wrongRecallVotes.findIndex(object => {
-                return selectedRecall.phrase === object.phrase;
-              }) + 1}{" "}
-              / {wrongRecallVotes.length}
+              {next + 1} / {notSatisfiedSelections.length}
             </Box>
             {schemasBoolean?.length > 0 && (
               <Typography variant="h6" component="Box" align="left">
@@ -470,11 +438,15 @@ export const SchemaGenRecalls = props => {
               </Typography>
             )}
 
-            {schemasBoolean?.length > 0 &&
+            {schemasBoolean?.length > 0 ? (
               schemasBoolean.map((schemaE, index) => {
                 return (
                   <Box key={index} className="query-container" style={{ marginBottom: "30px" }}>
-                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedRecall.phrase} readOnly={true} />
+                    <QueryBuilder
+                      query={schemaE.schema}
+                      selectedPhrase={notSatisfiedSelections[next].phrase}
+                      readOnly={true}
+                    />
                     <Box style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <Box style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <Box style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
@@ -508,7 +480,21 @@ export const SchemaGenRecalls = props => {
                     </Box>
                   </Box>
                 );
-              })}
+              })
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column"
+                }}
+              >
+                <CircularProgress />
+                <br />
+                <Typography sx={{ mt: "5px" }}> Loading...</Typography>
+              </Box>
+            )}
             <QueryBuilder
               query={schema}
               onQueryChange={q => {
