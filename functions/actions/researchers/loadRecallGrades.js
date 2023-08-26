@@ -39,7 +39,7 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
           .sort(() => 0.5 - Math.random())
           .splice(0, 4);
 
-        conditionItem.phrases = [...phrasesSatisfied, ...notSatisfiedphrases];
+        conditionItem.phrases = [...phrasesSatisfied, ...notSatisfiedphrases].sort(() => 0.5 - Math.random());
         if (phrasesSatisfied.length > 0) {
           _conditionItems.push({
             docId: recallGradeDoc.id,
