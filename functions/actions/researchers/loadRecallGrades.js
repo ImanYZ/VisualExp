@@ -34,7 +34,7 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
         const notSatisfiedphrases = conditionItem.phrases
           .filter(phrase => {
             const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
-            return !validateBooleanExpression(schemaE, conditionItem.response);
+            return !phrase.deleted && !validateBooleanExpression(schemaE, conditionItem.response);
           })
           .sort(() => 0.5 - Math.random())
           .splice(0, 4);
