@@ -1,15 +1,52 @@
 const csv = require("fast-csv");
 const { db } = require("./admin");
 
-let columns = ["Participant", "numResearchers", "Code", "Category"];
-let columns2 = ["Code", "participantsNum", "Category"];
+const participantCodes = {
+  "Ava Lindo": "S4",
+  "Doug Paxton": "I4",
+  "Merve Hickok": "I5",
+  "Anika Vandermast": "S3",
+  "Diego Rojas": "I6",
+  "Goldey Katherine": "I7",
+  "Baoheng Ke": "S5",
+  "Michael Treadway": "I8",
+  "Steve Oney": "I2",
+  "Oleg Nikolsky": "I9",
+  "Alisar Alabdullah": "S6",
+  "Dave Westenberg": "I10",
+  "Belgin Kazkaz": "S7",
+  "J Edward Colgate": "I11",
+  "Reiter-Salisbury Nancy": "I12",
+  "Tebo Kristen": "I13",
+  "Anselm Spoerri": "I14",
+  "Eytan Adar": "I15",
+  "Nabeel Mohamed": "S8",
+  "Ryan Paitz": "I16",
+  "Michael Cherney": "I17",
+  "Denali Wood": "S9",
+  "Júlia Romagnoli": "S10",
+  "Edward Cannon": "I18",
+  "Maymani Adhiphandhuamphai": "S2",
+  "Emily Brabec": "S11",
+  "Jennifer McGee": "I1",
+  "George Hoffman": "I3",
+  "Salma Hassab": "S1"
+};
+
+let columns = ["Participant", "numResearchers", "Code", "Category", "Role"];
+let columns2 = ["Code", "participantsNum", "Category", "Role"];
 (async () => {
   console.log("thematicAnalysis");
   let counts = {};
   let codesCountes = {};
   const thematicDocs = await db.collection("thematicAnalysis").get();
   const feedbackCodeBooks = await db.collection("feedbackCodeBooks").get();
+  const transcriptDocs = await db.collection("transcript").get();
 
+  const transcrips = {};
+  for (let doc of transcriptDocs.docs) {
+    transcrips[doc.data().participant] = doc.data().surveyType;
+  }
   const codeCategories = {};
   for (let doc of feedbackCodeBooks.docs) {
     if (doc.data().hasOwnProperty("category") && doc.data().project === "OnlineCommunities") {
@@ -60,20 +97,34 @@ let columns2 = ["Code", "participantsNum", "Category"];
       }
     }
   }
-
-  for (let code of Object.keys(codesCountes)) {
-    row = [code, codesCountes[code], codeCategories[code]];
-    rowData2.push(row);
-  }
-
+  const codeRole = {};
+  const codeParticipants = {};
   for (let tId of Object.keys(counts)) {
     for (let code of Object.keys(counts[tId])) {
       if (codeCategories.hasOwnProperty(code)) {
-        row = [tId, counts[tId][code].length, code, codeCategories[code]];
+        if (codeRole[code] !== "instructor") {
+          codeRole[code] = transcrips[tId];
+        }
+        row = [tId, counts[tId][code].length, code, codeCategories[code], transcrips[tId]];
         rowData.push(row);
+        if (!codeParticipants.hasOwnProperty(code)) {
+          codeParticipants[code] = new Set();
+        }
+        if (!participantCodes.hasOwnProperty(tId)) {
+          participantCodes[tId] = "S10";
+        }
+        codeParticipants[code].add(participantCodes[tId]);
       }
     }
   }
+  for (let code of Object.keys(codesCountes)) {
+    row = [code, codesCountes[code], codeCategories[code], codeRole[code]];
+    rowData2.push(row);
+  }
+  for (let code of Object.keys(codeParticipants)) {
+    console.log("\\item \\textit{" + code + " - " + [...codeParticipants[code]] + "}");
+  }
+
   csv
     .writeToPath("csv/thematicAnalysis.csv", [...rowData], {
       headers: true
