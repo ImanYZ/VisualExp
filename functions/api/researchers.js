@@ -34,6 +34,8 @@ const addNewPhraseForPassage = require("../actions/researchers/addNewPhraseForPa
 const calcultesRecallGradesRecords = require("../actions/researchers/calcultesRecallGradesRecords");
 const deletePhraseFromPassage = require("../actions/researchers/deletePhraseFromPassage");
 
+const uploadAndReadFiles = require("../actions/researchers/uploadAndReadFiles");
+
 const firebaseAuth = require("../middlewares/firebaseAuth");
 const isResearcher = require("../middlewares/isResearcher");
 const researchersRouter = express.Router();
@@ -106,5 +108,8 @@ researchersRouter.post("/calcultesRecallGradesRecords", calcultesRecallGradesRec
 
 // POST /api/researchers/deletePhraseFromPassage
 researchersRouter.post("/deletePhraseFromPassage", deletePhraseFromPassage);
+
+// POST /api/researchers/uploadAndReadFiles
+researchersRouter.post("/uploadAndReadFiles", uploadAndReadFiles);
 
 module.exports = researchersRouter;
