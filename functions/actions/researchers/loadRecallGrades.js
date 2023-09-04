@@ -110,10 +110,10 @@ module.exports = async (req, res) => {
     let recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname, booleanByphrase, passagesByIds);
     for (let project in recallGrades) {
       let includeRecentParticipants = recallGrades[project].filter(g =>
-        Object.keys(recentParticipants[project]).includes(g.user)
+        Object.keys(recentParticipants[project] || {}).includes(g.user)
       );
       let dontIncludeRecentParticipants = recallGrades[project].filter(
-        g => !Object.keys(recentParticipants[project]).includes(g.user)
+        g => !Object.keys(recentParticipants[project] || {}).includes(g.user)
       );
       recallGrades[project] = [...includeRecentParticipants, ...dontIncludeRecentParticipants].slice(0, 100);
     }
