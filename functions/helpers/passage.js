@@ -1,14 +1,9 @@
 const { db } = require("../admin");
 
-
 const validateBooleanExpression = (rules, response) => {
   return rules.every(rule => {
     const { keyword, alternatives, not } = rule;
-    let keywords = [keyword];
-    if (alternatives && alternatives.length && alternatives.length > 0) {
-      keywords = [keyword, ...alternatives];
-    }
-    keywords.filter(kw => kw !== "");
+    const keywords = [keyword, ...(alternatives || [])].filter(kw => kw !== "");
     const match = keywords.some(kw => response.toLowerCase().includes(kw.toLowerCase()));
     return (match && !not) || (!match && not);
   });

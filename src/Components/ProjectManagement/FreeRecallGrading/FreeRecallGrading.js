@@ -63,18 +63,31 @@ const FreeRecallGrading = props => {
   const [recentParticipants, setRecentParticipants] = useState([]);
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
   const setHideLeaderBoard = useSetRecoilState(hideLeaderBoardState);
-  const [allRecallGrades, setAllRecallGrades] = useState([]);
+  const [allRecallGrades, setAllRecallGrades] = useState(null);
   const [selectedGrade, setSelectedGrade] = useState(null);
-
-  // Retrieve a free-recall response that is not evaluated by four
-  // researchers yet.
   const loadedRecallGrades = async () => {
     try {
+      if (allRecallGrades !== null && !allRecallGrades.hasOwnProperty(project) && project !== "Autograding") {
+        setRecallGrades([]);
+        setSelectedGrade(null);
+        return;
+      }
+
+      let tempRecallGrades = allRecallGrades ? allRecallGrades[project] || [] : [];
+
+      if (project === "Autograding") {
+        tempRecallGrades = [];
+        for (let project in allRecallGrades) {
+          tempRecallGrades = tempRecallGrades.concat(tempRecallGrades[project]);
+        }
+      }
+
       setProcessing(true);
       const recentParticipants = await fetchRecentParticipants(fullname, project);
       setRecentParticipants(recentParticipants);
       await firebase.idToken();
-      let response = await axios.post("/researchers/loadRecallGrades");
+      let response =
+        tempRecallGrades.length === 0 ? await axios.post("/researchers/loadRecallGrades") : { data: allRecallGrades };
       let _recallGrades = response.data;
       setAllRecallGrades(_recallGrades);
       let __recallGrades = [];
@@ -105,45 +118,13 @@ const FreeRecallGrading = props => {
       console.log(error);
     }
   };
-
   useEffect(() => {
-    if (firebase && fullname) {
+    // Retrieve a free-recall response that is not evaluated by four
+    // researchers yet.
+    if (firebase && fullname && recallGrades.length === 0) {
       return loadedRecallGrades();
     }
-  }, [firebase, fullname]);
-
-  useEffect(() => {
-    let _recallGrades = [];
-    if (!allRecallGrades.hasOwnProperty(project) && project !== "Autograding") {
-      setRecallGrades([]);
-      setSelectedGrade(null);
-      return;
-    }
-    if (project === "Autograding") {
-      for (let project in allRecallGrades) {
-        _recallGrades = _recallGrades.concat(allRecallGrades[project]);
-      }
-    } else {
-      _recallGrades = allRecallGrades[project];
-    }
-    if (project !== "Autograding") {
-      _recallGrades = _recallGrades.filter(g => g.project === project);
-      if (Object.keys(recentParticipants).length > 0) {
-        _recallGrades.sort((g1, g2) => {
-          const p1 =
-            Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
-          const p2 =
-            Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
-          if (p1 && p2) return 0;
-          return p1 && !p2 ? -1 : 1;
-        });
-      } else {
-        _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
-      }
-    }
-    setRecallGrades(_recallGrades);
-    setSelectedGrade(_recallGrades[0] || null);
-  }, [project]);
+  }, [firebase, fullname, project]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
@@ -179,6 +160,10 @@ const FreeRecallGrading = props => {
         );
       });
       _allRecallGrades[selectedGrade.project].splice(index, 1);
+      if (_recallGrades.length === 0) {
+        await loadedRecallGrades();
+        return;
+      }
       setAllRecallGrades(_allRecallGrades);
       setRecallGrades(_recallGrades);
       setSelectedGrade(_recallGrades[0] || null);
