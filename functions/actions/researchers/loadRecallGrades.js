@@ -1,7 +1,7 @@
 const { db } = require("../../admin");
 const { fetchRecentParticipants } = require("../../utils");
 
-const validateBooleanExpression = (rules, response, id) => {
+const validateBooleanExpression = (rules, response) => {
   return rules.every(rule => {
     const { keyword, alternatives, not } = rule;
     console.log([keyword, ...(alternatives || [])]);
