@@ -4,7 +4,8 @@ const { fetchRecentParticipants } = require("../../utils");
 const validateBooleanExpression = (rules, response) => {
   return rules.every(rule => {
     const { keyword, alternatives, not } = rule;
-    const keywords = [keyword, ...alternatives].filter(kw => kw !== "");
+    console.log([keyword, ...(alternatives || [])]);
+    const keywords = [keyword, ...(alternatives || [])].filter(kw => kw !== "");
     const match = keywords.some(kw => response.toLowerCase().includes(kw.toLowerCase()));
     return (match && !not) || (!match && not);
   });
