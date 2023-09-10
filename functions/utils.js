@@ -133,16 +133,37 @@ const delay = async time => {
 
 const fetchRecentParticipants = async researcher => {
   // logic to fetch recently participants names by current researcher
-  const recentParticipants = {};
+  const recentParticipants = [];
+
   const resSchedules = await db.collection("resSchedule").get();
+  const expSessions = await db.collection("expSessions").where("researcher", "==", researcher).get();
+
+  const assignedPoints = {};
+  for (let expDoc of expSessions.docs) {
+    const expData = expDoc.data();
+    const session = expData?.session;
+    const participant = expData?.user || "";
+    if (assignedPoints.hasOwnProperty(expData.project)) {
+      assignedPoints[expData.project] = {};
+    }
+    if (!assignedPoints[expData.project].hasOwnProperty(participant)) {
+      assignedPoints[expData.project][participant] = [];
+    }
+    assignedPoints[expData.project][participant].push(session);
+  }
+
   for (const resSchedule of resSchedules.docs) {
     const resScheduleData = resSchedule.data();
-    if (!recentParticipants.hasOwnProperty(resScheduleData.project)) {
-      recentParticipants[resScheduleData.project] = {};
-    }
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
+
     for (const participant in attendedSessions) {
-      recentParticipants[resScheduleData.project][participant] = attendedSessions[participant];
+      const participantNotGraded = attendedSessions[participant].some(
+        session => !assignedPoints[resScheduleData.project][participant].includes(session)
+      );
+
+      if (!recentParticipants.includes(participant) && participantNotGraded) {
+        recentParticipants.push(participant);
+      }
     }
   }
   return recentParticipants;

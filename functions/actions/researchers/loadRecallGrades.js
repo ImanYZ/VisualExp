@@ -4,7 +4,6 @@ const { fetchRecentParticipants } = require("../../utils");
 const validateBooleanExpression = (rules, response) => {
   return rules.every(rule => {
     const { keyword, alternatives, not } = rule;
-    console.log([keyword, ...(alternatives || [])]);
     const keywords = [keyword, ...(alternatives || [])].filter(kw => kw !== "");
     const match = keywords.some(kw => response.toLowerCase().includes(kw.toLowerCase()));
     return (match && !not) || (!match && not);
@@ -75,13 +74,32 @@ const consumeRecallGradesChanges = (recallGradesDocs, fullname, booleanByphrase,
 module.exports = async (req, res) => {
   try {
     console.log("loadRecallGrades");
+    const { project } = req.query;
+    if (!["H2K2", "H1L2", "Autograding"].includes(project)) {
+      return res.status(200).send([]);
+    }
     const { docId: fullname } = req.researcher;
 
     const booleanByphrase = {};
     let passagesByIds = {};
 
     const recentParticipants = await fetchRecentParticipants(fullname);
-    let recallGradesDocs = await db.collection("recallGradesV2").get();
+    let recallGradesRecentParticipantDocs = [];
+    for (let participant of recentParticipants) {
+      let docs = await db.collection("recallGradesV2").where("user", "==", participant).get();
+      recallGradesRecentParticipantDocs = [...recallGradesRecentParticipantDocs, ...docs.docs];
+    }
+
+    const fullyGradedDocs = await db.collection("recallGradesV2").where("viewers", "array-contains", fullname).get();
+    const fullyGradedIds = [];
+    fullyGradedDocs.docs.forEach(doc => fullyGradedIds.push(doc.id));
+    const remainingTogradeQuery = db.collection("recallGradesV2");
+    if (fullyGradedIds.length > 0) {
+      remainingTogradeQuery.where("__name__", "not-in", fullyGradedIds);
+    }
+    const remainingTogradeDocs = await remainingTogradeQuery.limit(50).get();
+
+    const recallGradesDocs = [...recallGradesRecentParticipantDocs, ...remainingTogradeDocs.docs];
 
     const booleanScratch = await db.collection("booleanScratch").get();
 
@@ -108,16 +126,8 @@ module.exports = async (req, res) => {
       });
     }
 
-    let recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname, booleanByphrase, passagesByIds);
-    for (let project in recallGrades) {
-      let includeRecentParticipants = recallGrades[project].filter(g =>
-        Object.keys(recentParticipants[project] || {}).includes(g.user)
-      );
-      let dontIncludeRecentParticipants = recallGrades[project].filter(
-        g => !Object.keys(recentParticipants[project] || {}).includes(g.user)
-      );
-      recallGrades[project] = [...includeRecentParticipants, ...dontIncludeRecentParticipants].slice(0, 100);
-    }
+    let recallGrades = consumeRecallGradesChanges(recallGradesDocs, fullname, booleanByphrase, passagesByIds);
+
     res.status(200).send(recallGrades);
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
