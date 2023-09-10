@@ -151,15 +151,15 @@ const fetchRecentParticipants = async researcher => {
     }
     assignedPoints[expData.project][participant].push(session);
   }
-
   for (const resSchedule of resSchedules.docs) {
     const resScheduleData = resSchedule.data();
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
 
     for (const participant in attendedSessions) {
-      const participantNotGraded = attendedSessions[participant].some(
-        session => !assignedPoints[resScheduleData.project][participant].includes(session)
-      );
+      const participantNotGraded = attendedSessions[participant].some(session => {
+        const attendedSessions = assignedPoints[resScheduleData.project][participant];
+        return !attendedSessions || !attendedSessions.includes(session);
+      });
 
       if (!recentParticipants.includes(participant) && participantNotGraded) {
         recentParticipants.push(participant);
