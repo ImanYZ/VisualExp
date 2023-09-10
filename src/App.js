@@ -248,7 +248,8 @@ const App = () => {
       user: fullname,
       priority: 0,
       email,
-      passages
+      passages,
+      viewers: []
     };
     if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
@@ -319,6 +320,7 @@ const App = () => {
       // marking as not done when new session/condition added
       if (recallGradeData.done) {
         recallGradeData.done = false;
+        recallGradeData.viewers = [];
       }
     }
 
@@ -399,8 +401,6 @@ const App = () => {
       default:
       // code block
     }
-
-
 
     for (let index of [0, 1]) {
       if (userData[explan] && userData[explan][index] !== "") {
