@@ -54,11 +54,17 @@ module.exports = async (req, res) => {
       const researchers = await t.get(db.collection("researchers"));
       let researchersUpdates = {};
       let updatedResearchers = [];
+
       for (const _researcher of researchers.docs) {
         const researcherData = _researcher.data();
         researchersUpdates[_researcher.id] = researcherData;
       }
       // adding gradingNum
+
+      console.log({ leng: researchersUpdates });
+      for (const researcherId in researchersUpdates) {
+        console.log(researcherId);
+      }
 
       researchersUpdates[researcher.docId].projects = researcher.projects;
       updatedResearchers.push(researcher.docId);
@@ -295,6 +301,7 @@ module.exports = async (req, res) => {
             }
           }
 
+          console.log({ researchersUpdates });
           updatedResearchers.push(...votesOfPhrase.researchers);
         }
       }
@@ -311,19 +318,22 @@ module.exports = async (req, res) => {
 
       // if all conditions in all sessions are done then flag recall grade document as done
       let isAllDone = true;
+      let fullyGraded = true;
       for (const session in recallGradeData.sessions) {
         for (const condition of recallGradeData.sessions[session]) {
           if (!condition.done) {
             isAllDone = false;
-            break;
           }
-        }
-        if (!isAllDone) {
-          break;
+          if (!condition.researchers.includes(fullname) && condition.researchers.length < 4) {
+            fullyGraded = false;
+          }
         }
       }
       if (isAllDone) {
         recallGradeData.done = true;
+      }
+      if (fullyGraded && !recallGradeData.viewers.includes(fullname)) {
+        recallGradeData.viewers.push(fullname);
       }
 
       transactionWrites.push({
