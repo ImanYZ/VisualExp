@@ -80,7 +80,22 @@ module.exports = async (req, res) => {
     let passagesByIds = {};
 
     const recentParticipants = await fetchRecentParticipants(fullname);
-    let recallGradesDocs = await db.collection("recallGradesV2").get();
+    let recallGradesRecentParticipantDocs = [];
+    for (let participant of recentParticipants) {
+      let docs = await db.collection("recallGradesV2").where("user", "==", participant).get();
+      recallGradesRecentParticipantDocs = [...recallGradesRecentParticipantDocs, ...docs.docs];
+    }
+
+    const fullyGradedDocs = await db.collection("recallGradesV2").where("viewers", "array-contains", fullname).get();
+    const fullyGradedIds = [];
+    fullyGradedDocs.docs.forEach(doc => fullyGradedIds.push(doc.id));
+    const remainingTogradeQuery = db.collection("recallGradesV2");
+    if (fullyGradedIds.length > 0) {
+      remainingTogradeQuery.where("__name__", "not-in", fullyGradedIds);
+    }
+    const remainingTogradeDocs = await remainingTogradeQuery.limit(50).get();
+
+    const recallGradesDocs = [...recallGradesRecentParticipantDocs, ...remainingTogradeDocs.docs];
 
     const booleanScratch = await db.collection("booleanScratch").get();
 
@@ -107,16 +122,8 @@ module.exports = async (req, res) => {
       });
     }
 
-    let recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname, booleanByphrase, passagesByIds);
-    for (let project in recallGrades) {
-      let includeRecentParticipants = recallGrades[project].filter(g =>
-        Object.keys(recentParticipants[project] || {}).includes(g.user)
-      );
-      let dontIncludeRecentParticipants = recallGrades[project].filter(
-        g => !Object.keys(recentParticipants[project] || {}).includes(g.user)
-      );
-      recallGrades[project] = [...includeRecentParticipants, ...dontIncludeRecentParticipants].slice(0, 100);
-    }
+    let recallGrades = consumeRecallGradesChanges(recallGradesDocs, fullname, booleanByphrase, passagesByIds);
+
     res.status(200).send(recallGrades);
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
