@@ -143,7 +143,7 @@ const fetchRecentParticipants = async researcher => {
     const expData = expDoc.data();
     const session = expData?.session;
     const participant = expData?.user || "";
-    if (assignedPoints.hasOwnProperty(expData.project)) {
+    if (!assignedPoints.hasOwnProperty(expData.project)) {
       assignedPoints[expData.project] = {};
     }
     if (!assignedPoints[expData.project].hasOwnProperty(participant)) {
