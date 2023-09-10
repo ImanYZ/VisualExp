@@ -74,6 +74,10 @@ const consumeRecallGradesChanges = (recallGradesDocs, fullname, booleanByphrase,
 module.exports = async (req, res) => {
   try {
     console.log("loadRecallGrades");
+    const { project } = req.query;
+    if (!["H2K2", "H1L2", "Autograding"].includes(project)) {
+      return res.status(200).send([]);
+    }
     const { docId: fullname } = req.researcher;
 
     const booleanByphrase = {};
