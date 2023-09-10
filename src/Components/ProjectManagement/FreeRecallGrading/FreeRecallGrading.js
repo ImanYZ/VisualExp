@@ -87,7 +87,9 @@ const FreeRecallGrading = props => {
       setRecentParticipants(recentParticipants);
       await firebase.idToken();
       let response =
-        tempRecallGrades.length === 0 ? await axios.post("/researchers/loadRecallGrades") : { data: allRecallGrades };
+        tempRecallGrades.length === 0
+          ? await axios.post("/researchers/loadRecallGrades", { project })
+          : { data: allRecallGrades };
       let _recallGrades = response.data;
       setAllRecallGrades(_recallGrades);
       let __recallGrades = [];
@@ -121,7 +123,7 @@ const FreeRecallGrading = props => {
   useEffect(() => {
     // Retrieve a free-recall response that is not evaluated by four
     // researchers yet.
-    if (firebase && fullname && recallGrades.length === 0) {
+    if (firebase && fullname && project) {
       return loadedRecallGrades();
     }
   }, [firebase, fullname, project]);
