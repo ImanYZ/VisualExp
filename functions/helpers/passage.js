@@ -50,7 +50,7 @@ const calculateViewers = async recallData => {
   return [...new Set(viewers)];
 };
 
-exports.getNonSatisfiedPhrasesByPassageTitle = async (passageTitle, response, phrases) => {
+const getNonSatisfiedPhrasesByPassageTitle = async (passageTitle, response, phrases) => {
   const booleanScratchDoc = await db.collection("booleanScratch").where("passage", "==", passageTitle).get();
   const booleanHashMap = {};
   for (let booleanDoc of booleanScratchDoc.docs) {
@@ -89,5 +89,6 @@ exports.getNonSatisfiedPhrasesByPassageTitle = async (passageTitle, response, ph
 
 module.exports = {
   validateBooleanExpression,
-  calculateViewers
+  calculateViewers,
+  getNonSatisfiedPhrasesByPassageTitle
 };
