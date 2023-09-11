@@ -1,14 +1,8 @@
 const { db } = require("../../admin");
 const { fetchRecentParticipants } = require("../../utils");
+const {validateBooleanExpression} = require("../../helpers/passage");
 
-const validateBooleanExpression = (rules, response) => {
-  return rules.every(rule => {
-    const { keyword, alternatives, not } = rule;
-    const keywords = [keyword, ...(alternatives || [])].filter(kw => kw !== "");
-    const match = keywords.some(kw => response.toLowerCase().includes(kw.toLowerCase()));
-    return (match && !not) || (!match && not);
-  });
-};
+
 
 const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphrase, passagesByIds) => {
   const recallGradeData = recallGradeDoc.data();
@@ -84,7 +78,8 @@ module.exports = async (req, res) => {
     const booleanByphrase = {};
     let passagesByIds = {};
 
-    const recentParticipants = await fetchRecentParticipants(fullname);
+    const recentParticipants = Object.keys(await fetchRecentParticipants(fullname));
+
     let recallGradesRecentParticipantDocs = [];
     for (let participant of recentParticipants) {
       let docs = await db.collection("recallGradesV2").where("user", "==", participant).get();

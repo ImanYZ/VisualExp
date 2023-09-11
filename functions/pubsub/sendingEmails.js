@@ -63,48 +63,56 @@ module.exports = async context => {
         email !== "ouhrac@gmail.com"
       ) {
         console.log("sending email to", email, "for", reason, "with id", emailData.id);
-        transporter.sendMail(mailOptions, async (error, data) => {
-          if (error) {
-            console.log("sendMail", { error });
-          } else {
-            const emailRef = db.collection("emails").doc(emailData.id);
-            if (reason === "instructor") {
-              const instructorRef = db.collection("instructors").doc(documentId);
-              await instructorRef.update({
-                emailedAt: Timestamp.fromDate(new Date()),
-                reminders: FieldValue.increment(1),
-                nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date()),
-                emailNumber: emailData.emailNumber
-              });
-            } else if (reason === "administrator") {
-              const administratorRef = db.collection("administrators").doc(documentId);
-              await administratorRef.update({
-                emailedAt: Timestamp.fromDate(new Date()),
-                reminders: FieldValue.increment(1),
-                nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date())
-              });
-            } else if (reason === "emailApplicationStatus") {
-              const userQuery = db.collection("users").where("email", "==", email.toLowerCase());
-              let userDoc = await userQuery.get();
-              if (!userDoc.docs.length) {
-                const userQuery = db.collection("usersSurvey").where("email", "==", email.toLowerCase());
-                userDoc = await userQuery.get();
-              }
-              if (userDoc.docs.length > 0) {
-                await userDoc.docs[0].ref.update({
+        try {
+          transporter.sendMail(mailOptions, async (error, data) => {
+            if (error) {
+              console.log("sendMail", { error });
+              throw error;
+            } else {
+              const emailRef = db.collection("emails").doc(emailData.id);
+              if (reason === "instructor") {
+                const instructorRef = db.collection("instructors").doc(documentId);
+                await instructorRef.update({
+                  emailedAt: Timestamp.fromDate(new Date()),
                   reminders: FieldValue.increment(1),
-                  reminder: Timestamp.fromDate(nextWeek())
+                  nextReminder: Timestamp.fromDate(nextWeek()),
+                  updatedAt: Timestamp.fromDate(new Date()),
+                  emailNumber: emailData.emailNumber
                 });
+              } else if (reason === "administrator") {
+                const administratorRef = db.collection("administrators").doc(documentId);
+                await administratorRef.update({
+                  emailedAt: Timestamp.fromDate(new Date()),
+                  reminders: FieldValue.increment(1),
+                  nextReminder: Timestamp.fromDate(nextWeek()),
+                  updatedAt: Timestamp.fromDate(new Date())
+                });
+              } else if (reason === "emailApplicationStatus") {
+                const userQuery = db.collection("users").where("email", "==", email.toLowerCase());
+                let userDoc = await userQuery.get();
+                if (!userDoc.docs.length) {
+                  const userQuery = db.collection("usersSurvey").where("email", "==", email.toLowerCase());
+                  userDoc = await userQuery.get();
+                }
+                if (userDoc.docs.length > 0) {
+                  await userDoc.docs[0].ref.update({
+                    reminders: FieldValue.increment(1),
+                    reminder: Timestamp.fromDate(nextWeek())
+                  });
+                }
               }
+              await emailRef.update({
+                sent: true,
+                sentAt: Timestamp.fromDate(new Date())
+              });
             }
-            await emailRef.update({
-              sent: true,
-              sentAt: Timestamp.fromDate(new Date())
-            });
+          });
+        } catch (error) {
+          if (error.code === "EAUTH") {
+            break;
           }
-        });
+        }
+
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // we have  waitTime by a random integer between 10 to 40 seconds.
         const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
