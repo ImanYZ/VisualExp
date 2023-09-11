@@ -1,6 +1,6 @@
 const { db } = require("../admin");
 
-export const validateBooleanExpression = (rules, response) => {
+const validateBooleanExpression = (rules, response) => {
   return rules.every(rule => {
     const { keyword, alternatives, not } = rule;
     const keywords = [keyword, ...(alternatives || [])].filter(kw => kw !== "");
@@ -9,7 +9,7 @@ export const validateBooleanExpression = (rules, response) => {
   });
 };
 
-export const calculateViewers = async recallData => {
+const calculateViewers = async recallData => {
   let viewers = [];
   let booleanByphrase = {};
   const booleanScratch = await db.collection("booleanScratch").get();
@@ -85,4 +85,9 @@ exports.getNonSatisfiedPhrasesByPassageTitle = async (passageTitle, response, ph
     }
   }
   return nonSatisfiedPhrases;
+};
+
+module.exports = {
+  validateBooleanExpression,
+  calculateViewers
 };
