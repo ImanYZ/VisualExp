@@ -1,4 +1,4 @@
-const {db } = require("./admin");
+const { db } = require("./admin");
 const { Timestamp } = require("firebase-admin/firestore");
 
 // We're using fullname as id in some Firestore collections.
@@ -156,7 +156,7 @@ const fetchRecentParticipants = async researcher => {
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
 
     for (const participant in attendedSessions) {
-      const assignedPointsSessions = assignedPoints[resScheduleData.project][participant];
+      const assignedPointsSessions = assignedPoints[resScheduleData.project][participant] || [];
 
       if (!recentParticipants.hasOwnProperty(participant)) {
         recentParticipants[participant] = [];
@@ -168,6 +168,11 @@ const fetchRecentParticipants = async researcher => {
       }
     }
   }
+  Object.keys(recentParticipants).forEach(participant => {
+    if (recentParticipants[participant].length === 0) {
+      delete recentParticipants[participant];
+    }
+  });
   return recentParticipants;
 };
 
