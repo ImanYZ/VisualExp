@@ -3,6 +3,7 @@ const { getNonSatisfiedPhrasesByPassageTitle } = require("../../helpers/passage"
 const { Timestamp } = require("firebase-admin/firestore");
 
 const { assignExpPoints } = require("../../helpers/assignExpPoints");
+const { calculateViewers } = require("../../helpers/passage");
 
 module.exports = async (req, res) => {
   try {
@@ -318,23 +319,18 @@ module.exports = async (req, res) => {
 
       // if all conditions in all sessions are done then flag recall grade document as done
       let isAllDone = true;
-      let fullyGraded = true;
       for (const session in recallGradeData.sessions) {
         for (const condition of recallGradeData.sessions[session]) {
           if (!condition.done) {
             isAllDone = false;
-          }
-          if (!condition.researchers.includes(fullname) && condition.researchers.length < 4) {
-            fullyGraded = false;
           }
         }
       }
       if (isAllDone) {
         recallGradeData.done = true;
       }
-      if (fullyGraded && !recallGradeData.viewers.includes(fullname)) {
-        recallGradeData.viewers.push(fullname);
-      }
+
+      recallGradeData.viewers = await calculateViewers(recallGradeData);
 
       transactionWrites.push({
         type: "update",
