@@ -1,4 +1,4 @@
-const { admin, db } = require("./admin");
+const {db } = require("./admin");
 const { Timestamp } = require("firebase-admin/firestore");
 
 // We're using fullname as id in some Firestore collections.
@@ -133,7 +133,7 @@ const delay = async time => {
 
 const fetchRecentParticipants = async researcher => {
   // logic to fetch recently participants names by current researcher
-  const recentParticipants = [];
+  const recentParticipants = {};
 
   const resSchedules = await db.collection("resSchedule").get();
   const expSessions = await db.collection("expSessions").where("researcher", "==", researcher).get();
@@ -156,13 +156,15 @@ const fetchRecentParticipants = async researcher => {
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
 
     for (const participant in attendedSessions) {
-      const participantNotGraded = attendedSessions[participant].some(session => {
-        const attendedSessions = assignedPoints[resScheduleData.project][participant];
-        return !attendedSessions || !attendedSessions.includes(session);
-      });
+      const assignedPointsSessions = assignedPoints[resScheduleData.project][participant];
 
-      if (!recentParticipants.includes(participant) && participantNotGraded) {
-        recentParticipants.push(participant);
+      if (!recentParticipants.hasOwnProperty(participant)) {
+        recentParticipants[participant] = [];
+      }
+      for (let session of attendedSessions[participant]) {
+        if (!recentParticipants[participant].includes(session) && !assignedPointsSessions.includes(session)) {
+          recentParticipants[participant].push(session);
+        }
       }
     }
   }
