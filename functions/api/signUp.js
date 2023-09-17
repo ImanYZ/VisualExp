@@ -28,13 +28,14 @@ module.exports = async (req, res) => {
     }
 
     const auth = getAuth(admin);
-
-    const previousUser = await auth.getUserByEmail(email);
-    if (previousUser) {
-      return res.status(500).json({
-        message: "Email already exists."
-      });
-    }
+    try {
+      const previousUser = await auth.getUserByEmail(email);
+      if (previousUser) {
+        return res.status(500).json({
+          message: "Email already exists."
+        });
+      }
+    } catch (error) {}
 
     const user = await auth.createUser({
       email,
