@@ -29,12 +29,12 @@ module.exports = async (req, res) => {
 
     const auth = getAuth(admin);
 
-    try {
-      await auth.getUserByEmail(email);
+    const previousUser = await auth.getUserByEmail(email);
+    if (previousUser) {
       return res.status(500).json({
         message: "Email already exists."
       });
-    } catch (e) {}
+    }
 
     const user = await auth.createUser({
       email,
