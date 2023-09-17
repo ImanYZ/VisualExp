@@ -2,7 +2,7 @@ const { db, admin } = require("../admin");
 const { getAuth } = require("firebase-admin/auth");
 const { Timestamp } = require("firebase-admin/firestore");
 const { shuffleArray } = require("../helpers");
-const { getAvailableFullname } = require("../helpers/common");
+const { getAvailableFullname, deletePreviousUserEmails } = require("../helpers/common");
 
 module.exports = async (req, res) => {
   try {
@@ -29,12 +29,12 @@ module.exports = async (req, res) => {
 
     const auth = getAuth(admin);
 
-    try {
-      await auth.getUserByEmail(email);
+    const previousUser = await auth.getUserByEmail(email);
+    if (previousUser) {
       return res.status(500).json({
         message: "Email already exists."
       });
-    } catch (e) {}
+    }
 
     const user = await auth.createUser({
       email,
@@ -135,6 +135,7 @@ module.exports = async (req, res) => {
     }
 
     const userRef = db.collection(collectionName).doc(fullName);
+    await deletePreviousUserEmails(email, collectionName);
     batch.set(userRef, userData);
 
     const userLogRef = db.collection("userLogs").doc();
