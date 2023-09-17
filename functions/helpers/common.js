@@ -104,3 +104,9 @@ exports.todayPastEvents = async () => {
     return false;
   }
 };
+exports.deletePreviousUserEmails = async (email, collectionName) => {
+  const userDocs = await db.collection(collectionName).where("email", "==", email).get();
+  for (const userDoc of userDocs.docs) {
+    await userDoc.ref.delete();
+  }
+};
