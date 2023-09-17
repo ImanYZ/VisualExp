@@ -1,7 +1,7 @@
 const { db } = require("../admin");
 const { getEvents } = require("../GoogleCalendar");
 
-const { pad2Num, capitalizeFirstLetter } = require("../utils");
+const { pad2Num } = require("../utils");
 
 exports.delay = async time => {
   return new Promise(resolve => {
@@ -20,46 +20,24 @@ exports.getUserDocsfromEmail = async email => {
 exports.getAvailableFullname = async fullname => {
   const userCollections = ["users", "usersSurvey"];
 
-  let _fullname = fullname;
   while (true) {
-    let found = false;
+    let exists = false;
 
     for (const userCollection of userCollections) {
-      const docRef = await db.collection(userCollection).doc(_fullname).get();
+      const docRef = await db.collection(userCollection).doc(fullname).get();
       if (docRef.exists) {
-        found = true;
+        exists = true;
       }
     }
 
-    if (!found) {
+    if (!exists) {
       break;
     }
-    const randomNum = Math.floor(Math.random() * 10);
-    _fullname += randomNum;
+    fullname += Math.floor(Math.random() * 10);
   }
 
-  return _fullname;
+  return fullname;
 };
-
-// exports.getAvailableFullnameOneCademy = async (fName, lName) => {
-//   let _fullname = fName.trim() + lName.trim();
-//   while (true) {
-//     let found = false;
-
-//     const docRef = await knowledgeDb.collection("users").doc(_fullname).get();
-//     if (docRef.exists) {
-//       found = true;
-//     }
-
-//     if (!found) {
-//       break;
-//     }
-//     const randomNum = Math.floor(Math.random() * 10);
-//     _fullname += randomNum;
-//   }
-//   console.log("_fullname", _fullname);
-//   return _fullname;
-// };
 
 // Get all the events in the past specified number of days.
 exports.pastEvents = async previousDays => {
@@ -102,5 +80,11 @@ exports.todayPastEvents = async () => {
   } catch (err) {
     console.log({ err });
     return false;
+  }
+};
+exports.deletePreviousUserEmails = async (email, collectionName) => {
+  const userDocs = await db.collection(collectionName).where("email", "==", email).get();
+  for (const userDoc of userDocs.docs) {
+    await userDoc.ref.delete();
   }
 };
