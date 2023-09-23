@@ -7,10 +7,9 @@ const { calculateViewers } = require("../../helpers/passage");
 
 module.exports = async (req, res) => {
   try {
+    console.log("grade recalls");
     const { recallGrade: sessionRecallGrade, voterProject } = req.body;
     const { docId: fullname } = req.researcher;
-
-    const gptResearcher = "Iman YeckehZaare";
 
     const { researcher } = req;
 
@@ -162,17 +161,13 @@ module.exports = async (req, res) => {
           if (!phraseApproval) continue;
 
           // we are only processing points when we have 4 researchers voted on phrase
+          // if document already had 4 researchers or phrase was approve, we don't continue calculations
           if (
             !votesOfPhrase?.researchers ||
-            votesOfPhrase.researchers.filter(r => r !== gptResearcher).length !== 4 ||
+            votesOfPhrase.researchers.length !== 4 ||
             votesOfPhrase.previousResearcher >= 4
           )
             continue;
-
-          // if document already had 4 researchers or phrase was approve, we don't continue calculations
-          if (votesOfPhrase.hasGPTVote && fullname === gptResearcher) {
-            continue;
-          }
 
           let recallResponse = "";
           switch (session) {
@@ -218,11 +213,6 @@ module.exports = async (req, res) => {
           const upVoteResearchers = [];
           const downVoteResearchers = [];
           for (let r = 0; r < votesOfPhrase.grades.length; r++) {
-            // skipping gpt researcher to be counted in grading
-            if (votesOfPhrase.researchers[r] === gptResearcher) {
-              continue;
-            }
-
             if (votesOfPhrase.grades[r]) {
               upVoteResearchers.push(votesOfPhrase.researchers[r]);
             } else {
