@@ -55,6 +55,7 @@ const ResearcherPassage = () => {
   const [deletingPhrase, setDeletingPhrase] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
   const [resetGrades, setResetGrades] = useState(false);
+  const [resetGradesGPT, setResetGradesGPT] = useState(false);
   const email = useRecoilValue(emailState);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [editor, setEditor] = useState(false);
@@ -172,15 +173,23 @@ const ResearcherPassage = () => {
     try {
       setUpdatingPhrase(true);
       await firebase.idToken();
-      await axios.post("/researchers/updatePhraseForPassage", { passagTitle, selectedPhrase, newPhrase, resetGrades });
+      await axios.post("/researchers/updatePhraseForPassage", {
+        passagTitle,
+        selectedPhrase,
+        newPhrase,
+        resetGrades,
+        resetGradesGPT
+      });
       handleCloseEditModal();
       setUpdatingPhrase(false);
       setResetGrades(false);
+      setResetGradesGPT(false);
       setSnackbarMessage("Phrase updated successfully");
     } catch (error) {
       handleCloseEditModal();
       setUpdatingPhrase(false);
       setResetGrades(false);
+      setResetGradesGPT(false);
       console.log(error);
       window.alert("There was an error updating the phrase");
     }
@@ -279,6 +288,7 @@ const ResearcherPassage = () => {
     setNewPhrase("");
     setUpdatingPhrase(false);
     setResetGrades(false);
+    setResetGradesGPT(false);
   };
 
   const savePhrasesOrder = async ({ passageId, phrasesOrder, passageNum }) => {
@@ -311,8 +321,12 @@ const ResearcherPassage = () => {
             rows={3}
             sx={{ width: "95%", m: 0.5 }}
           />
+          <>
+            <Switch checked={resetGradesGPT} onChange={() => setResetGradesGPT(previous => !previous)} color="secondary" />
+            Toggle This if you think this Phrase needs to be graded again by chat-GPT.
+          </>
           <Switch checked={resetGrades} onChange={() => setResetGrades(previous => !previous)} color="secondary" />{" "}
-          Toggle This if you think this Phrase needs to be graded again.
+          Toggle This if you think this Phrase needs to be graded again by researchers.
         </DialogContent>
         <DialogActions>
           <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
