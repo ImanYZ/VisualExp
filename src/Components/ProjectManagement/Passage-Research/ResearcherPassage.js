@@ -321,12 +321,17 @@ const ResearcherPassage = () => {
             rows={3}
             sx={{ width: "95%", m: 0.5 }}
           />
-          <>
-            <Switch checked={resetGradesGPT} onChange={() => setResetGradesGPT(previous => !previous)} color="secondary" />
-            Toggle This if you think this Phrase needs to be graded again by chat-GPT.
-          </>
-          <Switch checked={resetGrades} onChange={() => setResetGrades(previous => !previous)} color="secondary" />{" "}
-          Toggle This if you think this Phrase needs to be graded again by researchers.
+          Toggle This if you think this Phrase needs to be graded again by:
+          <br></br>
+          <Switch
+            checked={resetGradesGPT}
+            onChange={() => setResetGradesGPT(previous => !previous)}
+            color="secondary"
+          />
+          chat-GPT.
+          <br></br>
+          <Switch checked={resetGrades} onChange={() => setResetGrades(previous => !previous)} color="secondary" />
+          Researchers.
         </DialogContent>
         <DialogActions>
           <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
