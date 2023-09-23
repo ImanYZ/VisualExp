@@ -156,7 +156,8 @@ const fetchRecentParticipants = async researcher => {
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
 
     for (const participant in attendedSessions) {
-      const assignedPointsSessions = assignedPoints[resScheduleData.project][participant] || [];
+      const assignedPointsProject = assignedPoints[resScheduleData.project];
+      const assignedPointsSessions = assignedPointsProject ? assignedPointsProject[participant] || [] : [];
 
       if (!recentParticipants.hasOwnProperty(participant)) {
         recentParticipants[participant] = [];
