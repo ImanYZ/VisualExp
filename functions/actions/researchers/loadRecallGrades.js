@@ -1,8 +1,6 @@
 const { db } = require("../../admin");
 const { fetchRecentParticipants } = require("../../utils");
-const {validateBooleanExpression} = require("../../helpers/passage");
-
-
+const { validateBooleanExpression } = require("../../helpers/passage");
 
 const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphrase, passagesByIds) => {
   const recallGradeData = recallGradeDoc.data();
@@ -28,7 +26,11 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
         const notSatisfiedphrases = conditionItem.phrases
           .filter(phrase => {
             const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
-            return !phrase.deleted && !validateBooleanExpression(schemaE, conditionItem.response);
+            return (
+              !phrase.deleted &&
+              !validateBooleanExpression(schemaE, conditionItem.response) &&
+              !phrase.researchers.includes(fullname)
+            );
           })
           .sort(() => 0.5 - Math.random())
           .splice(0, 4);
@@ -80,22 +82,28 @@ module.exports = async (req, res) => {
 
     const recentParticipants = Object.keys(await fetchRecentParticipants(fullname));
 
-    let recallGradesRecentParticipantDocs = [];
-    for (let participant of recentParticipants) {
-      let docs = await db.collection("recallGradesV2").where("user", "==", participant).get();
-      recallGradesRecentParticipantDocs = [...recallGradesRecentParticipantDocs, ...docs.docs];
-    }
+    let recentParticipantDocs = [];
+    if (recentParticipants.length > 0)
+      recentParticipantDocs = await db.collection("recallGradesV2").where("user", "in", recentParticipants).get();
 
     const fullyGradedDocs = await db.collection("recallGradesV2").where("viewers", "array-contains", fullname).get();
     const fullyGradedIds = [];
-    fullyGradedDocs.docs.forEach(doc => fullyGradedIds.push(doc.id));
+
+    [...(recentParticipantDocs?.docs || []), ...(fullyGradedDocs?.docs || [])].forEach(doc =>
+      fullyGradedIds.push(doc.id)
+    );
     const remainingTogradeQuery = db.collection("recallGradesV2");
     if (fullyGradedIds.length > 0) {
       remainingTogradeQuery.where("__name__", "not-in", fullyGradedIds);
     }
-    const remainingTogradeDocs = await remainingTogradeQuery.limit(50).get();
+    const remainingTogradeDocsH2K2 = await remainingTogradeQuery.where("project", "==", "H2K2").limit(5).get();
+    const remainingTogradeDocsH1L2 = await remainingTogradeQuery.where("project", "==", "H1L2").limit(5).get();
 
-    const recallGradesDocs = [...recallGradesRecentParticipantDocs, ...remainingTogradeDocs.docs];
+    const recallGradesDocs = [
+      ...(recentParticipantDocs?.docs || []),
+      ...(remainingTogradeDocsH2K2?.docs || []),
+      ...(remainingTogradeDocsH1L2?.docs || [])
+    ];
 
     const booleanScratch = await db.collection("booleanScratch").get();
 
