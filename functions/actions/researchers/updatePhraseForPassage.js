@@ -2,7 +2,7 @@ const { db } = require("../../admin");
 
 module.exports = async (req, res) => {
   try {
-    const { passagTitle, selectedPhrase, newPhrase, resetGrades } = req.body;
+    const { passagTitle, selectedPhrase, newPhrase, resetGrades, resetGradesGPT } = req.body;
     const passageQuery = db.collection("passages").where("title", "==", passagTitle);
     const passageSnapshot = await passageQuery.get();
     const passageDoc = passageSnapshot.docs[0];
@@ -34,11 +34,10 @@ module.exports = async (req, res) => {
                 conditionItem.researchers = [];
                 phraseItem.researchers = [];
                 phraseItem.grades = [];
-                for (let key of Object.keys(phraseItem)) {
-                  if (!["phrase", "researchers", "grades"].includes(key)) {
-                    delete phraseItem[key];
-                  }
-                }
+              }
+              if (resetGradesGPT) {
+                delete phraseItem["gpt-4-0613"];
+                delete phraseItem["gpt-3.5-turbo-16k-0613"];
               }
             }
           }
