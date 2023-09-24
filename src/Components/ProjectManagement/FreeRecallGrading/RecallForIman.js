@@ -32,6 +32,7 @@ const RecallForIman = props => {
   const [resetGradesGPT, setResetGradesGPT] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const handleOpenEditModal = () => setOpenEditModal(true);
+  const [errorLoading, setErrorLoading] = useState(false);
 
   const researchers = [
     "lewisdeantruong@gmail.com",
@@ -72,21 +73,26 @@ const RecallForIman = props => {
 
   useEffect(() => {
     const getRecall = async () => {
-      await firebase.idToken();
-      const response = await axios.get("/researchers/loadRecallGradesNumbers");
-      setNoMajority(response.data.noMajority);
-      setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
-      setCurrentBot(response.data.majorityDifferentThanBot[indexOfmajorityDifferentThanBot]);
-      setCountPhrases([
-        response.data.notGrades,
-        response.data.countGraded,
-        response.data.countNSatisfiedGraded,
-        response.data.countSatifiedGraded,
-        response.data.notSatisfied,
-        response.data.satisfiedThreeRes,
-        response.data.countPairPhrases
-      ]);
-      setDoneProcessing(true);
+      try {
+        await firebase.idToken();
+        const response = await axios.get("/researchers/loadRecallGradesNumbers");
+        setNoMajority(response.data.noMajority);
+        setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
+        setCurrentBot(response.data.majorityDifferentThanBot[indexOfmajorityDifferentThanBot]);
+        setCountPhrases([
+          response.data.notGrades,
+          response.data.countGraded,
+          response.data.countNSatisfiedGraded,
+          response.data.countSatifiedGraded,
+          response.data.notSatisfied,
+          response.data.satisfiedThreeRes,
+          response.data.countPairPhrases
+        ]);
+        setDoneProcessing(true);
+      } catch (error) {
+        setErrorLoading(true);
+        console.log(error);
+      }
     };
 
     if (firebase) {
@@ -194,6 +200,25 @@ const RecallForIman = props => {
       </div>
     );
   }
+
+  if (errorLoading) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100vh",
+          padding: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Typography align="center" variant="h3">
+          Error Loading!
+        </Typography>
+      </div>
+    );
+  }
   if (!doneProcessing && !majorityDifferentThanBot.length)
     return (
       <Box
@@ -230,6 +255,11 @@ const RecallForIman = props => {
       setUpdatingPhrase(false);
       setResetGrades(false);
       setResetGradesGPT(false);
+      setCurrentBot(prev => ({ ...prev, phrase: newPhrase }));
+      setMajorityDifferentThanBot(prev => {
+        prev.map(item => (item.phrase === currentBot.phrase ? { ...item, phrase: newPhrase } : item));
+        return prev;
+      });
     } catch (error) {
       handleCloseEditModal();
       setUpdatingPhrase(false);
