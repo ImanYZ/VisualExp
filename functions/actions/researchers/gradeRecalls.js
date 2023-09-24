@@ -1,47 +1,48 @@
 const { db } = require("../../admin");
-const { getNonSatisfiedPhrasesByPassageTitle } = require("../../helpers/passage");
 const { Timestamp } = require("firebase-admin/firestore");
 
 const { assignExpPoints } = require("../../helpers/assignExpPoints");
 const { calculateViewers } = require("../../helpers/passage");
 
+const {
+  updateGradingPointsForResearchers,
+  getRecallResponse,
+  incrementGradingNum,
+  convertToVotesByPhrasesFunction,
+  separateResearchersByVotes
+} = require("../../helpers/grading-recalls");
+
 module.exports = async (req, res) => {
   try {
     console.log("grade recalls");
-    const { recallGrade: sessionRecallGrade, voterProject } = req.body;
+    const { recallGrade, voterProject } = req.body;
     const { docId: fullname } = req.researcher;
 
     const { researcher } = req;
 
-    if (!sessionRecallGrade || !voterProject) {
+    if (!recallGrade || !voterProject) {
       return res.status(500).send({
         message: "some parameters are missing"
       });
     }
 
-    const { session, condition } = sessionRecallGrade;
+    const { session, condition } = recallGrade;
 
     await db.runTransaction(async t => {
       let transactionWrites = [];
+      // loading user data from recall grade document
+      const recallGradeDoc = await t.get(db.collection("recallGradesV2").doc(recallGrade.docId));
+      const recallGradeData = recallGradeDoc.data();
 
-      const passage = await t.get(db.collection("passages").doc(sessionRecallGrade.passage));
-      const passageData = passage.data();
+      // loading user data from user document
+      const user = await t.get(db.collection("users").doc(recallGradeData.user));
+      let userUpdates = user.data();
+      let userUpdate = false;
 
-      const recallGradeRef = db.collection("recallGradesV2").doc(sessionRecallGrade.docId);
-      const recallGrade = await t.get(recallGradeRef);
-      const recallGradeData = recallGrade.data();
-
-      // updating gradingNum for the researcher
-      if (researcher.projects.hasOwnProperty(recallGradeData.project)) {
-        let gradenum = researcher.projects[recallGradeData.project].gradingNum || 0;
-        gradenum += 1;
-        researcher.projects[recallGradeData.project].gradingNum = gradenum;
-      }
-      if (researcher.projects.hasOwnProperty("Autograding")) {
-        let gradenum = researcher.projects["Autograding"].gradingNum || 0;
-        gradenum += 1;
-        researcher.projects["Autograding"].gradingNum = gradenum;
-      }
+      // updating gradingNum for the researcher for this project
+      // And for autograding
+      incrementGradingNum(researcher, recallGradeData.project);
+      incrementGradingNum(researcher, "Autograding");
 
       const conditionIdx = recallGradeData.sessions[session].findIndex(
         conditionItem => conditionItem.condition === condition
@@ -49,11 +50,14 @@ module.exports = async (req, res) => {
       if (conditionIdx === -1) {
         throw new Error("unknown condition supplied");
       }
+
       const conditionUpdates = recallGradeData.sessions[session][conditionIdx];
 
-      const researchers = await t.get(db.collection("researchers"));
       let researchersUpdates = {};
       let updatedResearchers = [];
+
+      //load Researchers
+      const researchers = await t.get(db.collection("researchers"));
 
       for (const _researcher of researchers.docs) {
         const researcherData = _researcher.data();
@@ -61,141 +65,40 @@ module.exports = async (req, res) => {
       }
       // adding gradingNum
 
-      console.log({ leng: researchersUpdates });
-      for (const researcherId in researchersUpdates) {
-        console.log(researcherId);
-      }
-
       researchersUpdates[researcher.docId].projects = researcher.projects;
       updatedResearchers.push(researcher.docId);
 
-      // loading user data from recall grade document
-      const user = await t.get(db.collection("users").doc(recallGradeData.user));
-      let userUpdates = user.data();
-      let userUpdated = false;
-
-      // filtering non satisfied phrases from recallgrade
-      const nonSatisfiedPhrases = await getNonSatisfiedPhrasesByPassageTitle(
-        passageData.title,
-        conditionUpdates.response,
-        conditionUpdates.phrases
-      );
-
-      // filtering satisfied phrases to calculate if session is verified or not
-      const satisfiedPhrases = conditionUpdates.phrases.filter(phrase => !nonSatisfiedPhrases.includes(phrase.phrase));
-
       // there should be 4 down/no votes or up/yes votes to consider phrase approval
-      const votesByPhrases = conditionUpdates.phrases.reduce((c, phrase) => {
-        const _phrase = sessionRecallGrade.phrases.find(_phrase => _phrase.phrase === phrase.phrase);
+      const votesByPhrases = convertToVotesByPhrasesFunction(conditionUpdates, recallGrade, fullname);
 
-        // extracting researcher's vote from payload
-        const { grades, researchers } = _phrase || {};
-        const researcherIdx = (researchers || []).indexOf(fullname);
-        const grade = researcherIdx !== -1 ? grades[researcherIdx] || false : false; // researcher's vote
-
-        // extracting other researcher's vote from firebase document
-        let { grades: docGrades, researchers: docResearchers } = phrase;
-        docGrades = docGrades || [];
-        docResearchers = docResearchers || [];
-
-        const previousGrades = {
-          // sum of previous up votes from all researchers
-          upVotes: docGrades.reduce((c, g) => c + (g === true ? 1 : 0), 0),
-          // sum of previous up votes from all researchers
-          downVotes: docGrades.reduce((c, g) => c + (g === false ? 1 : 0), 0)
-        };
-
-        // removing current researcher's vote from phrase if already exist by chance
-        const _researcherIdx = (docResearchers || []).indexOf(fullname);
-        if (_researcherIdx !== -1) {
-          docResearchers.splice(_researcherIdx, 1);
-          docGrades.splice(_researcherIdx, 1);
-        }
-
-        // if phrase was previously approved we skip it (according to sam we only execute when we have exactly 4 researchers in phrase)
-        /* const previouslyApprove = previousGrades.upVotes >= 3 || previousGrades.downVotes >= 3;
-        if(previouslyApprove) {
-          return c;
-        } */
-
-        // adding values to condition updates
-        const wasPresented = sessionRecallGrade.phrases.findIndex(p => p.phrase === phrase.phrase) !== -1;
-        phrase.grades = [...docGrades];
-        phrase.researchers = [...docResearchers];
-
-        if (wasPresented) {
-          phrase.grades.push(grade);
-          phrase.researchers.push(fullname);
-        }
-
-        return {
-          ...c,
-          [phrase.phrase]: {
-            // sum of up votes from other researchers and current one
-            upVotes: docGrades.reduce((c, g) => c + (g === true ? 1 : 0), wasPresented ? (grade ? 1 : 0) : 0),
-            // sum of down votes from other researchers and current one
-            downVotes: docGrades.reduce((c, g) => c + (g === false ? 1 : 0), wasPresented ? (!grade ? 1 : 0) : 0),
-            // list of all researchers that voted on this phrase
-            researchers: phrase.researchers,
-            grades: phrase.grades,
-            previousResearcher: previousGrades.upVotes + previousGrades.downVotes
-          }
-        };
-      }, {});
-
-      // check if all satisfying phrases have atleast 4 researchers we flag condition has done = true
-      const isDone = satisfiedPhrases.reduce((c, phrase) => c && phrase.researchers.length >= 4, true);
-      conditionUpdates.done = isDone;
-
-      const _phrases = Object.keys(votesByPhrases);
       // phrases considered as approved
-      const phrasesApproval = _phrases.filter(
+      const phrasesApproval = Object.keys(votesByPhrases).filter(
         phrase => votesByPhrases[phrase].upVotes >= 3 || votesByPhrases[phrase].downVotes >= 3
       );
 
       // distribute points to participants
       if (phrasesApproval.length) {
-        for (let i = 0; i < phrasesApproval.length; i++) {
-          const phraseApproval = phrasesApproval[i];
+        for (let phraseApproval of phrasesApproval) {
           const votesOfPhrase = votesByPhrases[phraseApproval];
-          if (!phraseApproval) continue;
 
           // we are only processing points when we have 4 researchers voted on phrase
           // if document already had 4 researchers or phrase was approve, we don't continue calculations
-          if (
-            !votesOfPhrase?.researchers ||
-            votesOfPhrase.researchers.length !== 4 ||
-            votesOfPhrase.previousResearcher >= 4
-          )
-            continue;
+          if (votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
 
-          let recallResponse = "";
-          switch (session) {
-            case "1st":
-              recallResponse = "recallreGrade";
-              break;
-            case "2nd":
-              recallResponse = "recall3DaysreGrade";
-              break;
-            case "3rd":
-              recallResponse = "recall1WeekreGrade";
-              break;
-            default:
-              throw new Error("Unknown value for session");
-          }
+          let recallResponse = getRecallResponse(session);
 
           const passageIdx = (userUpdates.pConditions || []).findIndex(
-            conditionItem => conditionItem.passage === sessionRecallGrade.passage
+            conditionItem => conditionItem.passage === recallGrade.passage
           );
           if (passageIdx === -1) {
             throw new Error("Unknown value for passage");
           }
 
-          userUpdated = true;
+          userUpdate = true;
           // The only piece of the user data that should be modified is
           // pCondition based on the point received.
           let grades = 1;
-          if (recallResponse && userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
+          if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
             // We should add up points here because each free recall response
             // may get multiple points from each of the key phrases identified
             // in it.
@@ -209,16 +112,7 @@ module.exports = async (req, res) => {
           userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
             (grades / conditionUpdates.phrases.length).toFixed(2)
           );
-
-          const upVoteResearchers = [];
-          const downVoteResearchers = [];
-          for (let r = 0; r < votesOfPhrase.grades.length; r++) {
-            if (votesOfPhrase.grades[r]) {
-              upVoteResearchers.push(votesOfPhrase.researchers[r]);
-            } else {
-              downVoteResearchers.push(votesOfPhrase.researchers[r]);
-            }
-          }
+          const { upVoteResearchers, downVoteResearchers } = separateResearchersByVotes(votesOfPhrase);
 
           let upVotePoint = 0.5;
           let downVotePoint = -0.5;
@@ -227,109 +121,25 @@ module.exports = async (req, res) => {
             downVotePoint = 0.5;
           }
 
-          for (const upVoteResearcher of upVoteResearchers) {
-            if (researchersUpdates[upVoteResearcher].projects.hasOwnProperty(recallGradeData.project)) {
-              let gradingPoints =
-                researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints || 0;
-              let negativeGradingPoints =
-                researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints || 0;
-              gradingPoints += upVotePoint;
-              // -ve
-              if (upVotePoint < 0) {
-                negativeGradingPoints += Math.abs(upVotePoint);
-              }
+          // updating points for researchers who upvoted or downvoted on this phrase
+          updateGradingPointsForResearchers(researchersUpdates, upVoteResearchers, recallGradeData, upVotePoint);
+          updateGradingPointsForResearchers(researchersUpdates, downVoteResearchers, recallGradeData, downVotePoint);
 
-              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints = Math.max(
-                gradingPoints,
-                0
-              );
-              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
-                negativeGradingPoints;
-            }
-            if (researchersUpdates[upVoteResearcher].projects.hasOwnProperty("Autograding")) {
-              let gradingPoints = researchersUpdates[upVoteResearcher].projects["Autograding"].gradingPoints || 0;
-              let negativeGradingPoints =
-                researchersUpdates[upVoteResearcher].projects["Autograding"].negativeGradingPoints || 0;
-              gradingPoints += upVotePoint;
-              if (upVotePoint < 0) {
-                negativeGradingPoints += Math.abs(upVotePoint);
-              }
-
-              researchersUpdates[upVoteResearcher].projects["Autograding"].gradingPoints = gradingPoints;
-              researchersUpdates[upVoteResearcher].projects["Autograding"].negativeGradingPoints =
-                negativeGradingPoints;
-            }
-          }
-
-          for (const downVoteResearcher of downVoteResearchers) {
-            if (researchersUpdates[downVoteResearcher].projects.hasOwnProperty(recallGradeData.project)) {
-              let gradingPoints =
-                researchersUpdates[downVoteResearcher].projects[recallGradeData.project].gradingPoints || 0;
-              let negativeGradingPoints =
-                researchersUpdates[downVoteResearcher].projects[recallGradeData.project].negativeGradingPoints || 0;
-              gradingPoints += downVotePoint;
-
-              if (downVotePoint < 0) {
-                negativeGradingPoints += Math.abs(downVotePoint);
-              }
-
-              researchersUpdates[downVoteResearcher].projects[recallGradeData.project].gradingPoints = gradingPoints;
-              researchersUpdates[downVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
-                negativeGradingPoints;
-            }
-            if (researchersUpdates[downVoteResearcher].projects.hasOwnProperty("Autograding")) {
-              let gradingPoints = researchersUpdates[downVoteResearcher].projects["Autograding"].gradingPoints || 0;
-              let negativeGradingPoints =
-                researchersUpdates[downVoteResearcher].projects["Autograding"].negativeGradingPoints || 0;
-              gradingPoints += downVotePoint;
-              if (upVotePoint < 0) {
-                negativeGradingPoints += Math.abs(downVotePoint);
-              }
-
-              researchersUpdates[downVoteResearcher].projects["Autograding"].gradingPoints = gradingPoints;
-              researchersUpdates[downVoteResearcher].projects["Autograding"].negativeGradingPoints =
-                negativeGradingPoints;
-            }
-          }
-
-          console.log({ researchersUpdates });
           updatedResearchers.push(...votesOfPhrase.researchers);
+          updatedResearchers = [...new Set(updatedResearchers)];
         }
-      }
-
-      // pushing researcher to condition so, that it doesn't show up to him again
-      if (!conditionUpdates.researchers.includes(fullname)) {
-        conditionUpdates.researchers.push(fullname);
-      }
-
-      // flagging phrase for future analysis (based on phrase's boolean expression with response)
-      for (const phrase of conditionUpdates.phrases) {
-        phrase.satisfied = nonSatisfiedPhrases.includes(phrase.phrase) ? false : true;
-      }
-
-      // if all conditions in all sessions are done then flag recall grade document as done
-      let isAllDone = true;
-      for (const session in recallGradeData.sessions) {
-        for (const condition of recallGradeData.sessions[session]) {
-          if (!condition.done) {
-            isAllDone = false;
-          }
-        }
-      }
-      if (isAllDone) {
-        recallGradeData.done = true;
       }
 
       recallGradeData.viewers = await calculateViewers(recallGradeData);
 
       transactionWrites.push({
         type: "update",
-        refObj: recallGradeRef,
+        refObj: recallGradeDoc.ref,
         updateObj: recallGradeData
       });
 
       // updating participant points if required
-      if (userUpdated) {
+      if (userUpdate) {
         const userRef = db.collection("users").doc(recallGradeData.user);
         transactionWrites.push({
           type: "update",

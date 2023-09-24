@@ -2,6 +2,7 @@ const { db } = require("../admin");
 const moment = require("moment-timezone");
 const { Timestamp } = require("firebase-admin/firestore");
 const { getEvent } = require("../GoogleCalendar");
+const { checkFullyGradedRecall } = require("./grading-recalls");
 
 exports.assignExpPoints = async obj => {
   try {
@@ -103,14 +104,14 @@ exports.assignExpPoints = async obj => {
 
       const userRecallGradeData = recallGradeData !== null ? recallGradeData : userRecallGrades.docs[0].data();
 
-      const reacallSession = userRecallGradeData.sessions[session];
-    
-      for (let recall of reacallSession) {
-        if (!recall.researchers.includes(researcher.docId)) {
-          console.log("researcher did not grade recall");
-          return;
-        }
+      const recallSession = userRecallGradeData.sessions[session];
+
+      const fullyGraded = checkFullyGradedRecall(recallSession, researcher);
+      if (!fullyGraded) {
+        console.log("researcher did not grade recall");
+        return;
       }
+
       let currentfeedbackId = "";
       if (feedbackCodeData !== null) {
         currentfeedbackId = feedbackCodeData.id;
