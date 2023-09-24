@@ -1,6 +1,7 @@
 const { db } = require("../../admin");
 const { fetchRecentParticipants } = require("../../utils");
 const { validateBooleanExpression } = require("../../helpers/passage");
+const { loadBooleanExpressions } = require("../../helpers/grading-recalls");
 
 const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphrase, passagesByIds) => {
   const recallGradeData = recallGradeDoc.data();
@@ -77,7 +78,7 @@ module.exports = async (req, res) => {
     }
     const { docId: fullname } = req.researcher;
 
-    const booleanByphrase = {};
+    const booleanByphrase = await loadBooleanExpressions();
     let passagesByIds = {};
 
     const recentParticipants = Object.keys(await fetchRecentParticipants(fullname));
@@ -105,30 +106,11 @@ module.exports = async (req, res) => {
       ...(remainingTogradeDocsH1L2?.docs || [])
     ];
 
-    const booleanScratch = await db.collection("booleanScratch").get();
-
     const passageDoc = await db.collection("passages").get();
 
     passageDoc.docs.forEach(doc => {
       passagesByIds[doc.id] = doc.data();
     });
-
-    for (const booleanScratchDoc of booleanScratch.docs) {
-      const booleanScratchData = booleanScratchDoc.data();
-      if (booleanScratchData.deleted) continue;
-      if (booleanByphrase.hasOwnProperty(booleanScratchData.phrase)) {
-        booleanByphrase[booleanScratchData.phrase].push(booleanScratchData);
-      } else {
-        booleanByphrase[booleanScratchData.phrase] = [booleanScratchData];
-      }
-    }
-    for (const phrase in booleanByphrase) {
-      booleanByphrase[phrase].sort((e1, e2) => {
-        const e1Vote = (e1.upVotes || 0) - (e1.downVotes || 0);
-        const e2Vote = (e2.upVotes || 0) - (e2.downVotes || 0);
-        return e1Vote < e2Vote ? 1 : -1;
-      });
-    }
 
     let recallGrades = consumeRecallGradesChanges(recallGradesDocs, fullname, booleanByphrase, passagesByIds);
 
