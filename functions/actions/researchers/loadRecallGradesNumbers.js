@@ -1,5 +1,19 @@
 const { db } = require("../../admin");
 
+const getGrades = (logs, phrase) => {
+  let sentences = [];
+  let botGrades = [];
+  for (let logIdx in logs) {
+    const phraseLogs = logs[logIdx];
+    const phraseIdx = phraseLogs.findIndex(p => p.rubric_item === phrase);
+    if (phraseIdx !== -1) {
+      sentences = sentences.concat(phraseLogs[phraseIdx].sentences);
+      botGrades.push(phraseLogs[phraseIdx].correct);
+    }
+  }
+
+  return { sentences: Array.from(new Set(sentences)), botGrades };
+};
 module.exports = async (req, res) => {
   try {
     console.log("loadRecallGradesNumbers");
@@ -26,78 +40,92 @@ module.exports = async (req, res) => {
     passageDocs.forEach(passageDoc => {
       passagesHash[passageDoc.id] = passageDoc.data().text;
     });
+    const logs = {};
+    const logsDocs = await db.collection("recallGradesBotLogs").get();
+
+    logsDocs.forEach(doc => {
+      logs[doc.id] = doc.data();
+    });
+
     const recallGradesDocs = await db.collection("recallGradesV2").get();
     for (let recallDoc of recallGradesDocs.docs) {
       const recallData = recallDoc.data();
-
+      const documentlogs = logs[recallDoc.id] ? logs[recallDoc.id] : {};
       for (let session in recallData.sessions) {
-        for (let conditionItem of recallData.sessions[session]) {
+        const sessionlogs =
+          documentlogs.sessions && documentlogs.sessions[session] ? documentlogs.sessions[session] : {};
+        for (let conditionIdx = 0; conditionIdx < recallData.sessions[session].length; conditionIdx++) {
+          const conditionlogs = sessionlogs[conditionIdx] ? sessionlogs[conditionIdx] : {};
+          const conditionItem = recallData.sessions[session][conditionIdx];
           const conditionIndex = recallData.sessions[session].indexOf(conditionItem);
           for (let phraseItem of conditionItem.phrases) {
-            if (!phraseItem.deleted) {
-              const phraseIndex = conditionItem.phrases.indexOf(phraseItem);
-              countPairPhrases++;
-              const researcherIdx = phraseItem.researchers.indexOf(gptResearcher);
-              let otherResearchers = phraseItem.researchers.slice();
-              let otherGrades = phraseItem.grades.slice();
-              if (researcherIdx !== -1) {
-                otherResearchers.splice(researcherIdx, 1);
-                otherGrades.splice(researcherIdx, 1);
-              }
-              const trueVotes = otherGrades.filter(grade => grade).length;
-              const falseVotes = otherGrades.filter(grade => !grade).length;
-              if (!phraseItem.hasOwnProperty("GPT4-jun") && phraseItem.satisfied && otherResearchers.length <= 2) {
-                notGrades++;
-              }
-              if (phraseItem.hasOwnProperty("GPT4-jun") && phraseItem.satisfied && otherResearchers.length <= 2) {
-                countGraded++;
-              }
+            if (phraseItem.deleted) continue;
+            const GPT4logs = conditionlogs.hasOwnProperty("gpt-4-0613") ? conditionlogs["gpt-4-0613"] : {};
+            countPairPhrases++;
 
-              if (phraseItem.hasOwnProperty("GPT4-jun") && !phraseItem.satisfied) {
-                countNSatisfiedGraded++;
-              }
-              if (
-                phraseItem.hasOwnProperty("GPT4-jun") &&
-                phraseItem.satisfied /* &&
+            const trueVotes = phraseItem.grades.filter(grade => grade).length;
+            const falseVotes = phraseItem.grades.filter(grade => !grade).length;
+            if (
+              !phraseItem.hasOwnProperty("gpt-4-0613") &&
+              phraseItem.satisfied &&
+              phraseItem.researchers.length <= 2
+            ) {
+              notGrades++;
+            }
+            if (phraseItem.hasOwnProperty("gpt-4-0613") && phraseItem.satisfied && phraseItem.researchers.length <= 2) {
+              countGraded++;
+            }
+
+            if (phraseItem.hasOwnProperty("gpt-4-0613") && !phraseItem.satisfied) {
+              countNSatisfiedGraded++;
+            }
+            if (
+              phraseItem.hasOwnProperty("gpt-4-0613") &&
+              phraseItem.satisfied /* &&
               otherResearchers.length >= 2 */
-              ) {
-                countSatifiedGraded++;
-              }
-              if (!phraseItem.satisfied) {
-                notSatisfied++;
-              }
-              if (otherResearchers.length >= 2 && phraseItem.satisfied) {
-                satisfiedThreeRes++;
-              }
-              const botGrade = phraseItem.hasOwnProperty("GPT4-jun") ? phraseItem["GPT4-jun"] : null;
-              if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT4-jun")) {
-                if ((trueVotes >= 3 && !botGrade) || (falseVotes >= 3 && botGrade)) {
-                  majorityDifferentThanBot.push({
-                    ...phraseItem,
-                    botGrade,
-                    grades: otherGrades,
-                    Response: conditionItem.response,
-                    session: session,
-                    condition: conditionIndex,
-                    id: recallDoc.id,
-                    originalPassgae: passagesHash[conditionItem.passage],
-                    phraseIndex
-                  });
+            ) {
+              countSatifiedGraded++;
+            }
+            if (!phraseItem.satisfied) {
+              notSatisfied++;
+            }
+            if (phraseItem.researchers.length >= 2 && phraseItem.satisfied) {
+              satisfiedThreeRes++;
+            }
+            const botGrade = phraseItem.hasOwnProperty("gpt-4-0613") ? phraseItem["gpt-4-0613"] : null;
+            if (phraseItem.hasOwnProperty("gpt-4-0613")) {
+              let inequality = false;
+              if (phraseItem.hasOwnProperty("majority")) {
+                if (phraseItem.majority !== botGrade) {
+                  inequality = true;
                 }
+              } else if ((trueVotes >= 3 && !botGrade) || (falseVotes >= 3 && botGrade)) {
+                inequality = true;
               }
-              if (!phraseItem.hasOwnProperty("majority") && trueVotes === falseVotes && otherGrades.length >= 4) {
-                noMajority.push({
+              if (inequality) {
+                majorityDifferentThanBot.push({
                   ...phraseItem,
                   botGrade,
-                  grades: otherGrades,
                   Response: conditionItem.response,
                   session: session,
                   condition: conditionIndex,
                   id: recallDoc.id,
                   originalPassgae: passagesHash[conditionItem.passage],
-                  phraseIndex
+                  passageId: conditionItem.passage,
+                  ...getGrades(GPT4logs, phraseItem.phrase)
                 });
               }
+            }
+            if (!phraseItem.hasOwnProperty("majority") && trueVotes === falseVotes && otherGrades.length >= 4) {
+              noMajority.push({
+                ...phraseItem,
+                botGrade,
+                Response: conditionItem.response,
+                session: session,
+                condition: conditionIndex,
+                id: recallDoc.id,
+                originalPassgae: passagesHash[conditionItem.passage]
+              });
             }
           }
         }
