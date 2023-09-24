@@ -444,9 +444,9 @@ module.exports = new MockData([
           "condition": "H1",
           "phrases": [
             {
-              "grades": [],
+              "grades": [false, false, true],
               "phrase": "Barn owls locate prey by having sensitivity to differences in loudness KL",
-              "researchers": []
+              "researchers": ["Haroon Waheed", "Iman", "Ukasha Tariq"]
             },
             {
               "grades": [],
