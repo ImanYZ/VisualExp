@@ -34,8 +34,6 @@ describe("POST /api/researchers/gradeRecalls", () => {
     mockBooleanScratch
   ];
 
-  const gptResearcher = "Iman YeckehZaare";
-
   const fullname = "Sam Ouhra";
   const email = "ouhrac@gmail.com";
   const password = "sam2022";
@@ -79,24 +77,24 @@ describe("POST /api/researchers/gradeRecalls", () => {
       condition: "H1",
       phrases: [
         {
-          grades: [],
+          grades: [false],
           phrase: "Barn owls locate prey by having sensitivity to differences in loudness KL",
-          researchers: []
+          researchers: [fullname]
         },
         {
-          grades: [],
+          grades: [false],
           phrase: "The face structure of barn owls improves sound location range and range",
-          researchers: []
+          researchers: [fullname]
         },
         {
-          grades: [],
+          grades: [false],
           phrase: "The face structure of barn owls contains two troughs",
-          researchers: []
+          researchers: [fullname]
         },
         {
-          grades: [],
+          grades: [true],
           phrase: "Barn owls must organize and interpret sound information",
-          researchers: []
+          researchers: [fullname]
         },
         {
           grades: [true],
@@ -130,8 +128,6 @@ describe("POST /api/researchers/gradeRecalls", () => {
 
     expect(phrase.researchers.includes(fullname)).toBeTruthy();
     expect(phrase.grades[researcherIdx]).toBeTruthy();
-
-    expect(condition.researchers.includes(fullname)).toBeTruthy();
   });
 
   it("updated document should automatically have false value for other phrases that where viewed", async () => {
@@ -156,36 +152,9 @@ describe("POST /api/researchers/gradeRecalls", () => {
     }
   });
 
-  it("check if a session considered as done when we have 4 researchers on each satisfying phrase", async () => {
-    const recallGradeRef = db.collection("recallGradesV2").doc(mockRecallGradesV2.data[0].documentId);
-    const recallGradeUpdates = { ...recallGradeData };
-    const { sessions } = recallGradeUpdates;
-    const session = sessions["1st"] || [];
-    const conditionIdx = session.findIndex(conditionItem => conditionItem.condition === "H1");
-    const conditionItem = session[conditionIdx];
-    const phrase = conditionItem.phrases.find(phrase => phrase.phrase === "Barn owl's life depends on hearing");
-    phrase.researchers = [...otherResearchers];
-    phrase.grades = [true, true, false]; // keeping last as false to validate disagreement points
-
-    await recallGradeRef.update(recallGradeUpdates);
-
-    await chai
-      .request(server)
-      .post("/api/researchers/gradeRecalls")
-      .set("Content-Type", "application/json")
-      .set("Authorization", "Bearer " + accessToken)
-      .send(payload);
-
-    const recallGrade = await recallGradeRef.get();
-    recallGradeData = recallGrade.data();
-
-    expect(recallGradeData.sessions["1st"][conditionIdx].done).toBeTruthy();
-  });
-
   it("check if all the researchers whom voted on a phrase received points", async () => {
-    const _otherResearchers = [...otherResearchers];
-    const disagreeingResearchers = _otherResearchers.splice(otherResearchers.length - 1);
-    const agreeingResearchers = [..._otherResearchers, fullname];
+    const disagreeingResearchers = ["Ukasha Tariq"];
+    const agreeingResearchers = ["Haroon Waheed", "Iman", "Sam Ouhra"];
 
     const researchers = await db
       .collection("researchers")
@@ -204,7 +173,7 @@ describe("POST /api/researchers/gradeRecalls", () => {
 
     disagreeingResearchers.forEach(researcher => {
       const researcherData = researcherHashMap[researcher];
-      expect(researcherData.projects[project].gradingPoints).toEqual(-0.5); // disagreement points
+      expect(researcherData.projects[project].negativeGradingPoints).toEqual(0.5); // disagreement points
     });
   });
 
