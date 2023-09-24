@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
     console.log("loadRecallGradesNumbers");
     let noMajority = [];
     let majorityDifferentThanBot = [];
-    const gptResearcher = "Iman YeckehZaare";
+
     //records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them
     let countGraded = 0;
     //number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them
@@ -116,7 +116,7 @@ module.exports = async (req, res) => {
                 });
               }
             }
-            if (!phraseItem.hasOwnProperty("majority") && trueVotes === falseVotes && otherGrades.length >= 4) {
+            if (!phraseItem.hasOwnProperty("majority") && trueVotes === falseVotes && phraseItem.grades.length >= 4) {
               noMajority.push({
                 ...phraseItem,
                 botGrade,
