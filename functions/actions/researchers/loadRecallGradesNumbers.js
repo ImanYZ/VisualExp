@@ -20,7 +20,8 @@ const newId = () => {
 };
 module.exports = async (req, res) => {
   try {
-    console.log("loadRecallGradesNumbers");
+    const { docId: fullname } = req.researcher;
+    console.log("loadRecallGradesNumbers", fullname);
     let noMajority = [];
     let majorityDifferentThanBot = [];
 
@@ -45,13 +46,16 @@ module.exports = async (req, res) => {
       passagesHash[passageDoc.id] = passageDoc.data();
     });
     const logs = {};
-    const logsDocs = await db.collection("recallGradesBotLogs").get();
+    const logsDocs = await db.collection("recallGradesBotLogs").where("__name__", "==", "05KUJRngJzo2gPsx2Mya").get();
 
     logsDocs.forEach(doc => {
       logs[doc.id] = doc.data();
     });
 
-    const recallGradesDocs = await db.collection("recallGradesV2").get();
+    const recallGradesDocs = await db
+      .collection("recallGradesV2")
+      .where("__name__", "==", "05KUJRngJzo2gPsx2Mya")
+      .get();
     for (let recallDoc of recallGradesDocs.docs) {
       const recallData = recallDoc.data();
       const documentlogs = logs[recallDoc.id] ? logs[recallDoc.id] : {};
@@ -130,7 +134,7 @@ module.exports = async (req, res) => {
                 session: session,
                 condition: conditionIndex,
                 docId: recallDoc.id,
-                originalPassage: passagesHash[conditionItem.passage]
+                originalPassage: passagesHash[conditionItem.passage].text
               });
             }
           }
