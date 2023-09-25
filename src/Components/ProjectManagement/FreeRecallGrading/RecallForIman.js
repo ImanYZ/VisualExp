@@ -14,6 +14,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Switch } from "@mui/material";
+import SnackbarComp from "../../SnackbarComp";
 const RecallForIman = props => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
@@ -33,6 +34,8 @@ const RecallForIman = props => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const handleOpenEditModal = () => setOpenEditModal(true);
   const [errorLoading, setErrorLoading] = useState(false);
+  const [gradingPhrase, setGradingPhrase] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const researchers = [
     "lewisdeantruong@gmail.com",
@@ -100,16 +103,24 @@ const RecallForIman = props => {
     }
   }, [firebase]);
 
+  // console.log({ majorityDifferentThanBot });
+
   const nextPhrase = () => {
-    if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1)
-      return setIndexOfmajorityDifferentThanBot(0);
+    if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1) return;
+
     setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
-    setCurrentBot(majorityDifferentThanBot[indexOfmajorityDifferentThanBot + 1]);
+    setCurrentBot(current => {
+      const indexCurrent = majorityDifferentThanBot.findIndex(m => m.id === current.id);
+      return majorityDifferentThanBot[indexCurrent + 1];
+    });
   };
   const previousPhrase = () => {
-    if (indexOfmajorityDifferentThanBot === 0) return setIndexOfmajorityDifferentThanBot(0);
+    if (indexOfmajorityDifferentThanBot === 0) return;
     setIndexOfmajorityDifferentThanBot(indexBot => indexBot - 1);
-    setCurrentBot(majorityDifferentThanBot[indexOfmajorityDifferentThanBot + 1]);
+    setCurrentBot(current => {
+      const indexCurrent = majorityDifferentThanBot.findIndex(m => m.id === current.id);
+      return majorityDifferentThanBot[indexCurrent - 1];
+    });
   };
 
   const previousPhraseMajority = () => {
@@ -126,7 +137,7 @@ const RecallForIman = props => {
     try {
       const majorityDifferentData = majorityDifferentThanBot[indexOfmajorityDifferentThanBot];
 
-      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(majorityDifferentData.id);
+      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(majorityDifferentData.docId);
       const recallDoc = await recallgradeRef.get();
       const sessions = recallDoc.data().sessions;
       sessions[majorityDifferentData.session][majorityDifferentData.condition].phrases[
@@ -145,7 +156,7 @@ const RecallForIman = props => {
     try {
       const noMajorityData = noMajority[indexOfNoMajority];
 
-      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(noMajorityData.id);
+      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(noMajorityData.docId);
       const recallDoc = await recallgradeRef.get();
       const sessions = recallDoc.data().sessions;
       sessions[noMajorityData.session][noMajorityData.condition].phrases[noMajorityData.phraseIndex].majority =
@@ -257,7 +268,7 @@ const RecallForIman = props => {
       setResetGradesGPT(false);
       setCurrentBot(prev => ({ ...prev, phrase: newPhrase }));
       setMajorityDifferentThanBot(prev => {
-        prev.map(item => (item.phrase === currentBot.phrase ? { ...item, phrase: newPhrase } : item));
+        prev.map(item => (item.id === currentBot.id ? { ...item, phrase: newPhrase } : item));
         return prev;
       });
     } catch (error) {
@@ -276,6 +287,45 @@ const RecallForIman = props => {
     setUpdatingPhrase(false);
     setResetGrades(false);
     setResetGradesGPT(false);
+  };
+  const getGrades = (logs, phrase) => {
+    let sentences = [];
+    let botGrades = [];
+    for (let logIdx in logs) {
+      const phraseLogs = logs[logIdx];
+      const phraseIdx = phraseLogs.findIndex(p => p.rubric_item === phrase);
+      if (phraseIdx !== -1) {
+        sentences = sentences.concat(phraseLogs[phraseIdx].sentences);
+        botGrades.push(phraseLogs[phraseIdx].correct);
+      }
+    }
+
+    return { sentences: Array.from(new Set(sentences)), botGrades };
+  };
+
+  const gradeItAgain = async () => {
+    try {
+      setGradingPhrase(true);
+
+      await firebase.idToken();
+      const response = await axios.post("/researchers/gradeGPT", { record: currentBot });
+      console.log(response);
+      const { grade, logs } = response.data;
+
+      setMajorityDifferentThanBot(prev => {
+        prev.map(item =>
+          item.id === currentBot.id ? { ...item, botGrade: grade, ...getGrades(logs, currentBot.phrase) } : item
+        );
+        return prev;
+      });
+      setCurrentBot(prev => ({ ...prev, botGrade: grade, ...getGrades(logs, currentBot.phrase) }));
+      setGradingPhrase(false);
+      setSnackbarMessage("Graded successfully");
+    } catch (error) {
+      console.log(error);
+      setSnackbarMessage("There was an error grading the phrase");
+      setGradingPhrase(false);
+    }
   };
 
   return (
@@ -339,9 +389,9 @@ const RecallForIman = props => {
           </Box>
           {"\n"}
           <Box>OriginalPassgae :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.originalPassgae}</Paper>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.originalPassage}</Paper>
           <Box>Response :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.Response}</Paper>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.response}</Paper>
           <Box>The key phrase :</Box>
           <Box sx={{ display: "flex", gap: "10px", mt: "25px", mb: "25px" }}>
             <Paper>{currentBot.phrase}</Paper>
@@ -359,9 +409,11 @@ const RecallForIman = props => {
           </Box>
           <Box sx={{ display: "flex" }}>
             Researchers Grades:{" "}
-            <Typography sx={{ ml: "15px", color: currentBot["majority"] ? "green" : "red" }}>
-              {currentBot["majority"] ? "YES" : "NO"}
-            </Typography>
+            <Tooltip title={"Majority"}>
+              <Typography sx={{ ml: "15px", color: currentBot["majority"] ? "green" : "red" }}>
+                {currentBot["majority"] ? "YES" : "NO"}
+              </Typography>
+            </Tooltip>
           </Box>
           <Paper sx={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
             {currentBot.grades.map((grade, index) => {
@@ -422,6 +474,15 @@ const RecallForIman = props => {
           >
             NO
           </Button>
+          <LoadingButton
+            onClick={gradeItAgain}
+            className="LoadingButton"
+            variant="contained"
+            id="recall-submit"
+            loading={gradingPhrase}
+          >
+            Grade It Again
+          </LoadingButton>
         </Box>
       )}
       {noMajority.length > 0 && noMajority[indexOfNoMajority] && (
@@ -431,11 +492,11 @@ const RecallForIman = props => {
           </Typography>
           <Box>OriginalPassgae :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority[indexOfNoMajority].originalPassgae}
+            {noMajority[indexOfNoMajority].originalPassage}
           </Paper>
           <Box>Response :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority[indexOfNoMajority].Response}
+            {noMajority[indexOfNoMajority].response}
           </Paper>
           <Box>The key phrase :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
@@ -494,6 +555,7 @@ const RecallForIman = props => {
           </Button>
         </Box>
       )}
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </Box>
   );
 };
