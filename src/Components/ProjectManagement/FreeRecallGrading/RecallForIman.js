@@ -25,8 +25,7 @@ const RecallForIman = props => {
   const [majorityDifferentThanBot, setMajorityDifferentThanBot] = useState([]);
   const [doneProcessing, setDoneProcessing] = useState(false);
   const [countPhrases, setCountPhrases] = useState([]);
-  const [passages, setPassages] = useState([]);
-  const [currentBot, setCurrentBot] = useState(majorityDifferentThanBot[indexOfmajorityDifferentThanBot]);
+  const [currentBot, setCurrentBot] = useState(null);
   const [updatingPhrase, setUpdatingPhrase] = useState(false);
   const [newPhrase, setNewPhrase] = useState("");
   const [resetGrades, setResetGrades] = useState(false);
@@ -61,27 +60,13 @@ const RecallForIman = props => {
   ];
 
   useEffect(() => {
-    const getPassges = async () => {
-      const passagesDocs = await firebase.db.collection("passages").get();
-      const passagesHash = {};
-      passagesDocs.forEach(passageDoc => {
-        passagesHash[passageDoc.id] = passageDoc.data();
-      });
-      setPassages(passagesHash);
-    };
-    if (firebase) {
-      getPassges();
-    }
-  }, [firebase]);
-
-  useEffect(() => {
     const getRecall = async () => {
       try {
         await firebase.idToken();
         const response = await axios.get("/researchers/loadRecallGradesNumbers");
         setNoMajority(response.data.noMajority);
         setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
-        setCurrentBot(response.data.majorityDifferentThanBot[indexOfmajorityDifferentThanBot]);
+        setCurrentBot(response.data.majorityDifferentThanBot[0]);
         setCountPhrases([
           response.data.notGrades,
           response.data.countGraded,
@@ -102,8 +87,6 @@ const RecallForIman = props => {
       getRecall();
     }
   }, [firebase]);
-
-  // console.log({ majorityDifferentThanBot });
 
   const nextPhrase = () => {
     if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1) return;
@@ -256,7 +239,7 @@ const RecallForIman = props => {
       setUpdatingPhrase(true);
       await firebase.idToken();
       await axios.post("/researchers/updatePhraseForPassage", {
-        passagTitle: passages[currentBot.passageId].title,
+        passagTitle: currentBot.passageTitle,
         selectedPhrase: currentBot.phrase,
         newPhrase,
         resetGrades,
