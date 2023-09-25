@@ -2,13 +2,7 @@ const { db } = require("../admin");
 const { validateBooleanExpression } = require("../helpers/passage");
 const stem = require("wink-porter2-stemmer");
 const tokenizer = require("wink-tokenizer");
-const { Configuration, OpenAIApi } = require("openai");
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-  organization: process.env.OPENAI_API_ORG_ID
-});
-const openai = new OpenAIApi(configuration);
+const sendPromptAndReceiveResponse = require("../helpers/send-prompt");
 
 const USE_DIFFIRENT_PROMPT = [
   [
@@ -364,17 +358,6 @@ const generatePrompt = ({ phrase, passageTitle, response, originalPassage }) => 
       "correct": if the student has mentioned the key phrase and their explanation is correct, the value should be "YES", otherwise, "NO",
       "sentences": [an array of sentences from the student's answer, which mention the key phrase.] If the student has not mentioned the key phrase anywhere in their answer, the value should be an empty array [].
       }`;
-};
-
-const sendPromptAndReceiveResponse = async ({ model, prompt }) => {
-  try {
-    const completion = await openai.createChatCompletion({
-      model,
-      temperature: 0,
-      messages: [{ role: "user", content: prompt }]
-    });
-    return completion.data.choices[0].message.content;
-  } catch (error) {}
 };
 
 const areArraysEqual = (array1, array2) => {
