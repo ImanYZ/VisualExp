@@ -26,6 +26,7 @@ const updateThematicCode = require("../actions/researchers/updateThematicCode");
 const deleteThematicCode = require("../actions/researchers/deleteThematicCode");
 
 const loadRecallGradesNumbers = require("../actions/researchers/loadRecallGradesNumbers");
+const gradeGPT = require("../actions/researchers/gradeGPT");
 
 const submitThematic = require("../actions/researchers/submitThematic");
 
@@ -111,5 +112,8 @@ researchersRouter.post("/deletePhraseFromPassage", deletePhraseFromPassage);
 
 // POST /api/researchers/uploadAndReadFiles
 researchersRouter.post("/uploadAndReadFiles", uploadAndReadFiles);
+
+// POST /api/researchers/gradeGPT
+researchersRouter.post("/gradeGPT", gradeGPT);
 
 module.exports = researchersRouter;
