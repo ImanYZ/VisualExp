@@ -1,7 +1,7 @@
 const { db } = require("../admin");
 const { validateBooleanExpression } = require("../helpers/passage");
 const stem = require("wink-porter2-stemmer");
-const { tokenizer } = require("wink-tokenizer");
+const tokenizer = require("wink-tokenizer");
 const sendPromptAndReceiveResponse = require("../helpers/send-prompt");
 
 const USE_DIFFIRENT_PROMPT = [
