@@ -46,16 +46,13 @@ module.exports = async (req, res) => {
       passagesHash[passageDoc.id] = passageDoc.data();
     });
     const logs = {};
-    const logsDocs = await db.collection("recallGradesBotLogs").where("__name__", "==", "05KUJRngJzo2gPsx2Mya").get();
+    const logsDocs = await db.collection("recallGradesBotLogs").get();
 
     logsDocs.forEach(doc => {
       logs[doc.id] = doc.data();
     });
 
-    const recallGradesDocs = await db
-      .collection("recallGradesV2")
-      .where("__name__", "==", "05KUJRngJzo2gPsx2Mya")
-      .get();
+    const recallGradesDocs = await db.collection("recallGradesV2").get();
     for (let recallDoc of recallGradesDocs.docs) {
       const recallData = recallDoc.data();
       const documentlogs = logs[recallDoc.id] ? logs[recallDoc.id] : {};
