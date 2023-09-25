@@ -371,7 +371,7 @@ const RecallForIman = props => {
             </Box> */}
           </Box>
           {"\n"}
-          <Box>OriginalPassgae :</Box>
+          <Box sx={{ mt: "5px" }}>OriginalPassage:</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.originalPassage}</Paper>
           <Box>Response :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.response}</Paper>
@@ -473,7 +473,7 @@ const RecallForIman = props => {
           <Typography variant="h5" component="h5">
             The Response has four grades, but do not satisfy the majority of votes :
           </Typography>
-          <Box>OriginalPassgae :</Box>
+          <Box sx={{ mt: "5px" }}>>OriginalPassage:</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
             {noMajority[indexOfNoMajority].originalPassage}
           </Paper>
