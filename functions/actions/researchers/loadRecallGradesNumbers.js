@@ -14,6 +14,10 @@ const getGrades = (logs, phrase) => {
 
   return { sentences: Array.from(new Set(sentences)), botGrades };
 };
+const newId = () => {
+  const doc = db.collection("recallGradesV2").doc();
+  return doc.id;
+};
 module.exports = async (req, res) => {
   try {
     console.log("loadRecallGradesNumbers");
@@ -38,7 +42,7 @@ module.exports = async (req, res) => {
     const passagesHash = {};
     const passageDocs = await db.collection("passages").get();
     passageDocs.forEach(passageDoc => {
-      passagesHash[passageDoc.id] = passageDoc.data().text;
+      passagesHash[passageDoc.id] = passageDoc.data();
     });
     const logs = {};
     const logsDocs = await db.collection("recallGradesBotLogs").get();
@@ -106,11 +110,13 @@ module.exports = async (req, res) => {
                 majorityDifferentThanBot.push({
                   ...phraseItem,
                   botGrade,
-                  Response: conditionItem.response,
+                  response: conditionItem.response,
                   session: session,
                   condition: conditionIndex,
-                  id: recallDoc.id,
-                  originalPassgae: passagesHash[conditionItem.passage],
+                  docId: recallDoc.id,
+                  id: newId(),
+                  originalPassage: passagesHash[conditionItem.passage].text,
+                  passageTitle: passagesHash[conditionItem.passage].title,
                   passageId: conditionItem.passage,
                   ...getGrades(GPT4logs, phraseItem.phrase)
                 });
@@ -120,11 +126,11 @@ module.exports = async (req, res) => {
               noMajority.push({
                 ...phraseItem,
                 botGrade,
-                Response: conditionItem.response,
+                response: conditionItem.response,
                 session: session,
                 condition: conditionIndex,
-                id: recallDoc.id,
-                originalPassgae: passagesHash[conditionItem.passage]
+                docId: recallDoc.id,
+                originalPassage: passagesHash[conditionItem.passage]
               });
             }
           }
