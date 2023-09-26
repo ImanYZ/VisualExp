@@ -26,6 +26,7 @@ const RecallForIman = props => {
   const [doneProcessing, setDoneProcessing] = useState(false);
   const [countPhrases, setCountPhrases] = useState([]);
   const [currentBot, setCurrentBot] = useState(null);
+  const [currentNoMajority, setCurrentNoMajority] = useState(null);
   const [updatingPhrase, setUpdatingPhrase] = useState(false);
   const [newPhrase, setNewPhrase] = useState("");
   const [resetGrades, setResetGrades] = useState(false);
@@ -67,6 +68,7 @@ const RecallForIman = props => {
         setNoMajority(response.data.noMajority);
         setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
         setCurrentBot(response.data.majorityDifferentThanBot[0]);
+        setCurrentNoMajority(response.data.noMajority[0]);
         setCountPhrases([
           response.data.notGrades,
           response.data.countGraded,
@@ -107,48 +109,69 @@ const RecallForIman = props => {
   };
 
   const previousPhraseMajority = () => {
-    if (indexOfNoMajority === 0) return setIndexOfNoMajority(0);
+    if (indexOfNoMajority === 0) return;
     setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority - 1);
+    setCurrentNoMajority(current => {
+      const indexCurrent = noMajority.findIndex(m => m.id === current.id);
+      return noMajority[indexCurrent - 1];
+    });
   };
 
   const nextPhraseMajority = () => {
-    if (indexOfNoMajority === noMajority.length - 1) return setIndexOfNoMajority(0);
+    if (indexOfNoMajority === noMajority.length - 1) return;
     setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority + 1);
+    setCurrentNoMajority(current => {
+      const indexCurrent = noMajority.findIndex(m => m.id === current.id);
+      return noMajority[indexCurrent + 1];
+    });
   };
 
   const voteOnPhraseMajority1 = async vote => {
     try {
-      const majorityDifferentData = majorityDifferentThanBot[indexOfmajorityDifferentThanBot];
-
-      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(majorityDifferentData.docId);
+      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(currentBot.docId);
       const recallDoc = await recallgradeRef.get();
       const sessions = recallDoc.data().sessions;
-      sessions[majorityDifferentData.session][majorityDifferentData.condition].phrases[
-        majorityDifferentData.phraseIndex
-      ].majority = vote === "yes" ? true : false;
+
+      const phrases = sessions[currentBot.session][currentBot.condition].phrases;
+      const phraseIdx = phrases.findIndex(p => p.phrase === currentBot.phrase);
+
+      sessions[currentBot.session][currentBot.condition].phrases[phraseIdx].majority = vote === "yes";
+      setCurrentBot(prev => ({ ...prev, majority: vote === "yes" }));
+
+      setMajorityDifferentThanBot(prev => {
+        prev.map(item => {
+          if (item.id === currentBot.id) item.majority = vote === "yes";
+          return item;
+        });
+        return prev;
+      });
 
       await recallgradeRef.update({ sessions });
-      if (indexOfmajorityDifferentThanBot < majorityDifferentThanBot.length - 1) {
-        setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
-      }
     } catch (error) {
       console.log("error", error);
     }
   };
   const voteOnPhraseMajority2 = async vote => {
     try {
-      const noMajorityData = noMajority[indexOfNoMajority];
-
-      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(noMajorityData.docId);
+      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(currentNoMajority.docId);
       const recallDoc = await recallgradeRef.get();
       const sessions = recallDoc.data().sessions;
-      sessions[noMajorityData.session][noMajorityData.condition].phrases[noMajorityData.phraseIndex].majority =
-        vote === "yes" ? true : false;
 
+      const phrases = sessions[currentNoMajority.session][currentNoMajority.condition].phrases;
+      const phraseIdx = phrases.findIndex(p => p.phrase === currentNoMajority.phrase);
+
+      sessions[currentNoMajority.session][currentNoMajority.condition].phrases[phraseIdx].majority =
+        vote === "yes" ? true : false;
+      setCurrentNoMajority(prev => ({ ...prev, majority: vote === "yes" }));
+
+      setNoMajority(prev => {
+        prev.map(item => {
+          if (item.id === currentNoMajority.id) item.majority = vote === "yes";
+          return item;
+        });
+        return prev;
+      });
       await recallgradeRef.update({ sessions });
-      if (indexOfNoMajority < noMajority.length - 1) {
-        setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority + 1);
-      }
     } catch (error) {
       console.log("error", error);
     }
@@ -238,6 +261,7 @@ const RecallForIman = props => {
     try {
       setUpdatingPhrase(true);
       await firebase.idToken();
+      const oldPhrase = currentBot.phrase;
       await axios.post("/researchers/updatePhraseForPassage", {
         passagTitle: currentBot.passageTitle,
         selectedPhrase: currentBot.phrase,
@@ -252,6 +276,10 @@ const RecallForIman = props => {
       setCurrentBot(prev => ({ ...prev, phrase: newPhrase }));
       setMajorityDifferentThanBot(prev => {
         prev.map(item => (item.id === currentBot.id ? { ...item, phrase: newPhrase } : item));
+        return prev;
+      });
+      setNoMajority(prev => {
+        prev.map(item => (item.phrase === oldPhrase ? { ...item, phrase: newPhrase } : item));
         return prev;
       });
     } catch (error) {
@@ -371,7 +399,7 @@ const RecallForIman = props => {
             </Box> */}
           </Box>
           {"\n"}
-          <Box>OriginalPassgae :</Box>
+          <Box sx={{ mt: "5px" }}>OriginalPassage:</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.originalPassage}</Paper>
           <Box>Response :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentBot.response}</Paper>
@@ -440,23 +468,28 @@ const RecallForIman = props => {
             Next
           </Button>
           <Button
+            variant="outlined"
             onClick={() => voteOnPhraseMajority1("yes")}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-            sx={{ bgcolor: "#4caf50" }}
-          >
-            YES
-          </Button>
+            sx={{
+              ml: "5px",
+              backgroundColor: currentBot.hasOwnProperty("majority") && currentBot.majority ? "#91ff35" : "",
+              color: currentBot.hasOwnProperty("majority") && currentBot.majority ? "white" : "",
+              width: "50px",
+              height: "50px"
+            }}
+          >{`YES `}</Button>
           <Button
+            variant="outlined"
             onClick={() => voteOnPhraseMajority1("no")}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-            sx={{ bgcolor: "#f44336" }}
-          >
-            NO
-          </Button>
+            sx={{
+              ml: "15px",
+              mr: "15px",
+              backgroundColor: currentBot.hasOwnProperty("majority") && !currentBot.majority ? "red" : "",
+              color: currentBot.hasOwnProperty("majority") && !currentBot.majority ? "white" : "",
+              width: "50px",
+              height: "50px"
+            }}
+          >{`NO `}</Button>
           <LoadingButton
             onClick={gradeItAgain}
             className="LoadingButton"
@@ -468,34 +501,28 @@ const RecallForIman = props => {
           </LoadingButton>
         </Box>
       )}
-      {noMajority.length > 0 && noMajority[indexOfNoMajority] && (
+      {noMajority.length > 0 && currentNoMajority && (
         <Box sx={{ mt: "15px" }}>
           <Typography variant="h5" component="h5">
             The Response has four grades, but do not satisfy the majority of votes :
           </Typography>
-          <Box>OriginalPassgae :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority[indexOfNoMajority].originalPassage}
-          </Paper>
+          <Box sx={{ mt: "5px" }}>OriginalPassage:</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentNoMajority.originalPassage}</Paper>
           <Box>Response :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority[indexOfNoMajority].response}
-          </Paper>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentNoMajority.response}</Paper>
           <Box>The key phrase :</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority[indexOfNoMajority].phrase}
-          </Paper>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{currentNoMajority.phrase}</Paper>
           <Box>Researchers grades :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority[indexOfNoMajority].grades.map(grade => {
+            {currentNoMajority.grades.map(grade => {
               return <>{grade ? "YES" : "NO"} </>;
             })}
           </Paper>
-          {noMajority[indexOfNoMajority].botGrade !== null && email === "oneweb@umich.edu" && (
+          {currentNoMajority.botGrade !== null && email === "oneweb@umich.edu" && (
             <>
               <Box>GPT-4's grade</Box>
               <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-                {noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
+                {currentNoMajority.botGrade ? "YES" : "NO"}
               </Paper>
             </>
           )}
@@ -519,23 +546,27 @@ const RecallForIman = props => {
             Next
           </Button>
           <Button
+            variant="outlined"
             onClick={() => voteOnPhraseMajority2("yes")}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-            sx={{ bgcolor: "#4caf50" }}
-          >
-            YES
-          </Button>
+            sx={{
+              width: "50px",
+              height: "50px",
+              mr: "15px",
+              backgroundColor:
+                currentNoMajority.hasOwnProperty("majority") && currentNoMajority.majority ? "#91ff35" : "",
+              color: currentNoMajority.hasOwnProperty("majority") && currentNoMajority.majority ? "white" : ""
+            }}
+          >{`YES `}</Button>
           <Button
+            variant="outlined"
             onClick={() => voteOnPhraseMajority2("no")}
-            className="Button"
-            variant="contained"
-            id="recall-submit"
-            sx={{ bgcolor: "#f44336" }}
-          >
-            NO
-          </Button>
+            sx={{
+              width: "50px",
+              height: "50px",
+              backgroundColor: currentNoMajority.hasOwnProperty("majority") && !currentNoMajority.majority ? "red" : "",
+              color: currentNoMajority.hasOwnProperty("majority") && !currentNoMajority.majority ? "white" : ""
+            }}
+          >{`NO `}</Button>
         </Box>
       )}
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
