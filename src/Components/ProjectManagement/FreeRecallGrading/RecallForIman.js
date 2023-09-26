@@ -146,7 +146,7 @@ const RecallForIman = props => {
         return prev;
       });
 
-      // await recallgradeRef.update({ sessions });
+      await recallgradeRef.update({ sessions });
     } catch (error) {
       console.log("error", error);
     }
@@ -171,7 +171,7 @@ const RecallForIman = props => {
         });
         return prev;
       });
-      // await recallgradeRef.update({ sessions });
+      await recallgradeRef.update({ sessions });
     } catch (error) {
       console.log("error", error);
     }
