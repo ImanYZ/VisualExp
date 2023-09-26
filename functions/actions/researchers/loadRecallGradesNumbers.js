@@ -131,6 +131,7 @@ module.exports = async (req, res) => {
                 session: session,
                 condition: conditionIndex,
                 docId: recallDoc.id,
+                id: newId(),
                 originalPassage: passagesHash[conditionItem.passage].text
               });
             }
