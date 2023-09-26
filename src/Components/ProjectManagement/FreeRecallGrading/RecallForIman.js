@@ -339,6 +339,12 @@ const RecallForIman = props => {
     }
   };
 
+  const getMajority = grades => {
+    const upvotes = grades.filter(grade => grade.toLowerCase() === "yes").length;
+    const downvotes = grades.filter(grade => grade.toLowerCase() === "no").length;
+    return upvotes > downvotes ? "YES" : "NO";
+  };
+
   return (
     <Box sx={{ mb: "15px", ml: "15px", height: "100vh", overflow: "auto" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
@@ -422,7 +428,11 @@ const RecallForIman = props => {
             Researchers Grades:{" "}
             <Tooltip title={"Majority"}>
               <Typography sx={{ ml: "15px", color: currentBot["majority"] ? "green" : "red" }}>
-                {currentBot["majority"] ? "YES" : "NO"}
+                {currentNoMajority.hasOwnProperty("majority")
+                  ? currentBot["majority"]
+                    ? "YES"
+                    : "NO"
+                  : getMajority(currentBot.grades)}
               </Typography>
             </Tooltip>
           </Box>
