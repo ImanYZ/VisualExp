@@ -298,15 +298,19 @@ const RecallForIman = props => {
     }
   };
 
-  const getMajority = grades => {
-    const upvotes = grades.filter(grade => grade.toLowerCase() === "yes").length;
-    const downvotes = grades.filter(grade => grade.toLowerCase() === "no").length;
-    return upvotes > downvotes ? "YES" : "NO";
+  const getMajority = () => {
+    if (currentBot.hasOwnProperty("majority")) {
+      return currentBot["majority"];
+    }
+    const upvotes = currentBot.grades.filter(grade => grade).length;
+    const downvotes = currentBot.grades.filter(grade => !grade).length;
+
+    return upvotes > downvotes;
   };
 
   if (!majorityDecision) {
     return (
-      <div
+      <Box
         style={{
           width: "100%",
           height: "100vh",
@@ -319,13 +323,13 @@ const RecallForIman = props => {
         <Typography align="center" variant="h3">
           You don't have Access!
         </Typography>
-      </div>
+      </Box>
     );
   }
 
   if (errorLoading) {
     return (
-      <div
+      <Box
         style={{
           width: "100%",
           height: "100vh",
@@ -338,7 +342,7 @@ const RecallForIman = props => {
         <Typography align="center" variant="h3">
           Error Loading!
         </Typography>
-      </div>
+      </Box>
     );
   }
   if (!doneProcessing && !majorityDifferentThanBot.length)
@@ -353,7 +357,7 @@ const RecallForIman = props => {
         }}
       >
         <CircularProgress />
-        <br />
+        {/* <br /> */}
         <Typography sx={{ mt: "5px" }}> Loading...</Typography>
       </Box>
     );
@@ -443,20 +447,10 @@ const RecallForIman = props => {
               <Typography
                 sx={{
                   ml: "15px",
-                  color: currentBot.hasOwnProperty("majority")
-                    ? currentBot["majority"]
-                      ? "YES"
-                      : "NO"
-                    : getMajority(currentBot.grades)
-                    ? "green"
-                    : "red"
+                  color: getMajority() ? "green" : "red"
                 }}
               >
-                {currentBot.hasOwnProperty("majority")
-                  ? currentBot["majority"]
-                    ? "YES"
-                    : "NO"
-                  : getMajority(currentBot.grades)}
+                {getMajority() ? "YES" : "NO"}
               </Typography>
             </Tooltip>
           </Box>
