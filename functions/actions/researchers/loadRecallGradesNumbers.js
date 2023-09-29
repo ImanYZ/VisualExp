@@ -98,7 +98,8 @@ module.exports = async (req, res) => {
               satisfiedThreeRes++;
             }
             const botGrade = phraseItem.hasOwnProperty("gpt-4-0613") ? phraseItem["gpt-4-0613"] : null;
-            if (phraseItem.hasOwnProperty("gpt-4-0613")) {
+            const { botGrades } = getGrades(GPT4logs, phraseItem.phrase);
+            if (phraseItem.hasOwnProperty("gpt-4-0613") && botGrades.length >= 4) {
               let inequality = false;
               if (phraseItem.hasOwnProperty("majority")) {
                 if (phraseItem.majority !== botGrade) {
