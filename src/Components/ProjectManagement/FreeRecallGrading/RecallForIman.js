@@ -36,6 +36,7 @@ const RecallForIman = props => {
   const [errorLoading, setErrorLoading] = useState(false);
   const [gradingPhrase, setGradingPhrase] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [majorityDecision, setMajorityDecision] = useState(false);
 
   const researchers = [
     "lewisdeantruong@gmail.com",
@@ -59,6 +60,17 @@ const RecallForIman = props => {
     "of phrases that their boolean expressions are satisfied and 2 or more researchers graded them",
     "Total of phrases"
   ];
+
+  useEffect(() => {
+    const checkEditor = async () => {
+      const researcherDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
+      if (researcherDoc.docs.length > 0) {
+        const researcherData = researcherDoc.docs[0].data();
+        setMajorityDecision(researcherData?.majorityDecision || false);
+      }
+    };
+    if (email && firebase) checkEditor();
+  }, [email, firebase]);
 
   useEffect(() => {
     const getRecall = async () => {
@@ -199,59 +211,6 @@ const RecallForIman = props => {
       </Box>
     );
   }
-  if (!researchers.includes(email)) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "100vh",
-          padding: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <Typography align="center" variant="h3">
-          You don't have Access!
-        </Typography>
-      </div>
-    );
-  }
-
-  if (errorLoading) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "100vh",
-          padding: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <Typography align="center" variant="h3">
-          Error Loading!
-        </Typography>
-      </div>
-    );
-  }
-  if (!doneProcessing && !majorityDifferentThanBot.length)
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          flexDirection: "column"
-        }}
-      >
-        <CircularProgress />
-        <br />
-        <Typography sx={{ mt: "5px" }}> Loading...</Typography>
-      </Box>
-    );
 
   const handlePhraseChange = e => {
     setNewPhrase(e.target.value);
@@ -345,6 +304,60 @@ const RecallForIman = props => {
     return upvotes > downvotes ? "YES" : "NO";
   };
 
+  if (!majorityDecision) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100vh",
+          padding: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Typography align="center" variant="h3">
+          You don't have Access!
+        </Typography>
+      </div>
+    );
+  }
+
+  if (errorLoading) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100vh",
+          padding: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Typography align="center" variant="h3">
+          Error Loading!
+        </Typography>
+      </div>
+    );
+  }
+  if (!doneProcessing && !majorityDifferentThanBot.length)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          flexDirection: "column"
+        }}
+      >
+        <CircularProgress />
+        <br />
+        <Typography sx={{ mt: "5px" }}> Loading...</Typography>
+      </Box>
+    );
+
   return (
     <Box sx={{ mb: "15px", ml: "15px", height: "100vh", overflow: "auto" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
@@ -427,8 +440,19 @@ const RecallForIman = props => {
           <Box sx={{ display: "flex" }}>
             Researchers Grades:{" "}
             <Tooltip title={"Majority"}>
-              <Typography sx={{ ml: "15px", color: currentBot["majority"] ? "green" : "red" }}>
-                {currentNoMajority.hasOwnProperty("majority")
+              <Typography
+                sx={{
+                  ml: "15px",
+                  color: currentBot.hasOwnProperty("majority")
+                    ? currentBot["majority"]
+                      ? "YES"
+                      : "NO"
+                    : getMajority(currentBot.grades)
+                    ? "green"
+                    : "red"
+                }}
+              >
+                {currentBot.hasOwnProperty("majority")
                   ? currentBot["majority"]
                     ? "YES"
                     : "NO"
