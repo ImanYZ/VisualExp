@@ -304,8 +304,7 @@ const RecallForIman = props => {
     }
     const upvotes = currentBot.grades.filter(grade => grade).length;
     const downvotes = currentBot.grades.filter(grade => !grade).length;
-    console.log(upvotes);
-    console.log(downvotes);
+
     return upvotes > downvotes;
   };
 
@@ -362,7 +361,7 @@ const RecallForIman = props => {
         <Typography sx={{ mt: "5px" }}> Loading...</Typography>
       </Box>
     );
-  console.log(majorityDifferentThanBot);
+
   return (
     <Box sx={{ mb: "15px", ml: "15px", height: "100vh", overflow: "auto" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
