@@ -2,7 +2,7 @@ const { db } = require("../admin");
 
 const { replaceNewLogs, ObjectToArray, ArrayToObject } = require("../helpers/grading-recalls");
 
-export const reduceHelper = (acc, cur, phrase) => {
+const reduceHelper = (acc, cur, phrase) => {
   const phraseResponseIdx = cur.findIndex(p => p.rubric_item === phrase.phrase);
   if (phraseResponseIdx !== -1) {
     if (cur[phraseResponseIdx].correct.toLowerCase() === "yes") {
@@ -14,7 +14,7 @@ export const reduceHelper = (acc, cur, phrase) => {
   return acc;
 };
 
-export const countMajority = (responseLogs, phrase) => {
+const countMajority = (responseLogs, phrase) => {
   const gptMajority = responseLogs.reduce((acc, cur) => reduceHelper(acc, cur, phrase), []);
   if (gptMajority.length === 0) return null;
 
