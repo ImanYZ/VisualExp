@@ -472,9 +472,9 @@ const ArrayToObject = arrayOfArrays => {
   }
   return resultObject;
 };
-function filterItemsByRubric(array, rubricItems) {
+export const filterItemsByRubric = (array, rubricItems) => {
   return array.filter(item => !rubricItems.includes(item.rubric_item));
-}
+};
 
 const replaceNewLogs = ({ prevLogs, newLogs, phrasesToGrade }) => {
   prevLogs = prevLogs.map(subarray =>

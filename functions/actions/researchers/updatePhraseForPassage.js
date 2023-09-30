@@ -1,5 +1,17 @@
 const { db } = require("../../admin");
 
+const { dbReal } = require("../../admin_real");
+const { ObjectToArray, filterItemsByRubric, ArrayToObject } = require("../../helpers/grading-recalls");
+
+const replacePhraseInLogs = (array, oldphrase, newphrase) => {
+  for (let i = 0; i < array.length; i++) {
+    const item = array[i];
+    if (item.hasOwnProperty("rubric_item") && item.rubric_item === oldphrase) {
+      item.rubric_item = newphrase;
+    }
+  }
+};
+
 module.exports = async (req, res) => {
   try {
     const { passagTitle, selectedPhrase, newPhrase, resetGrades, resetGradesGPT } = req.body;
@@ -35,9 +47,38 @@ module.exports = async (req, res) => {
                 phraseItem.researchers = [];
                 phraseItem.grades = [];
               }
-              if (resetGradesGPT) {
-                delete phraseItem["gpt-4-0613"];
-                delete phraseItem["gpt-3.5-turbo-16k-0613"];
+              const recallGradesLogsRef = dbReal.ref(`/recallGradesGPTLogs/${recallDoc.id}`);
+              const previousLogDoc = await recallGradesLogsRef.once("value");
+              if (previousLogDoc.exists()) {
+                const previousLogData = previousLogDoc.val() || { sessions: {} };
+                const sessionItemLogs = previousLogData.sessions[session] || {};
+                const conditionItemLogs = sessionItemLogs[conditionItem.condition] || {};
+                if (conditionItemLogs.hasOwnProperty("gpt4")) {
+                  let consitionlogs_gpt4 = ObjectToArray(conditionItemLogs.gpt4);
+                  if (resetGradesGPT) {
+                    consitionlogs_gpt4 = consitionlogs_gpt4.map(subarray =>
+                      filterItemsByRubric(subarray, [selectedPhrase])
+                    );
+                    conditionItemLogs.gpt4 = ArrayToObject(consitionlogs_gpt4);
+                  } else {
+                    consitionlogs_gpt4 = consitionlogs_gpt4.map(subarray =>
+                      replacePhraseInLogs(subarray, selectedPhrase, newPhrase)
+                    );
+                  }
+                }
+                if (conditionItemLogs.hasOwnProperty("gpt35")) {
+                  let consitionlogs_gpt35 = ObjectToArray(conditionItemLogs.gpt35);
+                  if (resetGradesGPT) {
+                    consitionlogs_gpt35 = consitionlogs_gpt35.map(subarray =>
+                      filterItemsByRubric(subarray, [selectedPhrase])
+                    );
+                    conditionItemLogs.gpt35 = ArrayToObject(consitionlogs_gpt35);
+                  } else {
+                    consitionlogs_gpt35 = consitionlogs_gpt35.map(subarray =>
+                      replacePhraseInLogs(subarray, selectedPhrase, newPhrase)
+                    );
+                  }
+                }
               }
             }
           }
