@@ -50,7 +50,7 @@ const updateGrades = ({
   }
 };
 
-const updateLogs = ({ previousLogData, conditionIndex, session, responseLogsGPT4 }) => {
+const updateLogs = ({ phrasesToGrade, previousLogData, conditionIndex, session, responseLogsGPT4 }) => {
   if (!previousLogData.sessions.hasOwnProperty(session)) {
     previousLogData.sessions[session] = {};
   }
@@ -61,7 +61,8 @@ const updateLogs = ({ previousLogData, conditionIndex, session, responseLogsGPT4
 
     const resultLogsGpt4 = replaceNewLogs({
       prevLogs: ObjectToArray(previousPhrasesGpt4),
-      newLogs: responseLogsGPT4
+      newLogs: responseLogsGPT4,
+      phrasesToGrade
     });
 
     sessionItem[conditionIndex]["gpt-4-0613"] = ArrayToObject(resultLogsGpt4);
@@ -103,6 +104,7 @@ module.exports = async (req, res) => {
       console.log("updated Firebase document successfully");
 
       updateLogs({
+        phrasesToGrade: recallGrade.phrasesToGrade,
         previousLogData,
         conditionIndex: recallGrade.conditionIndex,
         session: recallGrade.session,
