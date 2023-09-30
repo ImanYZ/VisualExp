@@ -2,7 +2,7 @@ const { db } = require("../admin");
 
 const { replaceNewLogs, ObjectToArray, ArrayToObject } = require("../helpers/grading-recalls");
 
-const countMajority = (acc, cur, phrase) => {
+const reduceHelper = (acc, cur, phrase) => {
   const phraseResponseIdx = cur.findIndex(p => p.rubric_item === phrase.phrase);
   if (phraseResponseIdx !== -1) {
     if (cur[phraseResponseIdx].correct.toLowerCase() === "yes") {
@@ -14,8 +14,8 @@ const countMajority = (acc, cur, phrase) => {
   return acc;
 };
 
-const reduceGradeTemp = (responseLogs, phrase) => {
-  const gptMajority = responseLogs.reduce((acc, cur) => countMajority(acc, cur, phrase), []);
+const countMajority = (responseLogs, phrase) => {
+  const gptMajority = responseLogs.reduce((acc, cur) => reduceHelper(acc, cur, phrase), []);
   if (gptMajority.length === 0) return null;
 
   if (gptMajority.filter(e => e === "yes").length >= 2) {
@@ -26,68 +26,101 @@ const reduceGradeTemp = (responseLogs, phrase) => {
     return false;
   }
 };
+const updateGrades = ({
+  phrasesToGrade,
+  recallGradeUpdate,
+  session,
+  conditionIndex,
+  responseLogsGPT4,
+  responseLogsGPT3_5
+}) => {
+  const conditionItem = recallGradeUpdate.sessions[session][conditionIndex];
+  for (let _phrase of phrasesToGrade) {
+    const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === _phrase.phrase && !p.deleted);
+
+    const gpt4grade = countMajority(responseLogsGPT4, _phrase);
+    const gpt3_5grade = countMajority(responseLogsGPT3_5, _phrase);
+
+    if (gpt4grade !== null) {
+      conditionItem.phrases[phraseIndex]["gpt-4-0613"] = gpt4grade;
+    }
+    if (gpt3_5grade !== null) {
+      conditionItem.phrases[phraseIndex]["gpt-3.5-turbo-16k-0613"] = gpt3_5grade;
+    }
+  }
+};
+
+const updateLogs = ({ phrasesToGrade, previousLogData, conditionIndex, session, responseLogsGPT4 }) => {
+  if (!previousLogData.sessions.hasOwnProperty(session)) {
+    previousLogData.sessions[session] = {};
+  }
+
+  const sessionItem = previousLogData.sessions[session];
+  if (sessionItem.hasOwnProperty(conditionIndex)) {
+    const previousPhrasesGpt4 = sessionItem[conditionIndex]["gpt-4-0613"];
+
+    const resultLogsGpt4 = replaceNewLogs({
+      prevLogs: ObjectToArray(previousPhrasesGpt4),
+      newLogs: responseLogsGPT4,
+      phrasesToGrade
+    });
+
+    sessionItem[conditionIndex]["gpt-4-0613"] = ArrayToObject(resultLogsGpt4);
+  } else {
+    sessionItem[conditionIndex] = {
+      "gpt-4-0613": ArrayToObject(responseLogsGPT4)
+    };
+  }
+  return previousLogData;
+};
+
 module.exports = async (req, res) => {
   try {
-    const { docId, session, condition, phrases, responseLogs } = req.body;
+    const { docId, recallGrade } = req.body;
     console.log("save recall logs", docId);
     console.log(req.body);
     await db.runTransaction(async t => {
       console.log("updating...");
-      let recallGradeDoc = await t.get(db.collection("recallGradesV2").doc(docId));
+      const recallGradeRef = db.collection("recallGradesV2").doc(docId);
+      let recallGradeDoc = await t.get(recallGradeRef);
       const recallGradeUpdate = recallGradeDoc.data();
 
       const logsRef = db.collection("recallGradesBotLogs").doc(docId);
       const previousLogDoc = await t.get(logsRef);
-
-      const conditionItem = recallGradeUpdate.sessions[session][condition];
-      conditionItem.gradedByAssistant = true;
-      for (let _phrase of phrases) {
-        const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === _phrase.phrase && !p.deleted);
-
-        conditionItem.phrases[phraseIndex].satisfied = true;
-
-        const gpt4grade = reduceGradeTemp(responseLogs, _phrase);
-
-        if (gpt4grade !== null) {
-          conditionItem.phrases[phraseIndex]["gpt-4-0613"] = gpt4grade;
-        }
-      }
 
       let previousLogData = { sessions: {} };
       if (previousLogDoc.exists) {
         previousLogData = previousLogDoc.data();
       }
 
-      if (!previousLogData.sessions.hasOwnProperty(session)) {
-        previousLogData.sessions[session] = {};
-      }
-      if (!previousLogData.sessions.hasOwnProperty(session)) {
-        previousLogData.sessions[session] = {};
-      }
+      updateGrades({
+        phrasesToGrade: recallGrade.phrasesToGrade,
+        recallGradeUpdate,
+        session: recallGrade.session,
+        conditionIndex: recallGrade.conditionIndex,
+        responseLogsGPT4: recallGrade.gpt4
+      });
 
-      const sessionItem = previousLogData.sessions[session];
+      console.log("updated Firebase document successfully");
 
-      if (sessionItem.hasOwnProperty(condition)) {
-        const previousPhrasesGpt4 = session[condition]["gpt-4-0613"];
+      updateLogs({
+        phrasesToGrade: recallGrade.phrasesToGrade,
+        previousLogData,
+        conditionIndex: recallGrade.conditionIndex,
+        session: recallGrade.session,
+        responseLogsGPT4: recallGrade.gpt4
+      });
 
-        const resultResponses = replaceNewLogs({
-          prevLogs: ObjectToArray(previousPhrasesGpt4),
-          newLogs: responseLogs
-        });
-
-        sessionItem[condition]["gpt-4-0613"] = ArrayToObject(resultResponses);
-      } else {
-        sessionItem[condition] = {
-          "gpt-4-0613": ArrayToObject(responseLogs)
-        };
-      }
+      console.log("updated Logs document successfully");
 
       t.update(recallGradeDoc.ref, recallGradeUpdate);
       if (previousLogDoc.exists) {
-        t.update(logsRef, previousLogData);
+        t.update(logsRef, { ...previousLogData, updatedAt: new Date() });
       } else {
-        t.set(logsRef, previousLogData);
+        t.set(logsRef, { ...previousLogData, createdAt: new Date() });
       }
+
+      console.log("updated Logs successfully", docId);
     });
     return res.status(200).send({ message: "updated Logs successfully" });
   } catch (error) {

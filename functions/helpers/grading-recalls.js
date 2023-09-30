@@ -7,13 +7,13 @@ const sendPromptAndReceiveResponse = require("../helpers/send-prompt");
 const USE_DIFFIRENT_PROMPT = [
   `In the escape jump, an ant orients its head and jaws perpendicular to the ground.`,
   `In the escape jump, trap-jaw ants slam their face straight down.`,
-  `In the escape jump, cocked mandibles are released with a force 400 times the ant’s body weight.`,
-  `During the escape jump, the ant doesn’t seem to go in any particular direction.`,
+  `In the escape jump, cocked mandibles are released with a force 400 times the ant's body weight.`,
+  `During the escape jump, the ant doesn't seem to go in any particular direction.`,
   `Escape jump helps the insect evade threats (ex. probing tongue of a lizard).`,
   `Escape jump helps the ants sow confusion.`,
   `Escape jump helps the ant get to a new vantage point to relaunch an attack.`,
-  `Bouncer-defense jump is done when an intruder enters the trap-jaw ants’ nest.`,
-  `For bouncer-defense jump, one of the ants bangs its jaws against the intruder (if an intruder enters the ants’ nest).`,
+  `Bouncer-defense jump is done when an intruder enters the trap-jaw ants' nest.`,
+  `For bouncer-defense jump, one of the ants bangs its jaws against the intruder (if an intruder enters the ants' nest).`,
   `Bouncer-defense jump propels the interloper (if small enough) in one direction, out of the nest.`,
   `Bouncer-defense jump propels the ant in the other direction, away from the interloper.`,
   `Bouncer defense jump (force) often sends the ant an inch off the ground (vertical).`,
@@ -25,15 +25,15 @@ const USE_DIFFIRENT_PROMPT = [
   `The narrator (they) met Reena at the funeral of Aunt Vi (Reena's aunt)`,
   `Reena (She) imprinted those e's (in Reena) in people's minds with the black of her eyes and her threatening finger (which was like a quill).`,
   `They (The narrator and Reena) were not friends through their own choice.`,
-  `Their (The narrator and Reena’s) mothers knew each other (since their childhood).`,
+  `Their (The narrator and Reena's) mothers knew each other (since their childhood).`,
   `Reena (She) seemed defined (mature).`,
-  `The raw edges of her (Reena’s) adolescence smoothed over.`,
+  `The raw edges of her (Reena's) adolescence smoothed over.`,
   `Reena (She) was really an adult masquerading as a child (this idea consoled the narrator).`,
   `The narrator thinks the narrator was not Reena's match. (The narrator had been at a disadvantage)`,
   `Reena (She) had a negative attitude toward the narrator (them).`,
   `Reena (she) overwhelmed the narrator (them).`,
   `Reena (she) overwhelmed her family.`,
-  `Reena’s (Her) father avoided her (because he was in awe of Reena).`,
+  `Reena's (Her) father avoided her (because he was in awe of Reena).`,
   `Reena (She) got away with (it) behaving like an only child.`,
   `Reena (she) behaved like an only child.`,
   `"Now...this" is commonly used on the radio and television newscasts.`,
@@ -50,7 +50,7 @@ const USE_DIFFIRENT_PROMPT = [
   `We are presented news without essential seriousness on TV.`,
   `You need to assemble a cast of talking hairdos.`,
   `The perception of the truth of a report rests heavily on the acceptability of a newscaster.`,
-  `Research indicated Christine Craft’s appearance "hampered viewer acceptance."`,
+  `Research indicated Christine Craft's appearance "hampered viewer acceptance."`,
   `"Hampered viewer acceptance" means that the viewers do not like the look of the performer (reporter).`,
   `"Hampered viewer acceptance" means that viewers do not believe the performer (reporter).`,
   `Text messages are already a part of the cultural landscape.`,
@@ -70,7 +70,7 @@ const USE_DIFFIRENT_PROMPT = [
   `Text messages bring us together.`,
   `We may cast text messages off quickly (casually).`,
   `We may have lost one of the essential elements of the human experience. (Suggested by Fields)`,
-  `The (Cuban) revolution affected Isabel’s early life in many ways`,
+  `The (Cuban) revolution affected Isabel's early life in many ways`,
   `School was at least something Isabel (she) had known about.`,
   `Watching “Giselle” felt like a rebirth to Isabel.`,
   `The “Palace of the Galician Center” had a grandness of the interior.`,
@@ -79,14 +79,14 @@ const USE_DIFFIRENT_PROMPT = [
   `When the music started and the dancers appeared (at the “Palace of the Galician Center”), Isabel couldn't lean back (due to being mesmerized). `,
   `When the music started and the dancers appeared (at the “Palace of the Galician Center”), Isabel was so mesmerized by what was happening on the stage. `,
   `Isabel whispered "thank you, my son" or “Gracias, mi hijo.”`,
-  `(At the “Palace of the Galician Center” ) The dancers’ movements transported Isabel to a joyful and yearning world. `,
+  `(At the “Palace of the Galician Center” ) The dancers' movements transported Isabel to a joyful and yearning world. `,
   `Isabel (She) knew those feelings, but had never been able to convey (imagine or express) them as perfectly as dancers (at the “Palace of the Galician Center” ) did.`,
   `Isabel wept for weeks (due to her rejection from the ballet school).`,
   `Isabel had begged her mother to let her try out for ballet school.`,
   `When Isabel attended ballet as an adult, she felt the same overwhelming sadness so powerful that she felt strangely joyful.`,
   `Alejandro had been trying to get her to come visit Miami for years, but she had never accepted`,
   `Alejandro had tried to entice his mother with visits to the Miami Ballet, but Isabel wasn't interested.`,
-  `Baryshnikov’s fierceness inspired Isabel to overcome her hesitations (about paperwork and vacation time).`,
+  `Baryshnikov's fierceness inspired Isabel to overcome her hesitations (about paperwork and vacation time).`,
   `(At the Miami Ballet) Isabel (She) was transported back to that first day at the ballet when she was a schoolgirl. `,
   `As a schoolgirl, Isabel (she) hadn't known such places (“Palace of the Galician Center”) existed.`,
   `Berry was a recording-session musician.`,
@@ -99,7 +99,7 @@ const USE_DIFFIRENT_PROMPT = [
   `Berry (was the rare artist who) refused to put his interests above those of the band.`,
   `Berry was a bandsman.`,
   `Berry never played (simply) to show off.`,
-  `A Ghost of a Chance is the sole recording (in Berry’s career) to feature Berry from start to finish.`,
+  `A Ghost of a Chance is the sole recording (in Berry's career) to feature Berry from start to finish.`,
   `A Ghost of a Chance was Berry's "Body and Soul."`,
   `A Ghost of a Chance is a response to Coleman Hawkin's famous recording ("Body and Soul").`,
   `A Ghost of a Chance may be Berry's one and only instance of indulgence on a record.`,
@@ -113,7 +113,7 @@ const USE_DIFFIRENT_PROMPT = [
   `Wang sees the (new) habitat as a positive trend in zoo design.`,
   `Wang is concerned about all the animals affected by habitat loss.`,
   `Critics dislike the focus on pandas.`,
-  `Wang understands the critics’ dislikes (over focus on pandas and the overspending on a single species).`,
+  `Wang understands the critics' dislikes (over focus on pandas and the overspending on a single species).`,
   `Pandas can serve as ambassadors for conservation.`,
   `Pandas were chosen as the icon for the World Wildlife Federation.`,
   `Pandas become a symbol for endangered species worldwide.`,
@@ -472,32 +472,26 @@ const ArrayToObject = arrayOfArrays => {
   }
   return resultObject;
 };
+function filterItemsByRubric(array, rubricItems) {
+  return array.filter(item => !rubricItems.includes(item.rubric_item));
+}
 
-const replaceNewLogs = ({ prevLogs, newLogs }) => {
+const replaceNewLogs = ({ prevLogs, newLogs, phrasesToGrade }) => {
+  prevLogs = prevLogs.map(subarray =>
+    filterItemsByRubric(
+      subarray,
+      phrasesToGrade.map(p => p.phrase)
+    )
+  );
+
   const maxLength = Math.max(prevLogs.length, newLogs.length);
 
   for (let preIdx = 0; preIdx < maxLength; preIdx++) {
     const newLogsIteration = newLogs[preIdx] || [];
     const prevLogsIteration = prevLogs[preIdx] || [];
-
-    if (!Array.isArray(newLogsIteration) || !Array.isArray(prevLogsIteration)) {
-      continue;
-    }
-
     for (const phrase of newLogsIteration) {
-      if (typeof phrase !== "object" || !phrase.rubric_item) {
-        continue;
-      }
-
-      const phraseIdx = prevLogsIteration.findIndex(p => p && p.rubric_item === phrase.rubric_item);
-
-      if (phraseIdx !== -1) {
-        prevLogsIteration[phraseIdx] = phrase;
-      } else {
-        prevLogsIteration.push(phrase);
-      }
+      prevLogsIteration.push(phrase);
     }
-
     if (preIdx < prevLogs.length) {
       prevLogs[preIdx] = prevLogsIteration;
     } else {
