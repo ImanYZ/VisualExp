@@ -472,32 +472,26 @@ const ArrayToObject = arrayOfArrays => {
   }
   return resultObject;
 };
+function filterItemsByRubric(array, rubricItems) {
+  return array.filter(item => !rubricItems.includes(item.rubric_item));
+}
 
-const replaceNewLogs = ({ prevLogs, newLogs }) => {
+const replaceNewLogs = ({ prevLogs, newLogs, phrasesToGrade }) => {
+  prevLogs = prevLogs.map(subarray =>
+    filterItemsByRubric(
+      subarray,
+      phrasesToGrade.map(p => p.phrase)
+    )
+  );
+
   const maxLength = Math.max(prevLogs.length, newLogs.length);
 
   for (let preIdx = 0; preIdx < maxLength; preIdx++) {
     const newLogsIteration = newLogs[preIdx] || [];
     const prevLogsIteration = prevLogs[preIdx] || [];
-
-    if (!Array.isArray(newLogsIteration) || !Array.isArray(prevLogsIteration)) {
-      continue;
-    }
-
     for (const phrase of newLogsIteration) {
-      if (typeof phrase !== "object" || !phrase.rubric_item) {
-        continue;
-      }
-
-      const phraseIdx = prevLogsIteration.findIndex(p => p && p.rubric_item === phrase.rubric_item);
-
-      if (phraseIdx !== -1) {
-        prevLogsIteration[phraseIdx] = phrase;
-      } else {
-        prevLogsIteration.push(phrase);
-      }
+      prevLogsIteration.push(phrase);
     }
-
     if (preIdx < prevLogs.length) {
       prevLogs[preIdx] = prevLogsIteration;
     } else {
