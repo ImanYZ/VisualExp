@@ -110,8 +110,8 @@ const FreeRecallGrading = props => {
       await firebase.idToken();
       await axios.post("/researchers/gradeRecalls", postData);
       // Increment retrieveNext to get the next free-recall response to grade.
-      await loadedRecallGrades();
       setSelectedGrade(null);
+      await loadedRecallGrades();
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
       setHideLeaderBoard(false);
