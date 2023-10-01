@@ -66,6 +66,7 @@ const FreeRecallGrading = props => {
   const loadedRecallGrades = async () => {
     try {
       setProcessing(true);
+      setSubmitting(false);
       const recentParticipants = await fetchRecentParticipants(fullname, project);
       setRecentParticipants(recentParticipants);
       await firebase.idToken();
@@ -108,7 +109,6 @@ const FreeRecallGrading = props => {
 
       await firebase.idToken();
       await axios.post("/researchers/gradeRecalls", postData);
-      setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
       await loadedRecallGrades();
       setSelectedGrade(null);
@@ -184,6 +184,17 @@ const FreeRecallGrading = props => {
       />
     );
 
+  if (!selectedGrade && !processing) {
+    return (
+      <Box>
+        <Alert severity="info" size="large">
+          <AlertTitle>Info</AlertTitle>
+          You've graded all the recalls from participants
+        </Alert>
+      </Box>
+    );
+  }
+
   if (processing) {
     return (
       <Box
@@ -200,14 +211,8 @@ const FreeRecallGrading = props => {
       </Box>
     );
   }
-
-  return !selectedGrade ? (
-    <Alert severity="info" size="large">
-      <AlertTitle>Info</AlertTitle>
-      You've graded all the recalls from participants
-    </Alert>
-  ) : (
-    <div id="FreeRecallGrading">
+  return (
+    <Box id="FreeRecallGrading">
       <Alert severity="success">
         <ul>
           <li>
@@ -318,7 +323,7 @@ const FreeRecallGrading = props => {
         </Paper>
       </Paper>
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
-    </div>
+    </Box>
   );
 };
 
