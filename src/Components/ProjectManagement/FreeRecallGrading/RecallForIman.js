@@ -438,8 +438,8 @@ const RecallForIman = props => {
           </Paper>
           <Box sx={{ display: "flex" }}>
             GPT-4's grades :{" "}
-            <Typography sx={{ ml: "15px", color: currentBot["gpt-4-0613"] ? "green" : "red" }}>
-              {currentBot["gpt-4-0613"] ? "YES" : "NO"}
+            <Typography sx={{ ml: "15px", color: currentBot.botGrade ? "green" : "red" }}>
+              {currentBot.botGrade ? "YES" : "NO"}
             </Typography>{" "}
           </Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
@@ -448,11 +448,25 @@ const RecallForIman = props => {
             })}
           </Paper>
           <Box>Mentioned Sententces</Box>
-          <ul>
-            {currentBot.sentences.map((sentence, index) => (
-              <li key={index}>{sentence}</li>
-            ))}
-          </ul>
+          {currentBot.sentences.length > 0 ? (
+            <ul>
+              {currentBot.sentences.map((sentence, index) => (
+                <li key={sentence}>{sentence}</li>
+              ))}
+            </ul>
+          ) : (
+            <Typography sx={{ mt: "10px", ml: "15px" }}>NO explanation</Typography>
+          )}
+          <Box sx={{ mt: "15px" }}>Why Incorrect</Box>
+          {currentBot.whyIncorect.length > 0 ? (
+            <ul>
+              {currentBot.whyIncorect.map((sentence, index) => (
+                <li key={sentence}>{sentence}</li>
+              ))}
+            </ul>
+          ) : (
+            <Typography sx={{ ml: "15px" }}>NO explanation</Typography>
+          )}
           {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length}
           <Button
             disabled={indexOfmajorityDifferentThanBot === 0}
