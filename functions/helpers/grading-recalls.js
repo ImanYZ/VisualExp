@@ -472,7 +472,7 @@ const ArrayToObject = arrayOfArrays => {
   }
   return resultObject;
 };
-export const filterItemsByRubric = (array, rubricItems) => {
+const filterItemsByRubric = (array, rubricItems) => {
   return array.filter(item => !rubricItems.includes(item.rubric_item));
 };
 
@@ -538,5 +538,6 @@ module.exports = {
   ObjectToArray,
   ArrayToObject,
   replaceNewLogs,
-  reduceGrade
+  reduceGrade,
+  filterItemsByRubric
 };

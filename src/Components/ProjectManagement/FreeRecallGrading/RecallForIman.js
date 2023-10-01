@@ -24,7 +24,7 @@ const RecallForIman = props => {
   const [noMajority, setNoMajority] = useState([]);
   const [majorityDifferentThanBot, setMajorityDifferentThanBot] = useState([]);
   const [doneProcessing, setDoneProcessing] = useState(false);
-  const [countPhrases, setCountPhrases] = useState([]);
+
   const [currentBot, setCurrentBot] = useState(null);
   const [currentNoMajority, setCurrentNoMajority] = useState(null);
   const [updatingPhrase, setUpdatingPhrase] = useState(false);
@@ -81,15 +81,6 @@ const RecallForIman = props => {
         setMajorityDifferentThanBot(response.data.majorityDifferentThanBot);
         setCurrentBot(response.data.majorityDifferentThanBot[0]);
         setCurrentNoMajority(response.data.noMajority[0]);
-        setCountPhrases([
-          response.data.notGrades,
-          response.data.countGraded,
-          response.data.countNSatisfiedGraded,
-          response.data.countSatifiedGraded,
-          response.data.notSatisfied,
-          response.data.satisfiedThreeRes,
-          response.data.countPairPhrases
-        ]);
         setDoneProcessing(true);
       } catch (error) {
         setErrorLoading(true);
@@ -194,20 +185,6 @@ const RecallForIman = props => {
         <Typography variant="h5" component="h5">
           THERE IS NO RECORDS TO COMPARE :{" "}
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {text.map((meaning, index) => (
-            <Tooltip title={meaning} placement="top">
-              <Box
-                style={{
-                  fontSize: 25,
-                  overflow: "hidden"
-                }}
-              >
-                {countPhrases[index] + "/"}
-              </Box>
-            </Tooltip>
-          ))}
-        </Box>
       </Box>
     );
   }
@@ -403,7 +380,7 @@ const RecallForIman = props => {
         <Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="h5" component="h5">
-              The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
+              The Response has three or four grades, but the majority of votes disagrees with GPT-4's grade :{" "}
             </Typography>
             <br />
             {/* <Box sx={{ display: "flex", alignItems: "center" }}>
