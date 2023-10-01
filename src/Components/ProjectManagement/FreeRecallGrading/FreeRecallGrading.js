@@ -57,63 +57,22 @@ const FreeRecallGrading = props => {
   const [processing, setProcessing] = useState(false);
 
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [recallGrades, setRecallGrades] = useState([]);
 
   const [notSatisfiedSelections, setNotSatisfiedSelections] = useState([]);
   const [recentParticipants, setRecentParticipants] = useState([]);
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
   const setHideLeaderBoard = useSetRecoilState(hideLeaderBoardState);
-  const [allRecallGrades, setAllRecallGrades] = useState(null);
   const [selectedGrade, setSelectedGrade] = useState(null);
   const loadedRecallGrades = async () => {
     try {
-      if (allRecallGrades !== null && !allRecallGrades.hasOwnProperty(project) && project !== "Autograding") {
-        setRecallGrades([]);
-        setSelectedGrade(null);
-        return;
-      }
-
-      let tempRecallGrades = allRecallGrades ? allRecallGrades[project] || [] : [];
-
-      if (project === "Autograding") {
-        tempRecallGrades = [];
-        for (let project in allRecallGrades) {
-          tempRecallGrades = tempRecallGrades.concat(tempRecallGrades[project]);
-        }
-      }
-
       setProcessing(true);
       const recentParticipants = await fetchRecentParticipants(fullname, project);
       setRecentParticipants(recentParticipants);
       await firebase.idToken();
-      let response =
-        tempRecallGrades.length === 0
-          ? await axios.post("/researchers/loadRecallGrades", { project })
-          : { data: allRecallGrades };
-      let _recallGrades = response.data;
-      setAllRecallGrades(_recallGrades);
-      let __recallGrades = [];
-      if (project === "Autograding") {
-        for (let project in _recallGrades) {
-          __recallGrades = __recallGrades.concat(_recallGrades[project]);
-        }
-      } else {
-        __recallGrades = _recallGrades[project] || [];
-      }
-      if (Object.keys(recentParticipants).length > 0) {
-        __recallGrades.sort((g1, g2) => {
-          const p1 =
-            Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
-          const p2 =
-            Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
-          if (p1 && p2) return 0;
-          return p1 && !p2 ? -1 : 1;
-        });
-      } else {
-        __recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
-      }
-      setRecallGrades(__recallGrades);
-      setSelectedGrade(__recallGrades[0] || null);
+      let response = await axios.post("/researchers/loadRecallGrades", { project });
+      console.log(response);
+      let _recallGrade = response.data.recallgrades[0];
+      setSelectedGrade(_recallGrade || null);
       setSubmitting(false);
       setProcessing(false);
     } catch (error) {
@@ -149,26 +108,10 @@ const FreeRecallGrading = props => {
 
       await firebase.idToken();
       await axios.post("/researchers/gradeRecalls", postData);
-
       setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
-      const _recallGrades = [...recallGrades];
-      _recallGrades.shift();
-
-      let _allRecallGrades = { ...allRecallGrades };
-      const index = _allRecallGrades[selectedGrade.project].findIndex(g => {
-        return (
-          g.docId === selectedGrade.id && g.session === selectedGrade.session && g.condition === selectedGrade.condition
-        );
-      });
-      _allRecallGrades[selectedGrade.project].splice(index, 1);
-      if (_recallGrades.length === 0) {
-        await loadedRecallGrades();
-        return;
-      }
-      setAllRecallGrades(_allRecallGrades);
-      setRecallGrades(_recallGrades);
-      setSelectedGrade(_recallGrades[0] || null);
+      await loadedRecallGrades();
+      setSelectedGrade(null);
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
       setHideLeaderBoard(false);
@@ -232,12 +175,12 @@ const FreeRecallGrading = props => {
   if (showTheSchemaGen && fullname !== gptResearcher)
     return (
       <SchemaGenRecalls
-        recallGrade={recallGrades?.[0]}
+        recallGrade={selectedGrade}
         notSatisfiedSelections={notSatisfiedSelections}
         setNotSatisfiedSelections={setNotSatisfiedSelections}
         gradeIt={gradeIt}
-        selectedPassageId={recallGrades?.[0]?.passage}
-        projectParticipant={recallGrades?.[0].project}
+        selectedPassageId={selectedGrade?.passage}
+        projectParticipant={selectedGrade?.project}
       />
     );
 
@@ -258,7 +201,7 @@ const FreeRecallGrading = props => {
     );
   }
 
-  return !recallGrades || !recallGrades.length ? (
+  return !selectedGrade ? (
     <Alert severity="info" size="large">
       <AlertTitle>Info</AlertTitle>
       You've graded all the recalls from participants
@@ -371,7 +314,7 @@ const FreeRecallGrading = props => {
             margin: "19px 19px 70px 19px"
           }}
         >
-          {recallGrades?.[0]?.originalText || ""}
+          {selectedGrade?.originalText || ""}
         </Paper>
       </Paper>
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
