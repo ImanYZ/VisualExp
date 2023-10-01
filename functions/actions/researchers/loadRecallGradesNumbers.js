@@ -11,7 +11,7 @@ const getGrades = (logs, phrase) => {
     if (phraseIdx !== -1) {
       sentences = sentences.concat((log[phraseIdx]?.sentences || []).map(s => s));
       botGrades.push(log[phraseIdx].correct);
-      if (log[phraseIdx].hasOwnProperty("why_incorrect")) {
+      if (log[phraseIdx].why_incorrect) {
         whyIncorect.push(log[phraseIdx].why_incorrect);
       }
     }
