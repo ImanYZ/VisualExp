@@ -5,15 +5,19 @@ const { ObjectToArray } = require("../../helpers/grading-recalls");
 const getGrades = (logs, phrase) => {
   let sentences = [];
   let botGrades = [];
+  let whyIncorect = [];
   for (let log of logs) {
     const phraseIdx = log.findIndex(p => p.rubric_item === phrase);
     if (phraseIdx !== -1) {
-      sentences = sentences.concat(log[phraseIdx].sentences);
+      sentences = sentences.concat((log[phraseIdx]?.sentences || []).map(s => s));
       botGrades.push(log[phraseIdx].correct);
+      if (log[phraseIdx].hasOwnProperty("why_incorrect")) {
+        whyIncorect.push(log[phraseIdx].why_incorrect);
+      }
     }
   }
 
-  return { sentences: Array.from(new Set(sentences)), botGrades };
+  return { sentences: Array.from(new Set(sentences)), botGrades, whyIncorect: Array.from(new Set(whyIncorect)) };
 };
 
 const reduceHelper = (acc, cur, phrase) => {
@@ -89,7 +93,7 @@ module.exports = async (req, res) => {
 
             const trueVotes = phraseItem.grades.filter(grade => grade).length;
             const falseVotes = phraseItem.grades.filter(grade => !grade).length;
-            const { botGrades, sentences } = getGrades(gpt4Logs, phraseItem.phrase);
+            const { botGrades, sentences, whyIncorect } = getGrades(gpt4Logs, phraseItem.phrase);
 
             const botGrade = countMajority(gpt4Logs, phraseItem);
 
@@ -107,6 +111,7 @@ module.exports = async (req, res) => {
                   originalPassage: passagesHash[conditionItem.passage].text,
                   passageTitle: passagesHash[conditionItem.passage].title,
                   passageId: conditionItem.passage,
+                  whyIncorect,
                   sentences,
                   botGrades
                 });
