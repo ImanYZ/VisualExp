@@ -36,6 +36,7 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
             return (
               !phrase.deleted &&
               !validateBooleanExpression(schemaE, conditionItem.response) &&
+              phrase.researchers.length < 4 &&
               !phrase.researchers.includes(fullname)
             );
           })
@@ -60,6 +61,7 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
             user: recallGradeData.user,
             project: recallGradeData.project,
             notSatisfiedphrases,
+            satisfiedphrases: phrasesSatisfied,
             originalText: passagesByIds[conditionItem.passage].text,
             ...conditionItem
           });

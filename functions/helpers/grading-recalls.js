@@ -178,9 +178,8 @@ const convertToVotesByPhrasesFunction = (conditionUpdates, sessionRecallGrade, f
     const grade = researcherIdx !== -1 ? grades[researcherIdx] || false : false; // researcher's vote
 
     // extracting other researcher's vote from firebase document
-    let { grades: docGrades, researchers: docResearchers } = phrase;
-    docGrades = docGrades || [];
-    docResearchers = docResearchers || [];
+    let docGrades = phrase.grades.slice() || [];
+    let docResearchers = phrase.researchers.slice() || [];
 
     const previousGrades = {
       // sum of previous up votes from all researchers
@@ -194,17 +193,12 @@ const convertToVotesByPhrasesFunction = (conditionUpdates, sessionRecallGrade, f
     if (currentResearcherIdx !== -1) {
       docResearchers.splice(currentResearcherIdx, 1);
       docGrades.splice(currentResearcherIdx, 1);
-    }
-
-    // adding values to condition updates
-    phrase.grades = [...docGrades];
-    phrase.researchers = [...docResearchers];
-
-    if (phraseIdx !== -1) {
-      phrase.grades.push(grade);
+    } else {
+      docResearchers.push(fullname);
+      docGrades.push(grade);
       phrase.researchers.push(fullname);
+      phrase.grades.push(grade);
     }
-
     return {
       ...c,
       [phrase.phrase]: {
@@ -213,8 +207,8 @@ const convertToVotesByPhrasesFunction = (conditionUpdates, sessionRecallGrade, f
         // sum of down votes from other researchers and current one
         downVotes: docGrades.reduce((c, g) => c + (g === false ? 1 : 0), phraseIdx !== -1 ? (!grade ? 1 : 0) : 0),
         // list of all researchers that voted on this phrase
-        researchers: phrase.researchers,
-        grades: phrase.grades,
+        researchers: [...docResearchers],
+        grades: [...docGrades],
         previousResearcher: previousGrades.upVotes + previousGrades.downVotes
       }
     };
@@ -473,7 +467,7 @@ const ArrayToObject = arrayOfArrays => {
   return resultObject;
 };
 const filterItemsByRubric = (array, rubricItems) => {
-  return array.filter(item => !rubricItems.includes(item.rubric_item));
+  return array.filter(item => !rubricItems.includes((item?.rubric_item || "").trim()));
 };
 
 const replaceNewLogs = ({ prevLogs, newLogs, phrasesToGrade }) => {

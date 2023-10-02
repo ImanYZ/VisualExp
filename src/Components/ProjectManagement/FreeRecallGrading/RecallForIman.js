@@ -38,29 +38,6 @@ const RecallForIman = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [majorityDecision, setMajorityDecision] = useState(false);
 
-  const researchers = [
-    "lewisdeantruong@gmail.com",
-    "dahewang0907@gmail.com",
-    "shabanagupta11@gmail.com",
-    "csakurau@ucsc.edu",
-    "tquonwork@gmail.com",
-    "fmabud@bu.edu",
-    "elhiew@ucdavis.edu",
-    "ouhrac@gmail.com",
-    "si270@scarletmail.rutgers.edu",
-    "oneweb@umich.edu"
-  ];
-
-  const text = [
-    "records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them",
-    "number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them",
-    "of phrases that the bot has graded and their boolean expressions are not satisfied",
-    "of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them",
-    "of phrases that their boolean expressions are not satisfied",
-    "of phrases that their boolean expressions are satisfied and 2 or more researchers graded them",
-    "Total of phrases"
-  ];
-
   useEffect(() => {
     const checkEditor = async () => {
       const researcherDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
@@ -238,12 +215,16 @@ const RecallForIman = props => {
   const getGrades = (logs, phrase) => {
     let sentences = [];
     let botGrades = [];
+    let whyIncorect = [];
     for (let logIdx in logs) {
       const phraseLogs = logs[logIdx];
       const phraseIdx = phraseLogs.findIndex(p => p.rubric_item === phrase);
       if (phraseIdx !== -1) {
-        sentences = sentences.concat(phraseLogs[phraseIdx].sentences);
+        sentences = sentences.concat((phraseLogs[phraseIdx]?.sentences || []).map(s => s));
         botGrades.push(phraseLogs[phraseIdx].correct);
+        if (phraseLogs[phraseIdx].why_incorrect) {
+          whyIncorect.push(phraseLogs[phraseIdx].why_incorrect);
+        }
       }
     }
 
