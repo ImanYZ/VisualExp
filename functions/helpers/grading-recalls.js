@@ -467,7 +467,7 @@ const ArrayToObject = arrayOfArrays => {
   return resultObject;
 };
 const filterItemsByRubric = (array, rubricItems) => {
-  return array.filter(item => !rubricItems.includes(item.rubric_item));
+  return array.filter(item => !rubricItems.includes((item?.rubric_item || "").trim()));
 };
 
 const replaceNewLogs = ({ prevLogs, newLogs, phrasesToGrade }) => {
