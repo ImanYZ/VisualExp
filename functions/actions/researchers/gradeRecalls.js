@@ -87,31 +87,29 @@ module.exports = async (req, res) => {
 
           let recallResponse = getRecallResponse(session);
 
-          const passageIdx = (userUpdates.pConditions || []).findIndex(
+          const passageIdx = (userUpdates?.pConditions || []).findIndex(
             conditionItem => conditionItem.passage === recallGrade.passage
           );
-          if (passageIdx === -1) {
-            throw new Error("Unknown value for passage");
+          if (passageIdx !== -1) {
+            userUpdate = true;
+            // The only piece of the user data that should be modified is
+            // pCondition based on the point received.
+            let grades = 1;
+            if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
+              // We should add up points here because each free recall response
+              // may get multiple points from each of the key phrases identified
+              // in it.
+              grades += userUpdates.pConditions[passageIdx][recallResponse];
+            }
+
+            userUpdates.pConditions[passageIdx][recallResponse] = grades;
+
+            // Depending on how many key phrases were in the passage, we should
+            // calculate the free-recall response ratio.
+            userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
+              (grades / conditionUpdates.phrases.length).toFixed(2)
+            );
           }
-
-          userUpdate = true;
-          // The only piece of the user data that should be modified is
-          // pCondition based on the point received.
-          let grades = 1;
-          if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
-            // We should add up points here because each free recall response
-            // may get multiple points from each of the key phrases identified
-            // in it.
-            grades += userUpdates.pConditions[passageIdx][recallResponse];
-          }
-
-          userUpdates.pConditions[passageIdx][recallResponse] = grades;
-
-          // Depending on how many key phrases were in the passage, we should
-          // calculate the free-recall response ratio.
-          userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
-            (grades / conditionUpdates.phrases.length).toFixed(2)
-          );
           const { upVoteResearchers, downVoteResearchers } = separateResearchersByVotes(votesOfPhrase);
 
           let upVotePoint = 0.5;

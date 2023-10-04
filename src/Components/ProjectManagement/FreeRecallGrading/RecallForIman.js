@@ -38,29 +38,6 @@ const RecallForIman = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [majorityDecision, setMajorityDecision] = useState(false);
 
-  const researchers = [
-    "lewisdeantruong@gmail.com",
-    "dahewang0907@gmail.com",
-    "shabanagupta11@gmail.com",
-    "csakurau@ucsc.edu",
-    "tquonwork@gmail.com",
-    "fmabud@bu.edu",
-    "elhiew@ucdavis.edu",
-    "ouhrac@gmail.com",
-    "si270@scarletmail.rutgers.edu",
-    "oneweb@umich.edu"
-  ];
-
-  const text = [
-    "records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them",
-    "number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them",
-    "of phrases that the bot has graded and their boolean expressions are not satisfied",
-    "of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them",
-    "of phrases that their boolean expressions are not satisfied",
-    "of phrases that their boolean expressions are satisfied and 2 or more researchers graded them",
-    "Total of phrases"
-  ];
-
   useEffect(() => {
     const checkEditor = async () => {
       const researcherDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
@@ -238,42 +215,46 @@ const RecallForIman = props => {
   const getGrades = (logs, phrase) => {
     let sentences = [];
     let botGrades = [];
+    let whyIncorect = [];
     for (let logIdx in logs) {
       const phraseLogs = logs[logIdx];
       const phraseIdx = phraseLogs.findIndex(p => p.rubric_item === phrase);
       if (phraseIdx !== -1) {
-        sentences = sentences.concat(phraseLogs[phraseIdx].sentences);
+        sentences = sentences.concat((phraseLogs[phraseIdx]?.sentences || []).map(s => s));
         botGrades.push(phraseLogs[phraseIdx].correct);
+        if (phraseLogs[phraseIdx].why_incorrect) {
+          whyIncorect.push(phraseLogs[phraseIdx].why_incorrect);
+        }
       }
     }
 
     return { sentences: Array.from(new Set(sentences)), botGrades };
   };
 
-  const gradeItAgain = async () => {
-    try {
-      setGradingPhrase(true);
+  // const gradeItAgain = async () => {
+  //   try {
+  //     setGradingPhrase(true);
 
-      await firebase.idToken();
-      const response = await axios.post("/researchers/gradeGPT", { record: currentBot });
-      console.log(response);
-      const { grade, logs } = response.data;
+  //     await firebase.idToken();
+  //     const response = await axios.post("/researchers/gradeGPT", { record: currentBot });
+  //     console.log(response);
+  //     const { grade, logs } = response.data;
 
-      setMajorityDifferentThanBot(prev => {
-        prev.map(item =>
-          item.id === currentBot.id ? { ...item, botGrade: grade, ...getGrades(logs, currentBot.phrase) } : item
-        );
-        return prev;
-      });
-      setCurrentBot(prev => ({ ...prev, botGrade: grade, ...getGrades(logs, currentBot.phrase) }));
-      setGradingPhrase(false);
-      setSnackbarMessage("Graded successfully");
-    } catch (error) {
-      console.log(error);
-      setSnackbarMessage("There was an error grading the phrase");
-      setGradingPhrase(false);
-    }
-  };
+  //     setMajorityDifferentThanBot(prev => {
+  //       prev.map(item =>
+  //         item.id === currentBot.id ? { ...item, botGrade: grade, ...getGrades(logs, currentBot.phrase) } : item
+  //       );
+  //       return prev;
+  //     });
+  //     setCurrentBot(prev => ({ ...prev, botGrade: grade, ...getGrades(logs, currentBot.phrase) }));
+  //     setGradingPhrase(false);
+  //     setSnackbarMessage("Graded successfully");
+  //   } catch (error) {
+  //     console.log(error);
+  //     setSnackbarMessage("There was an error grading the phrase");
+  //     setGradingPhrase(false);
+  //   }
+  // };
 
   const getMajority = () => {
     if (currentBot.hasOwnProperty("majority")) {
@@ -438,8 +419,8 @@ const RecallForIman = props => {
           </Paper>
           <Box sx={{ display: "flex" }}>
             GPT-4's grades :{" "}
-            <Typography sx={{ ml: "15px", color: currentBot["gpt-4-0613"] ? "green" : "red" }}>
-              {currentBot["gpt-4-0613"] ? "YES" : "NO"}
+            <Typography sx={{ ml: "15px", color: currentBot.botGrade ? "green" : "red" }}>
+              {currentBot.botGrade ? "YES" : "NO"}
             </Typography>{" "}
           </Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
@@ -448,11 +429,25 @@ const RecallForIman = props => {
             })}
           </Paper>
           <Box>Mentioned Sententces</Box>
-          <ul>
-            {currentBot.sentences.map((sentence, index) => (
-              <li key={index}>{sentence}</li>
-            ))}
-          </ul>
+          {currentBot.sentences.length > 0 ? (
+            <ul>
+              {currentBot.sentences.map((sentence, index) => (
+                <li key={sentence}>{sentence}</li>
+              ))}
+            </ul>
+          ) : (
+            <Typography sx={{ mt: "10px", ml: "15px" }}>NO explanation</Typography>
+          )}
+          <Box sx={{ mt: "15px" }}>Why Incorrect</Box>
+          {currentBot.whyIncorect.length > 0 ? (
+            <ul>
+              {currentBot.whyIncorect.map((sentence, index) => (
+                <li key={sentence}>{sentence}</li>
+              ))}
+            </ul>
+          ) : (
+            <Typography sx={{ ml: "15px" }}>NO explanation</Typography>
+          )}
           {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length}
           <Button
             disabled={indexOfmajorityDifferentThanBot === 0}
@@ -495,7 +490,7 @@ const RecallForIman = props => {
               height: "50px"
             }}
           >{`NO `}</Button>
-          <LoadingButton
+          {/* <LoadingButton
             onClick={gradeItAgain}
             className="LoadingButton"
             variant="contained"
@@ -503,7 +498,7 @@ const RecallForIman = props => {
             loading={gradingPhrase}
           >
             Grade It Again
-          </LoadingButton>
+          </LoadingButton> */}
         </Box>
       )}
       {noMajority.length > 0 && currentNoMajority && (
