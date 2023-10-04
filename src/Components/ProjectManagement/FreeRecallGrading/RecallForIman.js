@@ -231,30 +231,30 @@ const RecallForIman = props => {
     return { sentences: Array.from(new Set(sentences)), botGrades };
   };
 
-  const gradeItAgain = async () => {
-    try {
-      setGradingPhrase(true);
+  // const gradeItAgain = async () => {
+  //   try {
+  //     setGradingPhrase(true);
 
-      await firebase.idToken();
-      const response = await axios.post("/researchers/gradeGPT", { record: currentBot });
-      console.log(response);
-      const { grade, logs } = response.data;
+  //     await firebase.idToken();
+  //     const response = await axios.post("/researchers/gradeGPT", { record: currentBot });
+  //     console.log(response);
+  //     const { grade, logs } = response.data;
 
-      setMajorityDifferentThanBot(prev => {
-        prev.map(item =>
-          item.id === currentBot.id ? { ...item, botGrade: grade, ...getGrades(logs, currentBot.phrase) } : item
-        );
-        return prev;
-      });
-      setCurrentBot(prev => ({ ...prev, botGrade: grade, ...getGrades(logs, currentBot.phrase) }));
-      setGradingPhrase(false);
-      setSnackbarMessage("Graded successfully");
-    } catch (error) {
-      console.log(error);
-      setSnackbarMessage("There was an error grading the phrase");
-      setGradingPhrase(false);
-    }
-  };
+  //     setMajorityDifferentThanBot(prev => {
+  //       prev.map(item =>
+  //         item.id === currentBot.id ? { ...item, botGrade: grade, ...getGrades(logs, currentBot.phrase) } : item
+  //       );
+  //       return prev;
+  //     });
+  //     setCurrentBot(prev => ({ ...prev, botGrade: grade, ...getGrades(logs, currentBot.phrase) }));
+  //     setGradingPhrase(false);
+  //     setSnackbarMessage("Graded successfully");
+  //   } catch (error) {
+  //     console.log(error);
+  //     setSnackbarMessage("There was an error grading the phrase");
+  //     setGradingPhrase(false);
+  //   }
+  // };
 
   const getMajority = () => {
     if (currentBot.hasOwnProperty("majority")) {
@@ -490,7 +490,7 @@ const RecallForIman = props => {
               height: "50px"
             }}
           >{`NO `}</Button>
-          <LoadingButton
+          {/* <LoadingButton
             onClick={gradeItAgain}
             className="LoadingButton"
             variant="contained"
@@ -498,7 +498,7 @@ const RecallForIman = props => {
             loading={gradingPhrase}
           >
             Grade It Again
-          </LoadingButton>
+          </LoadingButton> */}
         </Box>
       )}
       {noMajority.length > 0 && currentNoMajority && (
