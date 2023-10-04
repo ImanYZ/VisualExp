@@ -40,7 +40,6 @@ const {
   trackStudentInvite,
   trackStudentEmailTemplateCopy
 } = require("./emailing");
-const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
@@ -85,9 +84,6 @@ app.get("/feedbackCodeData", feedbackCodeData);
 app.get("/quotesData", quotesData);
 app.get("/recallData", recallData);
 app.get("/keyPhrasesData", keyPhrasesData);
-app.get("/assignNodeContributorsInstitutionsStats", assignNodeContributorsInstitutionsStats);
-app.get("/getInstitutions", getInstitutions);
-app.post("/checkEmailInstitution", checkEmailInstitution);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
 app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);

@@ -4,66 +4,25 @@ steps:
     entrypoint: "bash"
     args:
       - "-c"
-      - 'source /root/.bashrc && npm install --legacy-peer-deps && npm run build:prod'
+      - "source /root/.bashrc && npm install --legacy-peer-deps && npm run build:prod"
 
   # running install for backend
   - name: "gcr.io/visualexp-a7d2c/firebase:latest"
     entrypoint: "bash"
     args:
       - "-c"
-      - 'source /root/.bashrc && cd functions && npm install --legacy-peer-deps'
+      - "source /root/.bashrc && cd functions && npm install --legacy-peer-deps"
 
   # running firebase deploy
   - name: "gcr.io/visualexp-a7d2c/firebase:latest"
     entrypoint: "bash"
     args:
       - "-c"
-      - 'echo $$VISUALEXP_PROD | base64 -d > functions/onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json && source /root/.bashrc &&  firebase --debug deploy'
-    secretEnv:
-      - "VISUALEXP_PROD"
-      - "VISUALEXPCRED_TYPE"
-      - "VISUALEXP_PROJECT_ID"
-      - "VISUALEXPCRED_PRIVATE_KEY_ID"
-      - "VISUALEXPCRED_PRIVATE_KEY"
-      - "VISUALEXPCRED_CLIENT_EMAIL"
-      - "VISUALEXPCRED_CLIENT_ID"
-      - "VISUALEXPCRED_AUTH_URI"
-      - "VISUALEXPCRED_TOKEN_URI"
-      - "VISUALEXPCRED_AUTH_PROVIDER_X509_CERT_URL"
-      - "VISUALEXP_STORAGE_BUCKET"
-      - "VISUALEXPCRED_CLIENT_X509_CERT_URL"
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/visualexp-a7d2c/secrets/VISUALEXP_PROD/versions/latest
-      env: 'VISUALEXP_PROD'
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_TYPE/versions/1
-      env: "VISUALEXPCRED_TYPE"
-    - versionName: projects/141114383555/secrets/VISUALEXP_PROJECT_ID/versions/1
-      env: "VISUALEXP_PROJECT_ID"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_PRIVATE_KEY_ID/versions/1
-      env: "VISUALEXPCRED_PRIVATE_KEY_ID"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_PRIVATE_KEY/versions/1
-      env: "VISUALEXPCRED_PRIVATE_KEY"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_CLIENT_EMAIL/versions/1
-      env: "VISUALEXPCRED_CLIENT_EMAIL"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_CLIENT_ID/versions/1
-      env: "VISUALEXPCRED_CLIENT_ID"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_AUTH_URI/versions/1
-      env: "VISUALEXPCRED_AUTH_URI"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_TOKEN_URI/versions/1
-      env: "VISUALEXPCRED_TOKEN_URI"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_AUTH_PROVIDER_X509_CERT_URL/versions/1
-      env: "VISUALEXPCRED_AUTH_PROVIDER_X509_CERT_URL"
-    - versionName: projects/141114383555/secrets/VISUALEXP_STORAGE_BUCKET/versions/1
-      env: "VISUALEXP_STORAGE_BUCKET"
-    - versionName: projects/141114383555/secrets/VISUALEXPCRED_CLIENT_X509_CERT_URL/versions/1
-      env: "VISUALEXPCRED_CLIENT_X509_CERT_URL"
-
+      - "source /root/.bashrc && firebase --debug deploy"
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: E2_HIGHCPU_8
 
-serviceAccount: 'projects/visualexp-a7d2c/serviceAccounts/114329020973802572254'
+serviceAccount: "projects/visualexp-a7d2c/serviceAccounts/114329020973802572254"
 
 timeout: 2000s
