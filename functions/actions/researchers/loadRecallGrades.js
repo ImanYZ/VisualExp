@@ -115,8 +115,8 @@ module.exports = async (req, res) => {
     if (fullyGradedIds.length > 0) {
       remainingTogradeQuery.where("__name__", "not-in", fullyGradedIds);
     }
-    const remainingTogradeDocsH2K2 = await remainingTogradeQuery.where("project", "==", "H2K2").get();
-    const remainingTogradeDocsH1L2 = await remainingTogradeQuery.where("project", "==", "H1L2").get();
+    const remainingTogradeDocsH2K2 = await remainingTogradeQuery.where("project", "==", "H2K2").limit(1).get();
+    const remainingTogradeDocsH1L2 = await remainingTogradeQuery.where("project", "==", "H1L2").limit(1).get();
 
     const recallGradesDocs = [
       ...(recentParticipantDocs?.docs || []),
