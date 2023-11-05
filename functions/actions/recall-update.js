@@ -41,8 +41,8 @@ const updateLogs = ({
     sessionItem[conditionIndex].gpt35 = ArrayToObject(resultLogsGpt3_5);
   } else {
     sessionItem[conditionIndex] = {
-      gpt4: ArrayToObject(responseLogsGPT3_5),
-      gpt35: ArrayToObject(responseLogsGPT4)
+      gpt4: ArrayToObject(responseLogsGPT4),
+      gpt35: ArrayToObject(responseLogsGPT3_5)
     };
   }
   return _previousLogData;
@@ -50,31 +50,32 @@ const updateLogs = ({
 
 module.exports = async (req, res) => {
   try {
-    const { docId, recallGrade } = req.body;
-    const recallGradesLogsRef = dbReal.ref(`/recallGradesGPTLogs/${docId}`);
+    const payload = req.body;
+    const recallGradesLogsRef = dbReal.ref(`/recallGradesGPTLogs/${payload.docId}`);
+    console.log("payload", payload);
     await recallGradesLogsRef.transaction(currentData => {
-      if (currentData !== null) {
+      if (currentData === null) {
         currentData = { sessions: {} };
       }
       currentData = updateLogs({
-        phrasesgpt35: recallGrade.gpt35phrases,
-        phrasesgpt4: recallGrade.gpt4phrases,
+        phrasesgpt35: payload.gpt35phrases || [],
+        phrasesgpt4: payload.gpt4phrases || [],
         previousLogData: currentData,
-        conditionIndex: recallGrade.conditionIndex,
-        session: recallGrade.session,
-        responseLogsGPT4: recallGrade?.gpt4 || [],
-        responseLogsGPT3_5: recallGrade?.gpt3_5 || []
+        conditionIndex: payload.conditionIndex,
+        session: payload.session,
+        responseLogsGPT4: payload?.gpt4 || [],
+        responseLogsGPT3_5: payload?.gpt3_5 || []
       });
       if (currentData.hasOwnProperty("sessions")) {
+        console.log(currentData);
         return currentData;
       }
     });
-    return res.status(200).send({ message: "updated Logs successfully" });
+    return res.status(200).send({ error: false });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
-      message: "error occurred",
-      error
+      error: true
     });
   }
 };
