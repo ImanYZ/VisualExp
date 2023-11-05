@@ -22,7 +22,7 @@ import { isEmail } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
-import {getFirebaseFriendlyError} from "../../utils/auth-helpers";
+import { getFirebaseFriendlyError } from "../../utils/auth-helpers";
 
 const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -119,29 +119,26 @@ const Auth = props => {
     setValidPasswordResetEmail(isEmail(resetPasswordEmail));
   }, [resetPasswordEmail]);
 
-  useEffect(() => {
-    const checkEmailInstitution = async () => {
-      try {
-        const domainName = email.match("@(.+)$")?.[0];
-        if (!domainName) return;
-        const institutionDoc = await dbOne
-          .collection("institutions")
-          .where("domains", "array-contains", domainName)
-          .limit(1)
-          .get();
-        if (institutionDoc && institutionDoc.docs.length > 0) {
-          const institutionData = institutionDoc.docs[0].data();
-          setNameFromInstitutionSelected(institutionData);
-          return institutionData;
-        } else {
-          setNameFromInstitutionSelected({});
-        }
-      } catch (err) {
-        console.log("err", err);
+  const checkEmailInstitution = async email => {
+    try {
+      const domainName = email.match("@(.+)$")?.[0];
+      if (!domainName) return;
+      const institutionDoc = await dbOne
+        .collection("institutions")
+        .where("domains", "array-contains", domainName)
+        .limit(1)
+        .get();
+      if (institutionDoc && institutionDoc.docs.length > 0) {
+        const institutionData = institutionDoc.docs[0].data();
+        setNameFromInstitutionSelected(institutionData);
+        return institutionData;
+      } else {
+        setNameFromInstitutionSelected({});
       }
-    };
-    checkEmailInstitution();
-  }, [email]);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
 
   const switchAccount = event => {
     event.preventDefault();
@@ -170,6 +167,7 @@ const Auth = props => {
 
   const emailChange = event => {
     setEmail(event.target.value.toLowerCase());
+    checkEmailInstitution(email);
   };
 
   const passwordChange = event => {
@@ -243,14 +241,9 @@ const Auth = props => {
   };
 
   return (
-    <div id="Auth">
-      {/* <img
-        src={UMSI_Logo_Light}
-        alt="University of Michigan, School of Information Logo"
-        width="100%"
-      /> */}
+    <Box id="Auth">
       {emailVerified === "Sent" ? (
-        <div>
+        <Box>
           <p>
             We just sent you a verification email. Please click the link in the email to verify and complete your
             sign-up.
@@ -261,7 +254,7 @@ const Auth = props => {
           <Button variant="contained" color="error" onClick={switchAccount}>
             <SwitchAccountIcon /> Switch Account
           </Button>
-        </div>
+        </Box>
       ) : (
         <>
           <h2>Sign the Consent Form to Get Started!</h2>
@@ -446,7 +439,7 @@ const Auth = props => {
           </Box>
         </>
       )}
-    </div>
+    </Box>
   );
 };
 

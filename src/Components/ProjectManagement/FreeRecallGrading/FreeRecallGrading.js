@@ -71,7 +71,6 @@ const FreeRecallGrading = props => {
       setRecentParticipants(recentParticipants);
       await firebase.idToken();
       let response = await axios.post("/researchers/loadRecallGrades", { project });
-      console.log(response);
       let _recallGrade = response.data.recallgrades[0];
       setSelectedGrade(_recallGrade || null);
       setSubmitting(false);
