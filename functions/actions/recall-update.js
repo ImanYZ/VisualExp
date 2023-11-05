@@ -1,133 +1,81 @@
-const { db } = require("../admin");
+const { dbReal } = require("../admin_real");
 
-const { replaceNewLogs, ObjectToArray, ArrayToObject } = require("../helpers/grading-recalls");
-
-const reduceHelper = (acc, cur, phrase) => {
-  const phraseResponseIdx = cur.findIndex(p => p.rubric_item === phrase.phrase);
-  if (phraseResponseIdx !== -1) {
-    if (cur[phraseResponseIdx].correct.toLowerCase() === "yes") {
-      acc.push("yes");
-    } else if (cur[phraseResponseIdx].correct.toLowerCase() === "no") {
-      acc.push("no");
-    }
-  }
-  return acc;
-};
-
-const countMajority = (responseLogs, phrase) => {
-  const gptMajority = responseLogs.reduce((acc, cur) => reduceHelper(acc, cur, phrase), []);
-  if (gptMajority.length === 0) return null;
-
-  if (gptMajority.filter(e => e === "yes").length >= 2) {
-    return true;
-  }
-
-  if (gptMajority.filter(e => e === "no").length >= 3) {
-    return false;
-  }
-};
-const updateGrades = ({
-  phrasesToGrade,
-  recallGradeUpdate,
-  session,
+const { replaceNewLogs, ArrayToObject } = require("../helpers/grading-recalls");
+const updateLogs = ({
+  phrasesgpt35,
+  phrasesgpt4,
+  previousLogData,
   conditionIndex,
+  session,
   responseLogsGPT4,
   responseLogsGPT3_5
 }) => {
-  const conditionItem = recallGradeUpdate.sessions[session][conditionIndex];
-  for (let _phrase of phrasesToGrade) {
-    const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === _phrase.phrase && !p.deleted);
-
-    const gpt4grade = countMajority(responseLogsGPT4, _phrase);
-    const gpt3_5grade = countMajority(responseLogsGPT3_5, _phrase);
-
-    if (gpt4grade !== null) {
-      conditionItem.phrases[phraseIndex]["gpt-4-0613"] = gpt4grade;
-    }
-    if (gpt3_5grade !== null) {
-      conditionItem.phrases[phraseIndex]["gpt-3.5-turbo-16k-0613"] = gpt3_5grade;
-    }
-  }
-};
-
-const updateLogs = ({ phrasesToGrade, previousLogData, conditionIndex, session, responseLogsGPT4 }) => {
-  if (!previousLogData.sessions.hasOwnProperty(session)) {
-    previousLogData.sessions[session] = {};
+  const _previousLogData = { ...previousLogData };
+  if (!_previousLogData.sessions.hasOwnProperty(session)) {
+    _previousLogData.sessions[session] = {};
   }
 
-  const sessionItem = previousLogData.sessions[session];
+  const sessionItem = _previousLogData.sessions[session];
   if (sessionItem.hasOwnProperty(conditionIndex)) {
-    const previousPhrasesGpt4 = sessionItem[conditionIndex]["gpt-4-0613"];
+    const previousPhrasesGpt4 = (sessionItem[conditionIndex]?.gpt4 || []).filter(
+      item => item !== null && item !== undefined
+    );
+
+    const previousPhrasesGpt3_5 = (sessionItem[conditionIndex].gpt35 || []).filter(
+      item => item !== null && item !== undefined
+    );
 
     const resultLogsGpt4 = replaceNewLogs({
-      prevLogs: ObjectToArray(previousPhrasesGpt4),
+      prevLogs: previousPhrasesGpt4,
       newLogs: responseLogsGPT4,
-      phrasesToGrade
+      phrasesToGrade: phrasesgpt4
+    });
+    const resultLogsGpt3_5 = replaceNewLogs({
+      prevLogs: previousPhrasesGpt3_5,
+      newLogs: responseLogsGPT3_5,
+      phrasesToGrade: phrasesgpt35
     });
 
-    sessionItem[conditionIndex]["gpt-4-0613"] = ArrayToObject(resultLogsGpt4);
+    sessionItem[conditionIndex].gpt4 = ArrayToObject(resultLogsGpt4);
+
+    sessionItem[conditionIndex].gpt35 = ArrayToObject(resultLogsGpt3_5);
   } else {
     sessionItem[conditionIndex] = {
-      "gpt-4-0613": ArrayToObject(responseLogsGPT4)
+      gpt4: ArrayToObject(responseLogsGPT4),
+      gpt35: ArrayToObject(responseLogsGPT3_5)
     };
   }
-  return previousLogData;
+  return _previousLogData;
 };
 
 module.exports = async (req, res) => {
   try {
-    const { docId, recallGrade } = req.body;
-    console.log("save recall logs", docId);
-    console.log(req.body);
-    await db.runTransaction(async t => {
-      console.log("updating...");
-      const recallGradeRef = db.collection("recallGradesV2").doc(docId);
-      let recallGradeDoc = await t.get(recallGradeRef);
-      const recallGradeUpdate = recallGradeDoc.data();
-
-      const logsRef = db.collection("recallGradesBotLogs").doc(docId);
-      const previousLogDoc = await t.get(logsRef);
-
-      let previousLogData = { sessions: {} };
-      if (previousLogDoc.exists) {
-        previousLogData = previousLogDoc.data();
+    const payload = req.body;
+    const recallGradesLogsRef = dbReal.ref(`/recallGradesGPTLogs/${payload.docId}`);
+    console.log("payload", payload);
+    await recallGradesLogsRef.transaction(currentData => {
+      if (currentData === null) {
+        currentData = { sessions: {} };
       }
-
-      updateGrades({
-        phrasesToGrade: recallGrade.phrasesToGrade,
-        recallGradeUpdate,
-        session: recallGrade.session,
-        conditionIndex: recallGrade.conditionIndex,
-        responseLogsGPT4: recallGrade.gpt4
+      currentData = updateLogs({
+        phrasesgpt35: payload.gpt35phrases || [],
+        phrasesgpt4: payload.gpt4phrases || [],
+        previousLogData: currentData,
+        conditionIndex: payload.conditionIndex,
+        session: payload.session,
+        responseLogsGPT4: payload?.gpt4 || [],
+        responseLogsGPT3_5: payload?.gpt3_5 || []
       });
-
-      console.log("updated Firebase document successfully");
-
-      updateLogs({
-        phrasesToGrade: recallGrade.phrasesToGrade,
-        previousLogData,
-        conditionIndex: recallGrade.conditionIndex,
-        session: recallGrade.session,
-        responseLogsGPT4: recallGrade.gpt4
-      });
-
-      console.log("updated Logs document successfully");
-
-      t.update(recallGradeDoc.ref, recallGradeUpdate);
-      if (previousLogDoc.exists) {
-        t.update(logsRef, { ...previousLogData, updatedAt: new Date() });
-      } else {
-        t.set(logsRef, { ...previousLogData, createdAt: new Date() });
+      if (currentData.hasOwnProperty("sessions")) {
+        console.log(currentData);
+        return currentData;
       }
-
-      console.log("updated Logs successfully", docId);
     });
-    return res.status(200).send({ message: "updated Logs successfully" });
+    return res.status(200).send({ error: false });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
-      message: "error occurred",
-      error
+      error: true
     });
   }
 };
