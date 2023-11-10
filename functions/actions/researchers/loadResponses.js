@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
         Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
           await Promise.all(
             conditionItems.map(async conditionItem => {
-              if (conditionItem.response !== "" && conditionItem.passage === selectedPassageId) {
+              if (conditionItem.response && conditionItem.passage === selectedPassageId) {
                 const votes = {};
                 await Promise.all(
                   conditionItem.phrases.map(async phrase => {
