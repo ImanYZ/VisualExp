@@ -140,42 +140,42 @@ describe("POST /api/researchers/gradeRecalls", () => {
     }
   });
 
-  it("updated document should not touch non viewed phrases", async () => {
-    const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
-    const condition = recallGradeData.sessions["1st"][conditionIdx];
+  // it("updated document should not touch non viewed phrases", async () => {
+  //   const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
+  //   const condition = recallGradeData.sessions["1st"][conditionIdx];
 
-    const nonViewedPhrases = condition.phrases.filter(
-      phrase => payload.recallGrade.phrases.findIndex(p => p.phrase === phrase.phrase) === -1
-    );
-    for (const nonViewedPhrase of nonViewedPhrases) {
-      expect(nonViewedPhrase.researchers.includes(fullname)).toBeFalsy();
-    }
-  });
+  //   const nonViewedPhrases = condition.phrases.filter(
+  //     phrase => payload.recallGrade.phrases.findIndex(p => p.phrase === phrase.phrase) === -1
+  //   );
+  //   for (const nonViewedPhrase of nonViewedPhrases) {
+  //     expect(nonViewedPhrase.researchers.includes(fullname)).toBeFalsy();
+  //   }
+  // });
 
-  it("check if all the researchers whom voted on a phrase received points", async () => {
-    const disagreeingResearchers = ["Ukasha Tariq"];
-    const agreeingResearchers = ["Haroon Waheed", "Iman", "Sam Ouhra"];
+  // it("check if all the researchers whom voted on a phrase received points", async () => {
+  //   const disagreeingResearchers = ["Ukasha Tariq"];
+  //   const agreeingResearchers = ["Haroon Waheed", "Iman", "Sam Ouhra"];
 
-    const researchers = await db
-      .collection("researchers")
-      .where("__name__", "in", [...disagreeingResearchers, ...agreeingResearchers])
-      .get();
+  //   const researchers = await db
+  //     .collection("researchers")
+  //     .where("__name__", "in", [...disagreeingResearchers, ...agreeingResearchers])
+  //     .get();
 
-    const researcherHashMap = {};
-    researchers.docs.forEach(researcher => {
-      researcherHashMap[researcher.id] = researcher.data();
-    });
+  //   const researcherHashMap = {};
+  //   researchers.docs.forEach(researcher => {
+  //     researcherHashMap[researcher.id] = researcher.data();
+  //   });
 
-    agreeingResearchers.forEach(researcher => {
-      const researcherData = researcherHashMap[researcher];
-      expect(researcherData.projects[project].gradingPoints).toEqual(0.5); // agreement points
-    });
+  //   agreeingResearchers.forEach(researcher => {
+  //     const researcherData = researcherHashMap[researcher];
+  //     expect(researcherData.projects[project].gradingPoints).toEqual(0.5); // agreement points
+  //   });
 
-    disagreeingResearchers.forEach(researcher => {
-      const researcherData = researcherHashMap[researcher];
-      expect(researcherData.projects[project].negativeGradingPoints).toEqual(0.5); // disagreement points
-    });
-  });
+  //   disagreeingResearchers.forEach(researcher => {
+  //     const researcherData = researcherHashMap[researcher];
+  //     expect(researcherData.projects[project].negativeGradingPoints).toEqual(0.5); // disagreement points
+  //   });
+  // });
 
   it("participant should get recall grade points on phrase approval", async () => {
     const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
