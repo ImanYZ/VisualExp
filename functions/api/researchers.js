@@ -116,4 +116,7 @@ researchersRouter.post("/uploadAndReadFiles", uploadAndReadFiles);
 // POST /api/researchers/gradeGPT
 researchersRouter.post("/gradeGPT", gradeGPT);
 
+// POST /api/researchers/loadResponses
+researchersRouter.post("/loadResponses", loadResponses);
+
 module.exports = researchersRouter;
