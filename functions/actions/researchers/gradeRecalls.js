@@ -5,11 +5,9 @@ const { assignExpPoints } = require("../../helpers/assignExpPoints");
 const { calculateViewers } = require("../../helpers/passage");
 
 const {
-  updateGradingPointsForResearchers,
   getRecallResponse,
   incrementGradingNum,
-  convertToVotesByPhrasesFunction,
-  separateResearchersByVotes
+  convertToVotesByPhrasesFunction
 } = require("../../helpers/grading-recalls");
 
 module.exports = async (req, res) => {
@@ -77,54 +75,38 @@ module.exports = async (req, res) => {
       );
 
       // distribute points to participants
-      if (phrasesApproval.length) {
-        for (let phraseApproval of phrasesApproval) {
-          const votesOfPhrase = votesByPhrases[phraseApproval];
 
-          // we are only processing points when we have 4 researchers voted on phrase
-          // if document already had 4 researchers or phrase was approve, we don't continue calculations
-          if (votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
+      for (let phraseApproval of phrasesApproval || []) {
+        const votesOfPhrase = votesByPhrases[phraseApproval];
 
-          let recallResponse = getRecallResponse(session);
+        // we are only processing points when we have 4 researchers voted on phrase
+        // if document already had 4 researchers or phrase was approve, we don't continue calculations
+        if (votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
 
-          const passageIdx = (userUpdates?.pConditions || []).findIndex(
-            conditionItem => conditionItem.passage === recallGrade.passage
+        let recallResponse = getRecallResponse(session);
+
+        const passageIdx = (userUpdates?.pConditions || []).findIndex(
+          conditionItem => conditionItem.passage === recallGrade.passage
+        );
+        if (passageIdx !== -1) {
+          userUpdate = true;
+          // The only piece of the user data that should be modified is
+          // pCondition based on the point received.
+          let grades = 1;
+          if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
+            // We should add up points here because each free recall response
+            // may get multiple points from each of the key phrases identified
+            // in it.
+            grades += userUpdates.pConditions[passageIdx][recallResponse];
+          }
+
+          userUpdates.pConditions[passageIdx][recallResponse] = grades;
+
+          // Depending on how many key phrases were in the passage, we should
+          // calculate the free-recall response ratio.
+          userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
+            (grades / conditionUpdates.phrases.length).toFixed(2)
           );
-          if (passageIdx !== -1) {
-            userUpdate = true;
-            // The only piece of the user data that should be modified is
-            // pCondition based on the point received.
-            let grades = 1;
-            if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
-              // We should add up points here because each free recall response
-              // may get multiple points from each of the key phrases identified
-              // in it.
-              grades += userUpdates.pConditions[passageIdx][recallResponse];
-            }
-
-            userUpdates.pConditions[passageIdx][recallResponse] = grades;
-
-            // Depending on how many key phrases were in the passage, we should
-            // calculate the free-recall response ratio.
-            userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
-              (grades / conditionUpdates.phrases.length).toFixed(2)
-            );
-          }
-          const { upVoteResearchers, downVoteResearchers } = separateResearchersByVotes(votesOfPhrase);
-
-          let upVotePoint = 0.5;
-          let downVotePoint = -0.5;
-          if (votesOfPhrase.upVotes < votesOfPhrase.downVotes) {
-            upVotePoint = -0.5;
-            downVotePoint = 0.5;
-          }
-
-          // updating points for researchers who upvoted or downvoted on this phrase
-          updateGradingPointsForResearchers(researchersUpdates, upVoteResearchers, recallGradeData, upVotePoint);
-          updateGradingPointsForResearchers(researchersUpdates, downVoteResearchers, recallGradeData, downVotePoint);
-
-          updatedResearchers.push(...votesOfPhrase.researchers);
-          updatedResearchers = [...new Set(updatedResearchers)];
         }
       }
 

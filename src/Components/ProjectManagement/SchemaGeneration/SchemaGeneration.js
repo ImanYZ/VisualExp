@@ -93,7 +93,7 @@ export const SchemaGeneration = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [fullname, selectedPassage.id]);
+  }, [selectedPassage.id]);
 
   useEffect(() => {
     if (selectedPassage.id) {
