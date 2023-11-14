@@ -11,7 +11,7 @@
     "test:ci": "firebase emulators:exec --project test --only auth,functions,firestore 'npx jest --ci --runInBand'"
   },
   "engines": {
-    "node": "14"
+    "node": "18"
   },
   "main": "index.js",
   "dependencies": {
