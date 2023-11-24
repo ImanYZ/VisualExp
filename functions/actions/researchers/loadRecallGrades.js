@@ -11,98 +11,105 @@ const shuffleArray = array => {
   }
 };
 const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, passagesByIds) => {
-  const _conditionItems = [];
-  Object.entries(recall.sessions).map(async ([session, conditionItems]) => {
-    conditionItems.forEach((conditionItem, conditionIdx) => {
-      conditionItem.phrases = conditionItem.phrases.filter(p =>
-        passagesByIds[conditionItem.passage].phrases.includes(p.phrase)
-      );
-      conditionItem.phrases.forEach(p => {
-        if (!p.hasOwnProperty("researchers")) {
-          p.researchers = [];
-          p.grades = [];
-        }
-      });
-      // console.log(conditionItem.phrases);
-      // console.log(consideredPhrases);
-      const filtered = (conditionItem.response || "")
-        .replace(/[\.,]/g, " ")
-        .split(" ")
-        .filter(w => w.trim());
-      if (recall.user !== fullname && filtered.length > 2) {
-        const phrasesSatisfied = conditionItem.phrases.filter(phrase => {
-          const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
-          return (
-            !phrase.deleted &&
-            !phrase.researchers.includes(fullname) &&
-            phrase.researchers.length < 4 &&
-            validateBooleanExpression(schemaE, conditionItem.response)
-          );
+  try {
+    const _conditionItems = [];
+    Object.entries(recall.sessions).map(async ([session, conditionItems]) => {
+      (Array.isArray(conditionItems) ? conditionItems || [] : []).forEach((conditionItem, conditionIdx) => {
+        conditionItem.phrases = conditionItem.phrases.filter(p =>
+          passagesByIds[conditionItem.passage].phrases.includes(p.phrase)
+        );
+        conditionItem.phrases.forEach(p => {
+          if (!p.hasOwnProperty("researchers")) {
+            p.researchers = [];
+            p.grades = [];
+          }
         });
-
-        //pick 4 random phrases that are not satisfied
-        const notSatisfiedphrases = conditionItem.phrases
-          .filter(phrase => {
+        // console.log(conditionItem.phrases);
+        // console.log(consideredPhrases);
+        const filtered = (conditionItem.response || "")
+          .replace(/[\.,]/g, " ")
+          .split(" ")
+          .filter(w => w.trim());
+        if (recall.user !== fullname && filtered.length > 2) {
+          const phrasesSatisfied = conditionItem.phrases.filter(phrase => {
             const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
             return (
               !phrase.deleted &&
-              !validateBooleanExpression(schemaE, conditionItem.response) &&
+              !phrase.researchers.includes(fullname) &&
               phrase.researchers.length < 4 &&
-              !phrase.researchers.includes(fullname)
+              validateBooleanExpression(schemaE, conditionItem.response)
             );
-          })
-          .sort(() => 0.5 - Math.random())
-          .splice(0, 4);
-
-        conditionItem.phrases = [...phrasesSatisfied, ...notSatisfiedphrases].sort(() => 0.5 - Math.random());
-        let priority = 4;
-        if (conditionItem.phrases.some(p => p.researchers.length === 1)) {
-          priority = 3;
-        }
-        if (conditionItem.phrases.some(p => p.researchers.length === 2)) {
-          priority = 2;
-        }
-        if (conditionItem.phrases.some(p => p.researchers.length >= 3)) {
-          priority = 1;
-        }
-        if (phrasesSatisfied.length > 0) {
-          _conditionItems.push({
-            docId: recall.id,
-            session,
-            user: recall.user,
-            project: recall.project,
-            notSatisfiedphrases,
-            satisfiedphrases: phrasesSatisfied,
-            originalText: passagesByIds[conditionItem.passage].text,
-            ...conditionItem,
-            priority,
-            conditionIdx
           });
-        }
-      }
-    });
-  });
 
-  return _conditionItems;
+          //pick 4 random phrases that are not satisfied
+          const notSatisfiedphrases = conditionItem.phrases
+            .filter(phrase => {
+              const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
+              return (
+                !phrase.deleted &&
+                !validateBooleanExpression(schemaE, conditionItem.response) &&
+                phrase.researchers.length < 4 &&
+                !phrase.researchers.includes(fullname)
+              );
+            })
+            .sort(() => 0.5 - Math.random())
+            .splice(0, 4);
+
+          conditionItem.phrases = [...phrasesSatisfied, ...notSatisfiedphrases].sort(() => 0.5 - Math.random());
+          let priority = 4;
+          if (conditionItem.phrases.some(p => p.researchers.length === 1)) {
+            priority = 3;
+          }
+          if (conditionItem.phrases.some(p => p.researchers.length === 2)) {
+            priority = 2;
+          }
+          if (conditionItem.phrases.some(p => p.researchers.length >= 3)) {
+            priority = 1;
+          }
+          if (phrasesSatisfied.length > 0) {
+            _conditionItems.push({
+              docId: recall.id,
+              session,
+              user: recall.user,
+              project: recall.project,
+              notSatisfiedphrases,
+              satisfiedphrases: phrasesSatisfied,
+              originalText: passagesByIds[conditionItem.passage].text,
+              ...conditionItem,
+              priority,
+              conditionIdx
+            });
+          }
+        }
+      });
+    });
+
+    return _conditionItems;
+  } catch (error) {
+    throw new Error("");
+  }
 };
 
 const consumeRecallGradesChanges = (recalls, fullname, booleanByphrase, passagesByIds) => {
-  let recallGrades = {};
-  for (const recall of recalls) {
-    const _recallGrades = getRecallConditionsByRecallGrade(recall, fullname, booleanByphrase, passagesByIds);
-    if (recallGrades.hasOwnProperty(recall.project)) {
-      recallGrades[recall.project] = [...recallGrades[recall.project], ..._recallGrades];
-    } else {
-      recallGrades[recall.project] = [..._recallGrades];
+  try {
+    let recallGrades = {};
+    for (const recall of recalls) {
+      const _recallGrades = getRecallConditionsByRecallGrade(recall, fullname, booleanByphrase, passagesByIds);
+      if (recallGrades.hasOwnProperty(recall.project)) {
+        recallGrades[recall.project] = [...recallGrades[recall.project], ..._recallGrades];
+      } else {
+        recallGrades[recall.project] = [..._recallGrades];
+      }
     }
+    return recallGrades;
+  } catch (error) {
+    throw new Error("");
   }
-  return recallGrades;
 };
 module.exports = async (req, res) => {
   try {
     console.log("loadRecallGrades");
     const { project } = req.body;
-    console.log(project);
     if (!["H2K2", "H1L2", "Autograding"].includes(project)) {
       return res.status(200).send([]);
     }
@@ -156,9 +163,9 @@ module.exports = async (req, res) => {
       });
     }
 
-    return res.status(200).send({ recallgrades: _recallGrades.splice(0, 5) });
+    return res.status(200).send({ recallgrades: _recallGrades.splice(0, 20) });
   } catch (error) {
-    console.log(error);
+    console.log("error error", error);
     return res.status(500).send({ message: "error", data: error });
   }
 };
