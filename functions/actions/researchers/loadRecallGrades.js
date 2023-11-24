@@ -1,4 +1,5 @@
 const { db } = require("../../admin");
+const { dbReal } = require("../../admin_real");
 const { fetchRecentParticipants } = require("../../utils");
 const { validateBooleanExpression } = require("../../helpers/passage");
 const { loadBooleanExpressions } = require("../../helpers/grading-recalls");
@@ -9,21 +10,26 @@ const shuffleArray = array => {
     [array[i], array[j]] = [array[j], array[i]];
   }
 };
-const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphrase, passagesByIds) => {
-  const recallGradeData = recallGradeDoc.data();
+const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, passagesByIds) => {
   const _conditionItems = [];
-  Object.entries(recallGradeData.sessions).map(async ([session, conditionItems]) => {
-    conditionItems.forEach(conditionItem => {
+  Object.entries(recall.sessions).map(async ([session, conditionItems]) => {
+    conditionItems.forEach((conditionItem, conditionIdx) => {
       conditionItem.phrases = conditionItem.phrases.filter(p =>
         passagesByIds[conditionItem.passage].phrases.includes(p.phrase)
       );
+      conditionItem.phrases.forEach(p => {
+        if (!p.hasOwnProperty("researchers")) {
+          p.researchers = [];
+          p.grades = [];
+        }
+      });
       // console.log(conditionItem.phrases);
       // console.log(consideredPhrases);
       const filtered = (conditionItem.response || "")
         .replace(/[\.,]/g, " ")
         .split(" ")
         .filter(w => w.trim());
-      if (recallGradeData.user !== fullname && filtered.length > 2) {
+      if (recall.user !== fullname && filtered.length > 2) {
         const phrasesSatisfied = conditionItem.phrases.filter(phrase => {
           const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
           return (
@@ -61,15 +67,16 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
         }
         if (phrasesSatisfied.length > 0) {
           _conditionItems.push({
-            docId: recallGradeDoc.id,
+            docId: recall.id,
             session,
-            user: recallGradeData.user,
-            project: recallGradeData.project,
+            user: recall.user,
+            project: recall.project,
             notSatisfiedphrases,
             satisfiedphrases: phrasesSatisfied,
             originalText: passagesByIds[conditionItem.passage].text,
             ...conditionItem,
-            priority
+            priority,
+            conditionIdx
           });
         }
       }
@@ -79,15 +86,14 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, booleanByphr
   return _conditionItems;
 };
 
-const consumeRecallGradesChanges = (recallGradesDocs, fullname, booleanByphrase, passagesByIds) => {
+const consumeRecallGradesChanges = (recalls, fullname, booleanByphrase, passagesByIds) => {
   let recallGrades = {};
-  for (const recallGradeDoc of recallGradesDocs) {
-    const recallGradeData = recallGradeDoc.data();
-    const _recallGrades = getRecallConditionsByRecallGrade(recallGradeDoc, fullname, booleanByphrase, passagesByIds);
-    if (recallGrades.hasOwnProperty(recallGradeData.project)) {
-      recallGrades[recallGradeData.project] = [...recallGrades[recallGradeData.project], ..._recallGrades];
+  for (const recall of recalls) {
+    const _recallGrades = getRecallConditionsByRecallGrade(recall, fullname, booleanByphrase, passagesByIds);
+    if (recallGrades.hasOwnProperty(recall.project)) {
+      recallGrades[recall.project] = [...recallGrades[recall.project], ..._recallGrades];
     } else {
-      recallGrades[recallGradeData.project] = [..._recallGrades];
+      recallGrades[recall.project] = [..._recallGrades];
     }
   }
   return recallGrades;
@@ -106,17 +112,21 @@ module.exports = async (req, res) => {
     let passagesByIds = {};
 
     const recentParticipants = Object.keys(await fetchRecentParticipants(fullname));
-
-    const recallGradesDocs = await db.collection("recallGradesV2").get();
+    const recallsDocs = await dbReal.ref("/recallGradesV2").once("value");
+    const recallsData = recallsDocs.val();
+    const recalls = [];
+    for (let id in recallsData) {
+      recalls.push({ id, ...recallsData[id] });
+    }
 
     const passageDoc = await db.collection("passages").get();
 
     passageDoc.docs.forEach(doc => {
       passagesByIds[doc.id] = doc.data();
     });
-    const gradesDocs = [...(recallGradesDocs?.docs || [])];
-    let recallGrades = consumeRecallGradesChanges(gradesDocs, fullname, booleanByphrase, passagesByIds);
-    console.log(recallGrades);
+
+    let recallGrades = consumeRecallGradesChanges(recalls, fullname, booleanByphrase, passagesByIds);
+
     let _recallGrades = [];
     if (project === "Autograding") {
       for (let project in recallGrades) {
@@ -137,7 +147,6 @@ module.exports = async (req, res) => {
 
     _recallGrades = [...recalls3Res, ...recalls2Res, ...recalls1Res, ...recalls0Res];
 
-    console.log({ _recallGrades });
     if (recentParticipants.length > 0) {
       _recallGrades.sort((g1, g2) => {
         const p1 = recentParticipants.includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
@@ -147,7 +156,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    return res.status(200).send({ recallgrades: _recallGrades.splice(0, 10) });
+    return res.status(200).send({ recallgrades: _recallGrades.splice(0, 5) });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: "error", data: error });
