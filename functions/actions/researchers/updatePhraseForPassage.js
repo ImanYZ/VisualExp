@@ -36,7 +36,8 @@ module.exports = async (req, res) => {
     const booleanExpressionsDocs = await db.collection("booleanScratch").where("phrase", "==", selectedPhrase).get();
     console.log("got the recall query");
     for (let recallDoc of recallsDocs.docs) {
-      const recallData = recallDoc.data();
+      const recallRef = dbReal.ref(`/recallGradesV2/${recallDoc.id}`);
+      const recallData = (await recallRef.once("value")).val();
       let sessions = recallData.sessions;
       let needUpdate = false;
 
@@ -87,7 +88,7 @@ module.exports = async (req, res) => {
         );
       }
       if (needUpdate) {
-        updateTasks.push(recallDoc.ref.update({ sessions }));
+        updateTasks.push(recallRef.update({ sessions }));
       }
     }
     for (let booleanDoc of booleanExpressionsDocs.docs) {
