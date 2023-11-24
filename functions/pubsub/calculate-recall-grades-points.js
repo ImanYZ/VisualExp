@@ -1,4 +1,5 @@
 const { db } = require("../admin");
+const { dbReal } = require("../admin_real");
 
 const getMajority = grades => {
   const upvotes = grades.filter(g => g).length;
@@ -13,10 +14,20 @@ module.exports = async context => {
         H2K2: {},
         H1L2: {}
       };
-      const recallgradesDocs = await t.get(db.collection("recallGradesV2"));
 
-      for (let recallgradeDoc of recallgradesDocs.docs) {
-        const recallgrade = recallgradeDoc.data();
+      const phrasesPassage = {};
+
+      const passagesDocs = await db.collection("passages").get();
+
+      for (let passageDoc of passagesDocs.docs) {
+        phrasesPassage[passageDoc.id] = [...(passageDoc.data().phrases || [])];
+      }
+
+      const recallsDocs = await dbReal.ref("/recallGradesV2").once("value");
+      const recallsData = recallsDocs.val();
+
+      for (let recallId of recallsData) {
+        const recallgrade = recallsData[recallId];
         const researchersPointsProject = researchersPoints[recallgrade.project];
         const sessions = recallgrade.sessions;
         for (let session in sessions) {
@@ -24,25 +35,27 @@ module.exports = async context => {
           for (let conditionItemIdx = 0; conditionItemIdx < sessionItem.length; conditionItemIdx++) {
             const conditionItem = sessionItem[conditionItemIdx];
             for (let phrase of conditionItem.phrases) {
-              const researchers = phrase.researchers;
-              const grades = phrase.grades;
-              const majority = getMajority(grades);
-              if (majority !== null) {
-                for (let researcherIdx = 0; researcherIdx < researchers.length; researcherIdx++) {
-                  if (!researchersPointsProject[researchers[researcherIdx]]) {
-                    researchersPointsProject[researchers[researcherIdx]] = {
-                      points: 0,
-                      negativePoints: 0
-                    };
-                  }
-                  if (grades[researcherIdx] === majority) {
-                    researchersPointsProject[researchers[researcherIdx]].points =
-                      (researchersPointsProject[researchers[researcherIdx]].points || 0) + 1;
-                  } else {
-                    researchersPointsProject[researchers[researcherIdx]].points =
-                      (researchersPointsProject[researchers[researcherIdx]].points || 0) - 1;
-                    researchersPointsProject[researchers[researcherIdx]].negativePoints =
-                      (researchersPointsProject[researchers[researcherIdx]].negativePoints || 0) + 1;
+              if ([...phrasesPassage[conditionItem.passage]].includes(phrase.phrase) && !phrase.deleted) {
+                const researchers = phrase.researchers;
+                const grades = phrase.grades;
+                const majority = getMajority(grades);
+                if (majority !== null) {
+                  for (let researcherIdx = 0; researcherIdx < researchers.length; researcherIdx++) {
+                    if (!researchersPointsProject[researchers[researcherIdx]]) {
+                      researchersPointsProject[researchers[researcherIdx]] = {
+                        points: 0,
+                        negativePoints: 0
+                      };
+                    }
+                    if (grades[researcherIdx] === majority) {
+                      researchersPointsProject[researchers[researcherIdx]].points =
+                        (researchersPointsProject[researchers[researcherIdx]].points || 0) + 1;
+                    } else {
+                      researchersPointsProject[researchers[researcherIdx]].points =
+                        (researchersPointsProject[researchers[researcherIdx]].points || 0) - 1;
+                      researchersPointsProject[researchers[researcherIdx]].negativePoints =
+                        (researchersPointsProject[researchers[researcherIdx]].negativePoints || 0) + 1;
+                    }
                   }
                 }
               }
