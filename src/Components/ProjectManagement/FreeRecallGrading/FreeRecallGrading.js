@@ -64,6 +64,7 @@ const FreeRecallGrading = props => {
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
   const setHideLeaderBoard = useSetRecoilState(hideLeaderBoardState);
   const [selectedGrade, setSelectedGrade] = useState(null);
+  const [recallGradesList, setRecallGradesList] = useState([]);
   const loadedRecallGrades = async () => {
     try {
       try {
@@ -75,7 +76,8 @@ const FreeRecallGrading = props => {
         await firebase.idToken();
         let response = await axios.post("/researchers/loadRecallGrades", { project });
         console.log(response);
-        let _recallGrade = response.data.recallgrades[0];
+        let _recallGrade = response.data.recallgrades.shift();
+        setRecallGradesList(response.data.recallgrades);
         setSelectedGrade(_recallGrade || null);
         setSubmitting(false);
         setProcessing(false);
@@ -117,8 +119,17 @@ const FreeRecallGrading = props => {
       await firebase.idToken();
       await axios.post("/researchers/gradeRecalls", postData);
       // Increment retrieveNext to get the next free-recall response to grade.
-      setSelectedGrade(null);
-      await loadedRecallGrades();
+
+      if (recallGradesList.length > 0) {
+        const newRecall = recallGradesList.shift();
+        setSelectedGrade(newRecall);
+        setRecallGradesList(recallGradesList);
+        setSubmitting(false);
+      } else {
+        await loadedRecallGrades();
+        setSelectedGrade(null);
+      }
+
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
       setHideLeaderBoard(false);

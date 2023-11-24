@@ -1,139 +1,30 @@
-const { db } = require("../../admin");
-const { Timestamp } = require("firebase-admin/firestore");
-
-const { assignExpPoints } = require("../../helpers/assignExpPoints");
-const { calculateViewers } = require("../../helpers/passage");
-
-const { incrementGradingNum } = require("../../helpers/grading-recalls");
-
+const { dbReal } = require("../../admin_real");
 module.exports = async (req, res) => {
   try {
     console.log("grade recalls");
     const { recallGrade, voterProject } = req.body;
     const { docId: fullname } = req.researcher;
-
-    const { researcher } = req;
-
     if (!recallGrade || !voterProject) {
       return res.status(500).send({
         message: "some parameters are missing"
       });
     }
-
-    const { session, condition } = recallGrade;
-
-    await db.runTransaction(async t => {
-      let transactionWrites = [];
-      // loading user data from recall grade document
-      const recallGradeDoc = await t.get(db.collection("recallGradesV2").doc(recallGrade.docId));
-      const recallGradeData = recallGradeDoc.data();
-
-      // loading user data from user document
-      const user = await t.get(db.collection("users").doc(recallGradeData.user));
-      let userUpdates = user.data();
-      let userUpdate = false;
-
-      // updating gradingNum for the researcher for this project
-      // And for autograding
-      incrementGradingNum(researcher, recallGradeData.project);
-      incrementGradingNum(researcher, "Autograding");
-
-      const conditionIdx = recallGradeData.sessions[session].findIndex(
-        conditionItem => conditionItem.condition === condition
-      );
-      if (conditionIdx === -1) {
-        throw new Error("unknown condition supplied");
-      }
-
-      const conditionUpdates = recallGradeData.sessions[session][conditionIdx];
-
-      let researchersUpdates = {};
-      let updatedResearchers = [];
-
-      // adding gradingNum
-
-      researchersUpdates[researcher.docId] = researcher;
-      updatedResearchers.push(researcher.docId);
-
-      for (let phrase of recallGrade.phrases) {
-        const researcherIdx = (phrase.researchers || []).indexOf(fullname);
-        const grade = !!(phrase.grades || [])[researcherIdx];
-        const phraseIdx = conditionUpdates.phrases.findIndex(p => p.phrase === phrase.phrase && !p.deleted);
-        conditionUpdates.phrases[phraseIdx].researchers = [...new Set([...phrase.researchers, fullname])];
-        conditionUpdates.phrases[phraseIdx].grades = [...(conditionUpdates.phrases[phraseIdx].grades || []), grade];
-      }
-
-      recallGradeData.viewers = await calculateViewers(recallGradeData);
-
-      transactionWrites.push({
-        type: "update",
-        refObj: recallGradeDoc.ref,
-        updateObj: recallGradeData
-      });
-
-      // updating participant points if required
-      if (userUpdate) {
-        const userRef = db.collection("users").doc(recallGradeData.user);
-        transactionWrites.push({
-          type: "update",
-          refObj: userRef,
-          updateObj: userUpdates
-        });
-      }
-      const recallGradeLogRef = db.collection("recallGradesLogs").doc();
-      transactionWrites.push({
-        type: "set",
-        refObj: recallGradeLogRef,
-        updateObj: {
-          createdAt: Timestamp.fromDate(new Date()),
-          researcher: fullname,
-          gradingNum: 1,
-          project: recallGradeData.project
-        }
-      });
-
-      let readyRecalls = true;
-      for (let recall of recallGradeData.sessions[session]) {
-        if (!(recall.researchers || []).includes(fullname)) {
-          readyRecalls = false;
-          break;
+    /*
+    update the recall grades accoding to the vote of the researcher 
+    */
+    const { session, conditionIdx, phrases } = recallGrade;
+    const recallGradeRef = dbReal.ref(`/recallGradesV2/${recallGrade.docId}/sessions/${session}/${conditionIdx}`);
+    await recallGradeRef.transaction(conditionUpdates => {
+      if (conditionUpdates !== null) {
+        for (let phrase of phrases) {
+          const researcherIdx = (phrase.researchers || []).indexOf(fullname);
+          const grade = !!(phrase.grades || [])[researcherIdx];
+          const phraseIdx = conditionUpdates.phrases.findIndex(p => p.phrase === phrase.phrase && !p.deleted);
+          conditionUpdates.phrases[phraseIdx].researchers = [...new Set([...phrase.researchers, fullname])];
+          conditionUpdates.phrases[phraseIdx].grades = [...(conditionUpdates.phrases[phraseIdx].grades || []), grade];
         }
       }
-      if (readyRecalls) {
-        await assignExpPoints({
-          researcher,
-          participant: recallGradeData.user,
-          session,
-          project: voterProject,
-          recallGradeData,
-          feedbackCodeData: null,
-          transactionWrites: transactionWrites,
-          researchersUpdates,
-          t
-        });
-      }
-      // updating points for researchers if required
-      for (const researcherId in researchersUpdates) {
-        if (!updatedResearchers.includes(researcherId)) {
-          continue;
-        }
-        const researcherRef = db.collection("researchers").doc(researcherId);
-        transactionWrites.push({
-          type: "update",
-          refObj: researcherRef,
-          updateObj: researchersUpdates[researcherId]
-        });
-      }
-
-      for (const transactionWrite of transactionWrites) {
-        if (transactionWrite.type === "update") {
-          t.update(transactionWrite.refObj, transactionWrite.updateObj);
-        } else if (transactionWrite.type === "set") {
-          t.set(transactionWrite.refObj, transactionWrite.updateObj);
-        } else if (transactionWrite.type === "delete") {
-          t.delete(transactionWrite.refObj);
-        }
-      }
+      return conditionUpdates;
     });
 
     return res.status(200).json({
@@ -184,4 +75,25 @@ module.exports = async (req, res) => {
 //       (grades / conditionUpdates.phrases.length).toFixed(2)
 //     );
 //   }
+// }
+
+// let readyRecalls = true;
+// for (let recall of recallGradeData.sessions[session]) {
+//   if (!(recall.researchers || []).includes(fullname)) {
+//     readyRecalls = false;
+//     break;
+//   }
+// }
+// if (readyRecalls) {
+//   await assignExpPoints({
+//     researcher,
+//     participant: recallGradeData.user,
+//     session,
+//     project: voterProject,
+//     recallGradeData,
+//     feedbackCodeData: null,
+//     transactionWrites: transactionWrites,
+//     researchersUpdates,
+//     t
+//   });
 // }
