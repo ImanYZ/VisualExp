@@ -1,5 +1,5 @@
 const { db } = require("../admin");
-const { dbReal } = require("../../admin_real");
+const { dbReal } = require("../admin_real");
 
 const getMajority = grades => {
   const upvotes = grades.filter(g => g).length;
