@@ -97,7 +97,7 @@ module.exports = async (req, res) => {
           const gpt4Logs = ObjectToArray(conditionLogs ? conditionLogs.gpt4 : {});
           const countedPhrases = phrasesPassage[conditionItem.passage];
           for (let phraseItem of conditionItem.phrases) {
-            if (phraseItem.deleted || countedPhrases.includes(phraseItem.phrase)) continue;
+            if (phraseItem.deleted || !countedPhrases.includes(phraseItem.phrase)) continue;
 
             const trueVotes = phraseItem.grades.filter(grade => grade).length;
             const falseVotes = phraseItem.grades.filter(grade => !grade).length;
