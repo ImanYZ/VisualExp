@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
-
+import LoadingButton from "@mui/lab/LoadingButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -394,15 +394,16 @@ const Auth = props => {
               <div className="Error">You've participated in this study before and cannot participate again!</div>
             )}
             <div id="SignButtonContainer">
-              <Button
+              <LoadingButton
                 id="SignButton"
                 onClick={signUp}
                 className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
                 variant="contained"
                 disabled={submitable && !isSubmitting ? null : true}
+                loading={isSubmitting}
               >
                 {isSignUp === 0 ? "Sign In" : isSubmitting ? "Creating your account..." : "Consent and Sign Up"}
-              </Button>
+              </LoadingButton>
             </div>
             <div style={{ textAlign: "center", marginTop: "10px" }}>
               <Button onClick={openForgotPassword} variant="contained" color="warning">
