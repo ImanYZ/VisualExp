@@ -1,5 +1,6 @@
 const { db } = require("../../admin");
 const { FieldValue } = require("firebase-admin/firestore");
+const { dbReal } = require("../../admin_real");
 
 module.exports = async (req, res) => {
   try {
@@ -15,7 +16,9 @@ module.exports = async (req, res) => {
     const updateTasks = [];
 
     for (let recallDoc of recallGradesDoc.docs) {
-      let updateSessions = recallDoc.data().sessions;
+      const recallRef = dbReal.ref(`/recallGradesV2/${recallDoc.id}`);
+      const recallData = (await recallRef.once("value")).val();
+      let updateSessions = recallData.sessions;
       let needUpdate = false;
       for (let session in updateSessions) {
         for (let conditionItem of updateSessions[session]) {
@@ -27,7 +30,7 @@ module.exports = async (req, res) => {
         }
       }
       if (needUpdate) {
-        updateTasks.push(recallDoc.ref.update({ sessions: updateSessions }));
+        updateTasks.push(recallRef.update({ sessions: updateSessions }));
       }
     }
     updateTasks.push(
