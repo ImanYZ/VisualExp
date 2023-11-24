@@ -404,8 +404,8 @@ const Activities = props => {
           margin: activePage === "SchemaGenerationTool" && 0
         }}
       >
-        {showLeaderBoard && !hideLeaderBoard &&  (
-          <div className="Columns40_60">
+        {showLeaderBoard && !hideLeaderBoard && (
+          <div className="Columns40_60" style={{ margin: "13px" }}>
             <Alert severity="warning">
               <ProjectPointThresholds projectPoints={projectPoints} />
               <Button

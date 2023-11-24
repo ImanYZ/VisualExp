@@ -1,35 +1,32 @@
 import React, { useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 // import IconButton from "@mui/material/IconButton";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import BiotechIcon from "@mui/icons-material/Biotech";
+import LogoutIcon from "@mui/icons-material/Logout";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom";
-import LogoutIcon from "@mui/icons-material/Logout";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import BiotechIcon from "@mui/icons-material/Biotech";
 
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
 // import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 import {
-  firebaseState,
-  emailState,
-  fullnameState,
-  resumeUrlState,
-  transcriptUrlState,
-  applicationsSubmittedState,
   colorModeState,
+  emailState,
+  firebaseState,
+  fullnameState,
   leadingState
 } from "../../../../store/AuthAtoms";
-import { notAResearcherState } from "../../../../store/ProjectAtoms";
 import { completedExperimentState } from "../../../../store/ExperimentAtoms";
+import { notAResearcherState } from "../../../../store/ProjectAtoms";
 
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
