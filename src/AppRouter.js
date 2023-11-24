@@ -3,6 +3,24 @@ import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { Routes, Route } from "react-router-dom";
 import RecallForIman from "./Components/ProjectManagement/FreeRecallGrading/RecallForIman.js";
 import {
+  addDoc,
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  onSnapshot,
+  Query,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+  where,
+  writeBatch
+} from "firebase/firestore";
+import {
   firebaseState,
   emailState,
   emailVerifiedState,
@@ -68,6 +86,8 @@ import GDPRPolicy from "./Components/Home/GDPRPolicy";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
+  const { db } = firebase;
+
   const { db: dbOne } = firebaseOne;
 
   // selected theme for authenticated user (dark mode/light mode)
@@ -101,118 +121,118 @@ const AppRouter = props => {
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
   const processAuth = async user => {
-    const { db } = firebase;
-    // const uid = user.uid;
-    const uEmail = user.email.toLowerCase();
-    const users = await db.collection("users").where("email", "==", uEmail).get();
-    let isSurvey = false;
+    try {
+      const uEmail = user.email.toLowerCase();
+      const users = await db.collection("users").where("email", "==", uEmail).get();
+      let isSurvey = false;
 
-    let userData = null;
-    let fullName = null;
+      let userData = null;
+      let fullName = null;
 
-    if (!users.docs.length) {
-      const usersSurvey = await db.collection("usersSurvey").where("email", "==", uEmail).get();
-      if (usersSurvey.docs.length) {
-        isSurvey = true;
-        fullName = usersSurvey.docs[0].id;
-        userData = usersSurvey.docs[0].data();
-      }
-    } else {
-      fullName = users.docs[0].id;
-      userData = users.docs[0].data();
-      setEmail(uEmail.toLowerCase());
-      if (!userData.firstname || !userData.lastname) {
-        window.location.href = "/";
-      }
-      if (userData.applicationsSubmitted) {
-        setApplicationsSubmitted(userData.applicationsSubmitted);
-      }
-      if ("Resume" in userData) {
-        setResumeUrl(userData["Resume"]);
-      }
-      if ("Transcript" in userData) {
-        setTranscriptUrl(userData["Transcript"]);
-      }
-      if ("projectDone" in userData && userData.projectDone) {
-        setHasScheduled(true);
-        setCompletedExperiment(true);
-        if (!userData.surveyType) {
-          await users.docs[0].ref.update({
-            surveyType: "student"
-          });
+      if (!users.docs.length) {
+        const usersSurvey = await db.collection("usersSurvey").where("email", "==", uEmail).get();
+        if (usersSurvey.docs.length) {
+          isSurvey = true;
+          fullName = usersSurvey.docs[0].id;
+          userData = usersSurvey.docs[0].data();
         }
       } else {
-        const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
-        const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
-        let allPassed = true;
-        if (scheduleDocs.docs.length >= 3) {
-          let scheduledSessions = 0;
-          for (let scheduleDoc of scheduleDocs.docs) {
-            const scheduleData = scheduleDoc.data();
-            if (scheduleData.order) {
-              scheduledSessions += 1;
-              if (scheduleData.session >= nowTimestamp) {
-                allPassed = false;
+        fullName = users.docs[0].id;
+        userData = users.docs[0].data();
+        setEmail(uEmail.toLowerCase());
+        if (!userData.firstname || !userData.lastname) {
+          window.location.href = "/";
+        }
+        if (userData.applicationsSubmitted) {
+          setApplicationsSubmitted(userData.applicationsSubmitted);
+        }
+        if ("Resume" in userData) {
+          setResumeUrl(userData["Resume"]);
+        }
+        if ("Transcript" in userData) {
+          setTranscriptUrl(userData["Transcript"]);
+        }
+        if ("projectDone" in userData && userData.projectDone) {
+          setHasScheduled(true);
+          setCompletedExperiment(true);
+          if (!userData.surveyType) {
+            await users.docs[0].ref.update({
+              surveyType: "student"
+            });
+          }
+        } else {
+          const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
+          const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
+          let allPassed = true;
+          if (scheduleDocs.docs.length >= 3) {
+            let scheduledSessions = 0;
+            for (let scheduleDoc of scheduleDocs.docs) {
+              const scheduleData = scheduleDoc.data();
+              if (scheduleData.order) {
+                scheduledSessions += 1;
+                if (scheduleData.session >= nowTimestamp) {
+                  allPassed = false;
+                }
+              }
+            }
+            if (scheduledSessions >= 3) {
+              setHasScheduled(true);
+              if (allPassed) {
+                setCompletedExperiment(true);
               }
             }
           }
-          if (scheduledSessions >= 3) {
-            setHasScheduled(true);
-            if (allPassed) {
-              setCompletedExperiment(true);
-            }
-          }
         }
       }
-    }
 
-    if (!userData) return; // if user document doesn't exists
-    const researcherDoc = await firebase.db.collection("researchers").doc(fullName).get();
-    let isResearcher = researcherDoc.exists;
+      if (!userData) return; // if user document doesn't exists
+      const researcherDoc = await firebase.db.collection("researchers").doc(fullName).get();
+      let isResearcher = true;
 
-    if (!isSurvey) {
-      setPhase(userData?.phase || 0);
-      setStep(userData?.step || 0);
-      setPassage(userData?.currentPCon?.passage || "");
-      setCondition(userData?.currentPCon?.condition || "");
-      setNullPassage(userData?.nullPassage || "");
-      setChoices(userData?.choices || []);
-    }
+      if (!isSurvey) {
+        setPhase(userData?.phase || 0);
+        setStep(userData?.step || 0);
+        setPassage(userData?.currentPCon?.passage || "");
+        setCondition(userData?.currentPCon?.condition || "");
+        setNullPassage(userData?.nullPassage || "");
+        setChoices(userData?.choices || []);
+      }
 
-    if (userData.leading && userData.leading.length > 0) {
-      setLeading(userData.leading.filter(id => !!communitiesOrder.find(com => com.id === id)));
-    }
+      if (userData.leading && userData.leading.length > 0) {
+        setLeading(userData.leading.filter(id => !!communitiesOrder.find(com => com.id === id)));
+      }
 
-    setFullname(fullName);
-    setEmailVerified("Verified");
-    setEmail(uEmail);
+      setFullname(fullName);
+      setEmailVerified("Verified");
+      setEmail(uEmail);
 
-    if (!isResearcher) {
-      if (!userData?.survey) {
-        setProject(userData.project);
+      if (!isResearcher) {
+        if (!userData?.survey) {
+          setProject(userData.project);
+        } else {
+          setProject("OnlineCommunities");
+        }
       } else {
-        setProject("OnlineCommunities");
-      }
-    } else {
-      // if current user a researcher
-      const researcherData = researcherDoc.data();
-      if (researcherData.isAdmin) {
-        setIsAdmin(true);
-      }
+        // if current user a researcher
+        const researcherData = researcherDoc.data();
+        if (researcherData.isAdmin) {
+          setIsAdmin(true);
+        }
 
-      const myProjects = [];
-      for (let pr in researcherData.projects) {
-        myProjects.push(pr);
+        const myProjects = [...Object.keys(researcherData.projects)];
+
+        setProjects(myProjects);
+        const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
+        if (myProjects.includes(prevProj)) {
+          setProject(prevProj);
+        } else {
+          setProject(myProjects[0]);
+        }
       }
-      setProjects(myProjects);
-      const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
-      if (myProjects.includes(prevProj)) {
-        setProject(prevProj);
-      } else {
-        setProject(myProjects[0]);
-      }
+      setNotAResearcher(!isResearcher);
+    } catch (error) {
+      console.error(error);
     }
-    setNotAResearcher(!isResearcher);
   };
   useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
@@ -252,6 +272,7 @@ const AppRouter = props => {
         setApplicationsSubmitted({});
       }
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase, fullname]);
 
@@ -539,7 +560,7 @@ const AppRouter = props => {
                 />
                 <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
                 <Route path="ScheduleInstructor/" element={<ScheduleUnknownInstructorPage />} />
-                <Route path="Activities/RecallForIman" element={<RecallForIman/>} />
+                <Route path="Activities/RecallForIman" element={<RecallForIman />} />
               </>
             </>
           )}

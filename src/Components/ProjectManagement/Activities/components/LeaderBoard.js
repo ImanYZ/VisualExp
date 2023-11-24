@@ -151,41 +151,51 @@ export const LeaderBoard = ({
 
   return (
     <div id="Leaderboard">
-      <h2 id="InternsLeaderboardHeader">Interns Leaderboard:</h2>
       <Paper
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          listStyle: "none",
           p: 0.5,
-          m: 0
+          ml: 1.5,
+          mr: 1.5
         }}
-        component="ul"
       >
-        {researchers.map(resear => {
-          return (
-            <li key={resear.id} className="LeaderboardItem">
-              <Chip
-                icon={
-                  isResearcherCriteriaMet(resear) ? (
-                    <span className="ChipContent">😊</span>
-                  ) : (
-                    <span className="ChipContent">😔</span>
-                  )
-                }
-                variant="outlined"
-                color={isResearcherCriteriaMet(resear) ? "success" : "error"}
-                label={
-                  <span className="ChipContent">
-                    {(resear.id === fullname || fullname === "Iman YeckehZaare") && resear.id + " - "}
-                    {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
-                  </span>
-                }
-              />
-            </li>
-          );
-        })}
+        <Typography variant="h4" sx={{ pl: "15px" }}>
+          Interns Leaderboard:
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            listStyle: "none",
+            p: 0.5,
+            m: 0
+          }}
+          component="ul"
+        >
+          {researchers.map(resear => {
+            return (
+              <li key={resear.id} className="LeaderboardItem">
+                <Chip
+                  icon={
+                    isResearcherCriteriaMet(resear) ? (
+                      <span className="ChipContent">😊</span>
+                    ) : (
+                      <span className="ChipContent">😔</span>
+                    )
+                  }
+                  variant="outlined"
+                  color={isResearcherCriteriaMet(resear) ? "success" : "error"}
+                  label={
+                    <span className="ChipContent">
+                      {(resear.id === fullname || fullname === "Iman YeckehZaare") && resear.id + " - "}
+                      {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
+                    </span>
+                  }
+                />
+              </li>
+            );
+          })}
+        </Box>
       </Paper>
       {hasRecentParticipantRecalls ? (
         <Box
