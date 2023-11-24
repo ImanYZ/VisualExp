@@ -3,6 +3,8 @@ import axios from "axios";
 import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 // mui imports
 import Paper from "@mui/material/Paper";
 import { makeStyles } from "@mui/styles";
@@ -618,7 +620,8 @@ export const SchemaGeneration = () => {
               sx={{ color: "white" }}
               onClick={previousPassage}
             >
-              {`< Previous Passage`}
+              <ArrowBackIosNewIcon style={{ fontSize: "15px" }} />
+              {`Previous Passage`}
             </Button>
           </Box>
           <Box sx={{ width: "55%" }}>
@@ -646,7 +649,7 @@ export const SchemaGeneration = () => {
               sx={{ color: "white" }}
               onClick={nextPassage}
             >
-              {` Next Passage >`}
+              {` Next Passage `} <ArrowForwardIosIcon style={{ fontSize: "15px" }} />
             </Button>
           </Box>
         </Box>
@@ -661,7 +664,7 @@ export const SchemaGeneration = () => {
                 disabled={(selectedPassage?.phrases || []).indexOf(selectedPhrase) === 0}
                 onClick={previousPhrase}
               >
-                {`< Prev `}
+                <ArrowBackIosNewIcon style={{ fontSize: "15px" }} /> {`Prev `}
               </Button>
             </Box>
             <Box
@@ -699,7 +702,9 @@ export const SchemaGeneration = () => {
                   (selectedPassage?.phrases || []).length - 1
                 }
                 onClick={nextPhrase}
-              >{`NEXT >`}</Button>
+              >
+                {`NEXT`} <ArrowForwardIosIcon style={{ fontSize: "15px" }} />
+              </Button>
             </Box>
           </Box>
           <Box className="query-block">

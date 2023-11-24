@@ -72,6 +72,14 @@ module.exports = async (req, res) => {
     });
     const logsDoc = await dbReal.ref("/recallGradesGPTLogs").once("value");
 
+    const phrasesPassage = {};
+
+    const passagesDocs = await db.collection("passages").get();
+
+    for (let passageDoc of passagesDocs.docs) {
+      phrasesPassage[passageDoc.id] = [...(passageDoc.data().phrases || [])];
+    }
+
     const logs = logsDoc.val();
     console.log("loaded logs");
     const recallGradesDocs = await db.collection("recallGradesV2").get();
@@ -87,9 +95,9 @@ module.exports = async (req, res) => {
           const conditionItem = recallData.sessions[session][conditionIdx];
           const conditionIndex = recallData.sessions[session].indexOf(conditionItem);
           const gpt4Logs = ObjectToArray(conditionLogs ? conditionLogs.gpt4 : {});
-
+          const countedPhrases = phrasesPassage[conditionItem.passage];
           for (let phraseItem of conditionItem.phrases) {
-            if (phraseItem.deleted) continue;
+            if (phraseItem.deleted || countedPhrases.includes(phraseItem.phrase)) continue;
 
             const trueVotes = phraseItem.grades.filter(grade => grade).length;
             const falseVotes = phraseItem.grades.filter(grade => !grade).length;
