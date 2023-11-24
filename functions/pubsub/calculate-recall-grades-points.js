@@ -1,4 +1,5 @@
 const { db } = require("../admin");
+const { dbReal } = require("../../admin_real");
 
 const getMajority = grades => {
   const upvotes = grades.filter(g => g).length;
@@ -13,10 +14,11 @@ module.exports = async context => {
         H2K2: {},
         H1L2: {}
       };
-      const recallgradesDocs = await t.get(db.collection("recallGradesV2"));
+      const recallsDocs = await dbReal.ref("/recallGradesV2").once("value");
+      const recallsData = recallsDocs.val();
 
-      for (let recallgradeDoc of recallgradesDocs.docs) {
-        const recallgrade = recallgradeDoc.data();
+      for (let recallId of recallsData) {
+        const recallgrade = recallsData[recallId];
         const researchersPointsProject = researchersPoints[recallgrade.project];
         const sessions = recallgrade.sessions;
         for (let session in sessions) {
