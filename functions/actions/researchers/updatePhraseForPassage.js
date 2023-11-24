@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
   try {
     console.log("updatePhraseForPassage");
     const { passagTitle, selectedPhrase, newPhrase, resetGrades, resetGradesGPT } = req.body;
+    const { docId: fullname } = req.researcher;
     const passageQuery = db.collection("passages").where("title", "==", passagTitle);
     const passageSnapshot = await passageQuery.get();
     const passageDoc = passageSnapshot.docs[0];
@@ -31,16 +32,12 @@ module.exports = async (req, res) => {
     passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
     const updateTasks = [];
 
-    updateTasks.push(
-      passageDoc.ref.update({
-        phrases: passageUpdate.phrases
-      })
-    );
     const recallsDocs = await db.collection("recallGradesV2").where("passages", "array-contains", passageDoc.id).get();
     const booleanExpressionsDocs = await db.collection("booleanScratch").where("phrase", "==", selectedPhrase).get();
     console.log("got the recall query");
     for (let recallDoc of recallsDocs.docs) {
-      const recallData = recallDoc.data();
+      const recallRef = dbReal.ref(`/recallGradesV2/${recallDoc.id}`);
+      const recallData = (await recallRef.once("value")).val();
       let sessions = recallData.sessions;
       let needUpdate = false;
 
@@ -91,13 +88,27 @@ module.exports = async (req, res) => {
         );
       }
       if (needUpdate) {
-        updateTasks.push(recallDoc.ref.update({ sessions }));
+        updateTasks.push(recallRef.update({ sessions }));
       }
     }
     for (let booleanDoc of booleanExpressionsDocs.docs) {
       updateTasks.push(booleanDoc.ref.update({ phrase: newPhrase }));
     }
+    updateTasks.push(
+      passageDoc.ref.update({
+        phrases: passageUpdate.phrases
+      })
+    );
     await Promise.all(updateTasks);
+    const newLogRef = db.collection("phrasesLogs").doc();
+
+    await newLogRef.set({
+      action: "deleted phrase",
+      phrase: selectedPhrase,
+      passage: passagTitle,
+      createdAt: new Date(),
+      doer: fullname
+    });
     res.status(200).send({ message: "success" });
   } catch (error) {
     res.status(500).send({ message: "error" });
