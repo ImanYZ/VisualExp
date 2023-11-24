@@ -4,6 +4,7 @@ const { FieldValue } = require("firebase-admin/firestore");
 module.exports = async (req, res) => {
   try {
     const { passageId, selectedPhrase } = req.body;
+    const { docId: fullname } = req.researcher;
     const passageRef = db.collection("passages").doc(passageId);
     const recallGradesDoc = await db.collection("recallGradesV2").where("passages", "array-contains", passageId).get();
     const passageDoc = await passageRef.get();
@@ -12,12 +13,6 @@ module.exports = async (req, res) => {
       passageData.phrasesTypes.splice(passageData.phrases.indexOf(selectedPhrase), 1);
     }
     const updateTasks = [];
-    updateTasks.push(
-      passageDoc.ref.update({
-        phrases: FieldValue.arrayRemove(selectedPhrase),
-        phrasesTypes: passageData.hasOwnProperty("phrasesTypes") ? passageData.phrasesTypes : []
-      })
-    );
 
     for (let recallDoc of recallGradesDoc.docs) {
       let updateSessions = recallDoc.data().sessions;
@@ -35,7 +30,23 @@ module.exports = async (req, res) => {
         updateTasks.push(recallDoc.ref.update({ sessions: updateSessions }));
       }
     }
+    updateTasks.push(
+      passageDoc.ref.update({
+        phrases: FieldValue.arrayRemove(selectedPhrase),
+        phrasesTypes: passageData.hasOwnProperty("phrasesTypes") ? passageData.phrasesTypes : []
+      })
+    );
     await Promise.all(updateTasks);
+
+    const newLogRef = db.collection("phrasesLogs").doc();
+
+    await newLogRef.set({
+      action: "deleted phrase",
+      phrase: selectedPhrase,
+      passageId,
+      createdAt: new Date(),
+      doer: fullname
+    });
     res.status(200).send({ message: "success" });
   } catch (error) {
     console.log(error);

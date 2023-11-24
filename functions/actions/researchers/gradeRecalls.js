@@ -4,11 +4,7 @@ const { Timestamp } = require("firebase-admin/firestore");
 const { assignExpPoints } = require("../../helpers/assignExpPoints");
 const { calculateViewers } = require("../../helpers/passage");
 
-const {
-  getRecallResponse,
-  incrementGradingNum,
-  convertToVotesByPhrasesFunction
-} = require("../../helpers/grading-recalls");
+const { incrementGradingNum } = require("../../helpers/grading-recalls");
 
 module.exports = async (req, res) => {
   try {
@@ -54,60 +50,17 @@ module.exports = async (req, res) => {
       let researchersUpdates = {};
       let updatedResearchers = [];
 
-      //load Researchers
-      const researchers = await t.get(db.collection("researchers"));
-
-      for (const _researcher of researchers.docs) {
-        const researcherData = _researcher.data();
-        researchersUpdates[_researcher.id] = researcherData;
-      }
       // adding gradingNum
 
-      researchersUpdates[researcher.docId].projects = researcher.projects;
+      researchersUpdates[researcher.docId] = researcher;
       updatedResearchers.push(researcher.docId);
 
-      // there should be 4 down/no votes or up/yes votes to consider phrase approval
-      const votesByPhrases = convertToVotesByPhrasesFunction(conditionUpdates, recallGrade, fullname);
-
-      // phrases considered as approved
-      const phrasesApproval = Object.keys(votesByPhrases).filter(
-        phrase => votesByPhrases[phrase].upVotes >= 3 || votesByPhrases[phrase].downVotes >= 3
-      );
-
-      // distribute points to participants
-
-      for (let phraseApproval of phrasesApproval || []) {
-        const votesOfPhrase = votesByPhrases[phraseApproval];
-
-        // we are only processing points when we have 4 researchers voted on phrase
-        // if document already had 4 researchers or phrase was approve, we don't continue calculations
-        if (votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
-
-        let recallResponse = getRecallResponse(session);
-
-        const passageIdx = (userUpdates?.pConditions || []).findIndex(
-          conditionItem => conditionItem.passage === recallGrade.passage
-        );
-        if (passageIdx !== -1) {
-          userUpdate = true;
-          // The only piece of the user data that should be modified is
-          // pCondition based on the point received.
-          let grades = 1;
-          if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
-            // We should add up points here because each free recall response
-            // may get multiple points from each of the key phrases identified
-            // in it.
-            grades += userUpdates.pConditions[passageIdx][recallResponse];
-          }
-
-          userUpdates.pConditions[passageIdx][recallResponse] = grades;
-
-          // Depending on how many key phrases were in the passage, we should
-          // calculate the free-recall response ratio.
-          userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
-            (grades / conditionUpdates.phrases.length).toFixed(2)
-          );
-        }
+      for (let phrase of recallGrade.phrases) {
+        const researcherIdx = (phrase.researchers || []).indexOf(fullname);
+        const grade = !!(phrase.grades || [])[researcherIdx];
+        const phraseIdx = conditionUpdates.phrases.findIndex(p => p.phrase === phrase.phrase && !p.deleted);
+        conditionUpdates.phrases[phraseIdx].researchers = [...new Set([...phrase.researchers, fullname])];
+        conditionUpdates.phrases[phraseIdx].grades = [...(conditionUpdates.phrases[phraseIdx].grades || []), grade];
       }
 
       recallGradeData.viewers = await calculateViewers(recallGradeData);
@@ -141,7 +94,7 @@ module.exports = async (req, res) => {
 
       let readyRecalls = true;
       for (let recall of recallGradeData.sessions[session]) {
-        if (!recall.researchers.includes(fullname)) {
+        if (!(recall.researchers || []).includes(fullname)) {
           readyRecalls = false;
           break;
         }
@@ -193,3 +146,42 @@ module.exports = async (req, res) => {
     });
   }
 };
+
+// TO-DO: move this to the pub-sub =: calculate-recall-grades-points.js
+
+// const phrasesApproval = Object.keys(votesByPhrases).filter(
+//   phrase => votesByPhrases[phrase].upVotes >= 3 || votesByPhrases[phrase].downVotes >= 3
+// );
+// for (let phraseApproval of phrasesApproval || []) {
+//   const votesOfPhrase = votesByPhrases[phraseApproval];
+
+//   // we are only processing points when we have 4 researchers voted on phrase
+//   // if document already had 4 researchers or phrase was approve, we don't continue calculations
+//   if (votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
+
+//   let recallResponse = getRecallResponse(session);
+
+//   const passageIdx = (userUpdates?.pConditions || []).findIndex(
+//     conditionItem => conditionItem.passage === recallGrade.passage
+//   );
+//   if (passageIdx !== -1) {
+//     userUpdate = true;
+//     // The only piece of the user data that should be modified is
+//     // pCondition based on the point received.
+//     let grades = 1;
+//     if (userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
+//       // We should add up points here because each free recall response
+//       // may get multiple points from each of the key phrases identified
+//       // in it.
+//       grades += userUpdates.pConditions[passageIdx][recallResponse];
+//     }
+
+//     userUpdates.pConditions[passageIdx][recallResponse] = grades;
+
+//     // Depending on how many key phrases were in the passage, we should
+//     // calculate the free-recall response ratio.
+//     userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = parseFloat(
+//       (grades / conditionUpdates.phrases.length).toFixed(2)
+//     );
+//   }
+// }
