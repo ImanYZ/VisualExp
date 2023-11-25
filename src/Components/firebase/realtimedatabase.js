@@ -12,6 +12,6 @@ const firebaseConfig = {
   databaseURL: "https://visualexp-a7d2c-default-rtdb.firebaseio.com/"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig, "realtime");
 
 export const database = getDatabase(app);
