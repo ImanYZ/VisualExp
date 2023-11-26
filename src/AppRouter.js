@@ -104,7 +104,7 @@ const AppRouter = props => {
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
   const processAuth = async user => {
     try {
-      const uEmail = "fmabud@bu.edu";
+      const uEmail = user.email.toLowerCase();
       const users = await db.collection("users").where("email", "==", uEmail).get();
       let isSurvey = false;
 
