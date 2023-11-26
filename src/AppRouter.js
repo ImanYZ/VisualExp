@@ -1,88 +1,70 @@
-import React, { useState, useEffect } from "react";
-import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
-import { Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import RecallForIman from "./Components/ProjectManagement/FreeRecallGrading/RecallForIman.js";
 import {
-  addDoc,
-  collection,
-  doc,
-  DocumentData,
-  getDoc,
-  getDocs,
-  getFirestore,
-  limit,
-  onSnapshot,
-  Query,
-  query,
-  setDoc,
-  Timestamp,
-  updateDoc,
-  where,
-  writeBatch
-} from "firebase/firestore";
-import {
-  firebaseState,
+  applicationsSubmittedState,
   emailState,
   emailVerifiedState,
+  firebaseState,
   fullnameState,
+  institutionsState,
+  isAdminState,
   /*   themeState,
   themeOSState, */
   leadingState,
-  institutionsState,
-  isAdminState,
   resumeUrlState,
-  transcriptUrlState,
-  applicationsSubmittedState
+  transcriptUrlState
 } from "./store/AuthAtoms";
 import {
   choicesState,
+  completedExperimentState,
   conditionState,
+  hasScheduledState,
   nullPassageState,
   passageState,
   phaseState,
   startedSessionState,
-  stepState,
-  hasScheduledState,
-  completedExperimentState
+  stepState
 } from "./store/ExperimentAtoms";
 
 import App from "./App";
-import SchedulePage from "./Components/SchedulePage/SchedulePage";
-import ScheduleInstructorPage from "./Components/SchedulePage/ScheduleInstructorPage";
-import ScheduleUnknownInstructorPage from "./Components/SchedulePage/ScheduleUnknownInstructorPage";
-import ScheduleAdministratorPage from "./Components/SchedulePage/ScheduleAdministratorPage";
 import AuthConsent from "./Components/Auth/AuthConsent";
-import Activities from "./Components/ProjectManagement/Activities/Activities";
-import Home from "./Components/Home/Home";
-import Privacy from "./Components/Home/Privacy";
-import Terms from "./Components/Home/Terms";
+import DissertationGantt from "./Components/DissertationGantt";
+import AdministratorLater from "./Components/Home/AdministratorLater";
+import AdministratorNo from "./Components/Home/AdministratorNo";
+import Communities from "./Components/Home/Communities";
+import CommunityApplications from "./Components/Home/CommunityApplications";
 import CookiePolicy from "./Components/Home/CookiePolicy";
-import LifeLogger from "./Components/LifeLogger/LifeLogger";
+import Home from "./Components/Home/Home";
+import InstructorLater from "./Components/Home/InstructorLater";
+import InstructorNo from "./Components/Home/InstructorNo";
+import InviteStudents from "./Components/Home/InviteStudents";
+import communitiesOrder from "./Components/Home/modules/views/communitiesOrder";
+import PaperTest from "./Components/Home/PaperTest";
+import Privacy from "./Components/Home/Privacy";
+import QuizFeedBack from "./Components/Home/QuizFeedBack";
+import ReminderDate from "./Components/Home/ReminderDate";
+import Terms from "./Components/Home/Terms";
 import Tutorial from "./Components/Home/Tutorial";
 import TutorialFeedback from "./Components/Home/TutorialFeedback";
 import Withdraw from "./Components/Home/Withdraw";
-import Communities from "./Components/Home/Communities";
-import communitiesOrder from "./Components/Home/modules/views/communitiesOrder";
-import PaperTest from "./Components/Home/PaperTest";
-import ReminderDate from "./Components/Home/ReminderDate";
-import CommunityApplications from "./Components/Home/CommunityApplications";
-import InviteStudents from "./Components/Home/InviteStudents";
-import InstructorNo from "./Components/Home/InstructorNo";
-import InstructorLater from "./Components/Home/InstructorLater";
-import AdministratorNo from "./Components/Home/AdministratorNo";
-import AdministratorLater from "./Components/Home/AdministratorLater";
-import QuizFeedBack from "./Components/Home/QuizFeedBack";
-import DissertationGantt from "./Components/DissertationGantt";
+import LifeLogger from "./Components/LifeLogger/LifeLogger";
 import OneCademyCollaborationModel from "./Components/OneCademyCollaborationModel";
+import Activities from "./Components/ProjectManagement/Activities/Activities";
+import ScheduleAdministratorPage from "./Components/SchedulePage/ScheduleAdministratorPage";
+import ScheduleInstructorPage from "./Components/SchedulePage/ScheduleInstructorPage";
+import SchedulePage from "./Components/SchedulePage/SchedulePage";
+import ScheduleUnknownInstructorPage from "./Components/SchedulePage/ScheduleUnknownInstructorPage";
 import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
-import WaitingForSessionStart from "./Components/WaitingForSessionStart";
-import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
-import { showSignInorUpState } from "./store/GlobalAtoms";
-import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
+import { firebaseOne } from "./Components/firebase/firebase";
 import GDPRPolicy from "./Components/Home/GDPRPolicy";
+import WaitingForSessionStart from "./Components/WaitingForSessionStart";
+import { showSignInorUpState } from "./store/GlobalAtoms";
+import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -122,7 +104,7 @@ const AppRouter = props => {
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
   const processAuth = async user => {
     try {
-      const uEmail = user.email.toLowerCase();
+      const uEmail = "fmabud@bu.edu";
       const users = await db.collection("users").where("email", "==", uEmail).get();
       let isSurvey = false;
 
