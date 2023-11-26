@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
     const booleanByphrase = await loadBooleanExpressions();
     let passagesByIds = {};
 
-    const recentParticipants = Object.keys(await fetchRecentParticipants(fullname));
+    const recentParticipants = await fetchRecentParticipants(fullname);
     const recallsDocs = await dbReal.ref("/recallGradesV2").once("value");
     const recallsData = recallsDocs.val();
     const recalls = [];
@@ -154,10 +154,12 @@ module.exports = async (req, res) => {
 
     _recallGrades = [...recalls3Res, ...recalls2Res, ...recalls1Res, ...recalls0Res];
 
-    if (recentParticipants.length > 0) {
+    if (Object.keys(recentParticipants).length > 0) {
       _recallGrades.sort((g1, g2) => {
-        const p1 = recentParticipants.includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
-        const p2 = recentParticipants.includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
+        const p1 =
+          Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
+        const p2 =
+          Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
         if (p1 && p2) return 0;
         return p1 && !p2 ? -1 : 1;
       });
