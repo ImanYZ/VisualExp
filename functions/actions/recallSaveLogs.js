@@ -2,13 +2,13 @@ const { dbReal } = require("../admin_real");
 
 const { replaceNewLogs, ArrayToObject } = require("../helpers/grading-recalls");
 const updateLogs = ({
-  phrasesgpt35,
+  phrasesLLama,
   phrasesgpt4,
   previousLogData,
   conditionIndex,
   session,
   responseLogsGPT4,
-  responseLogsGPT3_5
+  responseLogsllama
 }) => {
   const _previousLogData = { ...previousLogData };
   if (!_previousLogData.sessions.hasOwnProperty(session)) {
@@ -21,7 +21,7 @@ const updateLogs = ({
       item => item !== null && item !== undefined
     );
 
-    const previousPhrasesGpt3_5 = (sessionItem[conditionIndex].gpt35 || []).filter(
+    const previousPhrasesLlama = (sessionItem[conditionIndex].llama || []).filter(
       item => item !== null && item !== undefined
     );
 
@@ -30,19 +30,19 @@ const updateLogs = ({
       newLogs: responseLogsGPT4,
       phrasesToGrade: phrasesgpt4
     });
-    const resultLogsGpt3_5 = replaceNewLogs({
-      prevLogs: previousPhrasesGpt3_5,
-      newLogs: responseLogsGPT3_5,
-      phrasesToGrade: phrasesgpt35
+    const resultLogsLLama = replaceNewLogs({
+      prevLogs: previousPhrasesLlama,
+      newLogs: responseLogsllama,
+      phrasesToGrade: phrasesLLama
     });
 
     sessionItem[conditionIndex].gpt4 = ArrayToObject(resultLogsGpt4);
 
-    sessionItem[conditionIndex].gpt35 = ArrayToObject(resultLogsGpt3_5);
+    sessionItem[conditionIndex].llama = ArrayToObject(resultLogsLLama);
   } else {
     sessionItem[conditionIndex] = {
       gpt4: ArrayToObject(responseLogsGPT4),
-      gpt35: ArrayToObject(responseLogsGPT3_5)
+      llama: ArrayToObject(responseLogsllama)
     };
   }
   return _previousLogData;
@@ -51,20 +51,20 @@ const updateLogs = ({
 module.exports = async (req, res) => {
   try {
     const payload = req.body;
-    const recallGradesLogsRef = dbReal.ref(`/recallGradesGPTLogs/${payload.docId}`);
-    console.log("payload", payload);
+    const { phrasesLLama, gpt4phrases, conditionIndex, session, gpt4, llama, docId } = payload;
+    const recallGradesLogsRef = dbReal.ref(`/recallGradesGPTLogs/${docId}`);
     await recallGradesLogsRef.transaction(currentData => {
       if (currentData === null) {
         currentData = { sessions: {} };
       }
       currentData = updateLogs({
-        phrasesgpt35: payload.gpt35phrases || [],
-        phrasesgpt4: payload.gpt4phrases || [],
+        phrasesLLama: phrasesLLama || [],
+        phrasesgpt4: gpt4phrases || [],
         previousLogData: currentData,
-        conditionIndex: payload.conditionIndex,
-        session: payload.session,
-        responseLogsGPT4: payload?.gpt4 || [],
-        responseLogsGPT3_5: payload?.gpt3_5 || []
+        conditionIndex: conditionIndex,
+        session: session,
+        responseLogsGPT4: gpt4 || [],
+        responseLogsllama: llama || []
       });
       if (currentData.hasOwnProperty("sessions")) {
         console.log(currentData);
