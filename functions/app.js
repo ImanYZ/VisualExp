@@ -50,7 +50,7 @@ const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
 
 const express = require("express");
-const recallSaveLogs = require("./actions/recall-update");
+const recallSaveLogs = require("./actions/recallSaveLogs");
 
 const app = express();
 

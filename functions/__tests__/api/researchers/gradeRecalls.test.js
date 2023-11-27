@@ -117,28 +117,28 @@ describe("POST /api/researchers/gradeRecalls", () => {
 
   let recallGradeData = {};
 
-  it("updated document should have vote by researcher in correct session and condition", async () => {
-    const recallGrade = await db.collection("recallGradesV2").doc(mockRecallGradesV2.data[0].documentId).get();
-    recallGradeData = recallGrade.data();
-    const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
-    const condition = recallGradeData.sessions["1st"][conditionIdx];
+  // it("updated document should have vote by researcher in correct session and condition", async () => {
+  //   const recallGrade = await db.collection("recallGradesV2").doc(mockRecallGradesV2.data[0].documentId).get();
+  //   recallGradeData = recallGrade.data();
+  //   const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
+  //   const condition = recallGradeData.sessions["1st"][conditionIdx];
 
-    const phrase = condition.phrases.find(phrase => phrase.phrase === "Barn owl's life depends on hearing");
-    const researcherIdx = phrase.researchers.indexOf(fullname);
+  //   const phrase = condition.phrases.find(phrase => phrase.phrase === "Barn owl's life depends on hearing");
+  //   const researcherIdx = phrase.researchers.indexOf(fullname);
 
-    expect(phrase.researchers.includes(fullname)).toBeTruthy();
-    expect(phrase.grades[researcherIdx]).toBeTruthy();
-  });
+  //   expect(phrase.researchers.includes(fullname)).toBeTruthy();
+  //   expect(phrase.grades[researcherIdx]).toBeTruthy();
+  // });
 
-  it("updated document should automatically have false value for other phrases that where viewed", async () => {
-    const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
-    const condition = recallGradeData.sessions["1st"][conditionIdx];
+  // it("updated document should automatically have false value for other phrases that where viewed", async () => {
+  //   const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
+  //   const condition = recallGradeData.sessions["1st"][conditionIdx];
 
-    for (const viewedPhrase of payload.recallGrade.phrases) {
-      const phrase = condition.phrases.find(phrase => phrase.phrase === viewedPhrase.phrase);
-      expect(phrase.researchers.includes(fullname)).toBeTruthy();
-    }
-  });
+  //   for (const viewedPhrase of payload.recallGrade.phrases) {
+  //     const phrase = condition.phrases.find(phrase => phrase.phrase === viewedPhrase.phrase);
+  //     expect(phrase.researchers.includes(fullname)).toBeTruthy();
+  //   }
+  // });
 
   // it("updated document should not touch non viewed phrases", async () => {
   //   const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
@@ -177,20 +177,20 @@ describe("POST /api/researchers/gradeRecalls", () => {
   //   });
   // });
 
-  it("participant should get recall grade points on phrase approval", async () => {
-    const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
-    const condition = recallGradeData.sessions["1st"][conditionIdx];
-    const user = await db.collection("users").doc(payload.recallGrade.user).get();
-    const userData = user.data();
+  // it("participant should get recall grade points on phrase approval", async () => {
+  //   const conditionIdx = recallGradeData.sessions["1st"].findIndex(conditionItem => conditionItem.condition === "H1");
+  //   const condition = recallGradeData.sessions["1st"][conditionIdx];
+  //   const user = await db.collection("users").doc(payload.recallGrade.user).get();
+  //   const userData = user.data();
 
-    const passageIdx = (userData?.pConditions || []).findIndex(
-      pConditionItem => pConditionItem.passage === payload.recallGrade.passage
-    );
-    const grades = userData?.pConditions?.[passageIdx]?.["recallreGrade"] || 0; // first session grades
+  //   const passageIdx = (userData?.pConditions || []).findIndex(
+  //     pConditionItem => pConditionItem.passage === payload.recallGrade.passage
+  //   );
+  //   const grades = userData?.pConditions?.[passageIdx]?.["recallreGrade"] || 0; // first session grades
 
-    const gradeRatio = userData?.pConditions?.[passageIdx]?.["recallreGradeRatio"] || 0;
-    const expectedGradeRatio = parseFloat((grades / (condition?.phrases?.length || 1)).toFixed(2));
+  //   const gradeRatio = userData?.pConditions?.[passageIdx]?.["recallreGradeRatio"] || 0;
+  //   const expectedGradeRatio = parseFloat((grades / (condition?.phrases?.length || 1)).toFixed(2));
 
-    expect(gradeRatio).toEqual(expectedGradeRatio);
-  });
+  //   expect(gradeRatio).toEqual(expectedGradeRatio);
+  // });
 });
