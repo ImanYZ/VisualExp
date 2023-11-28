@@ -1,4 +1,7 @@
 const { dbReal } = require("../../admin_real");
+const { db } = require("../../admin");
+const { incrementGradingNum } = require("../../helpers/grading-recalls");
+
 module.exports = async (req, res) => {
   try {
     console.log("grade recalls");
@@ -26,6 +29,19 @@ module.exports = async (req, res) => {
       }
       return conditionUpdates;
     });
+    const researcherDoc = await db.collection("researchers").doc(fullname).get();
+    const researcherData = researcherDoc.data();
+    incrementGradingNum(researcherData, recallGrade.project);
+    incrementGradingNum(researcherData, "Autograding");
+
+    const recallGradeLogRef = db.collection("recallGradesLogs").doc();
+    await recallGradeLogRef.set({
+      createdAt: new Date(),
+      researcher: fullname,
+      gradingNum: 1,
+      project: recallGrade.project
+    });
+    await researcherDoc.ref.update(researcherData);
 
     return res.status(200).json({
       message: "grade recalls updated"
