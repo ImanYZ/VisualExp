@@ -272,5 +272,9 @@ service cloud.firestore {
        allow read: if  false;
        allow write: if false;
     }
+    match /responsesProgress/{id} {
+       allow read: if  true;
+       allow write: if false;
+    }
   }
 }

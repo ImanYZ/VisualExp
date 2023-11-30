@@ -10,6 +10,16 @@ const shuffleArray = array => {
     [array[i], array[j]] = [array[j], array[i]];
   }
 };
+
+const getMajority = (phrase, upvotes, downvotes) => {
+  if (phrase.hasOwnProperty("majority")) {
+    return phrase.majority ? "YES" : "NO";
+  }
+  if (upvotes < 3 && downvotes < 3) return null;
+
+  return upvotes > downvotes ? "YES" : "NO";
+};
+
 const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, passagesByIds) => {
   try {
     const _conditionItems = [];
@@ -55,17 +65,12 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
             .sort(() => 0.5 - Math.random())
             .splice(0, 4);
 
-          conditionItem.phrases = [...phrasesSatisfied, ...notSatisfiedphrases].sort(() => 0.5 - Math.random());
-          let priority = 4;
-          if (conditionItem.phrases.some(p => p.researchers.length === 1)) {
-            priority = 3;
-          }
-          if (conditionItem.phrases.some(p => p.researchers.length === 2)) {
-            priority = 2;
-          }
-          if (conditionItem.phrases.some(p => p.researchers.length >= 3)) {
-            priority = 1;
-          }
+          const phrasesWithMajority = phrasesSatisfied.filter(p => {
+            const upVotes = (p.grades || []).filter(grade => grade).length;
+            const downVotes = (p.grades || []).filter(grade => !grade).length;
+            return getMajority(p, upVotes, downVotes);
+          }).length;
+
           if (phrasesSatisfied.length > 0) {
             _conditionItems.push({
               docId: recall.id,
@@ -76,7 +81,7 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
               satisfiedphrases: phrasesSatisfied,
               originalText: passagesByIds[conditionItem.passage].text,
               ...conditionItem,
-              priority,
+              priority: phrasesWithMajority / phrasesSatisfied.length,
               conditionIdx
             });
           }
@@ -143,16 +148,7 @@ module.exports = async (req, res) => {
       _recallGrades = recallGrades[project] || [];
     }
 
-    const recalls3Res = _recallGrades.filter(g => g.priority === 1);
-    const recalls2Res = _recallGrades.filter(g => g.priority === 2);
-    const recalls1Res = _recallGrades.filter(g => g.priority === 3);
-    const recalls0Res = _recallGrades.filter(g => g.priority === 4);
-    shuffleArray(recalls3Res);
-    shuffleArray(recalls2Res);
-    shuffleArray(recalls1Res);
-    shuffleArray(recalls0Res);
-
-    _recallGrades = [...recalls3Res, ...recalls2Res, ...recalls1Res, ...recalls0Res];
+    _recallGrades = _recallGrades.sort((a, b) => b.priority - a.priority);
 
     if (Object.keys(recentParticipants).length > 0) {
       _recallGrades.sort((g1, g2) => {
