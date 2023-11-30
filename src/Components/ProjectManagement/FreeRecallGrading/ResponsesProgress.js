@@ -8,7 +8,7 @@ const ResponsesProgress = () => {
   const [progress, setProgress] = useState({});
   useEffect(() => {
     const loadProgres = async () => {
-      const responsesProgressDocs = await firebase.db.collection("responsesProgress").orderBy("createdAt").get();
+      const responsesProgressDocs = await firebase.db.collection("responsesProgress").orderBy("createdAt", "desc").get();
       const progressData = responsesProgressDocs.docs[0].data();
       console.log({ progressData });
       delete progressData.createdAt;
