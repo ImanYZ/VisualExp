@@ -9,6 +9,7 @@ const inviteInstructors = require("./pubsub/inviteInstructors");
 const inviteAdministrators = require("./pubsub/inviteAdministrators");
 const assignThematicPoints = require("./pubsub/assignThematicPoints");
 const updateRecallsPoints = require("./pubsub/calculate-recall-grades-points");
+const generateResponsesProgress = require("./pubsub/responses-progress-grades");
 
 const { deleteUser, applicationReminder } = require("./users");
 const app = require("./app");
@@ -108,6 +109,13 @@ exports.updateRecallsPoints = functions
   .timeZone(EST_TIMEZONE)
   .onRun(updateRecallsPoints);
 
+exports.generateResponsesProgress = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(generateResponsesProgress);
 // Knowledge
 // exports.assignNodeContributorsInstitutionsStats = functions
 //   .runWith({
