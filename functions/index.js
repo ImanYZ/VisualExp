@@ -9,7 +9,7 @@ const inviteInstructors = require("./pubsub/inviteInstructors");
 const inviteAdministrators = require("./pubsub/inviteAdministrators");
 const assignThematicPoints = require("./pubsub/assignThematicPoints");
 const updateRecallsPoints = require("./pubsub/calculate-recall-grades-points");
-const generateResponsesProgress = require("./pubsub/responses-progress-grades");
+const generateResponsesProgress = require("./pubsub/responses-progress");
 
 const { deleteUser, applicationReminder } = require("./users");
 const app = require("./app");
