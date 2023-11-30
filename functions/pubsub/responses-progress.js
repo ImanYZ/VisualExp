@@ -13,7 +13,7 @@ const getMajority = (phrase, upvotes, downvotes) => {
 };
 module.exports = async context => {
   try {
-    const { booleanByphrase } = await loadBooleanExpressions();
+    const booleanByphrase = await loadBooleanExpressions();
 
     const phrasesPassage = {};
 
@@ -35,7 +35,10 @@ module.exports = async context => {
         const sessionItem = sessions[session];
         for (let conditionItemIdx = 0; conditionItemIdx < sessionItem.length; conditionItemIdx++) {
           const conditionItem = sessionItem[conditionItemIdx];
-
+          if (!conditionItem.response) {
+            majorityPercentage["no satisfied phrases"] = (majorityPercentage["no satisfied phrases"] || 0) + 1;
+            continue;
+          }
           conditionItem.phrases = conditionItem.phrases.filter(p =>
             phrasesPassage[conditionItem.passage].includes(p.phrase)
           );
@@ -47,7 +50,9 @@ module.exports = async context => {
             const upVotes = (p.grades || []).filter(grade => grade).length;
             const downVotes = (p.grades || []).filter(grade => !grade).length;
             const schemaE = booleanByphrase[p.phrase] ? booleanByphrase[p.phrase][0]?.schema || [] : [];
-            return getMajority(p, upVotes, downVotes) && validateBooleanExpression(schemaE, conditionItem.response);
+            return (
+              getMajority(p, upVotes, downVotes) && validateBooleanExpression(schemaE, conditionItem.response || "")
+            );
           }).length;
           if (phrasesSatisfyBoolean !== 0) {
             const percontage = `${Math.floor((phrasesWithMajority / phrasesSatisfyBoolean) * 10) * 10}%`;

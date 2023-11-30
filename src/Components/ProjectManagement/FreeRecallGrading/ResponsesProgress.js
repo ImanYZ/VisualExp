@@ -8,22 +8,36 @@ const ResponsesProgress = () => {
   const [progress, setProgress] = useState({});
   useEffect(() => {
     const loadProgres = async () => {
-      const responsesProgressDocs = await firebase.db.collection("responsesProgress").orderBy("createdAt").get();
+      const responsesProgressDocs = await firebase.db.collection("responsesProgress").orderBy("createdAt", "desc").get();
       const progressData = responsesProgressDocs.docs[0].data();
-      setProgress(progressData);
+      console.log({ progressData });
+      delete progressData.createdAt;
+      delete progressData["no satisfied phrases"];
+
+      setProgress(
+        Object.fromEntries(
+          Object.entries(progressData).sort((a, b) => {
+            const percentageA = parseInt(a[0]);
+            const percentageB = parseInt(b[0]);
+            return percentageA - percentageB;
+          })
+        )
+      );
     };
+
     if (firebase) {
       loadProgres();
     }
   }, [firebase]);
+
   return (
     <Box style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
       <Box>
-        {Object.keys(progress).map(p => {
-          <Box key={p}>
-            {p}:{progress[p]}
-          </Box>;
-        })}
+        {Object.keys(progress).map(p => (
+          <Box key={p} sx={{ mt: "9px" }}>
+            {p}: {progress[p]}
+          </Box>
+        ))}
       </Box>
     </Box>
   );
