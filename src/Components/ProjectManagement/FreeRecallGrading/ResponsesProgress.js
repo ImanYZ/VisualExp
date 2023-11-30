@@ -43,7 +43,7 @@ const ResponsesProgress = () => {
             <TableHead>
               <TableRow>
                 <TableCell>The percentage of phrases done in a response</TableCell>
-                <TableCell>The number of those of responses</TableCell>
+                <TableCell>The number Responses</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
