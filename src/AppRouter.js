@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import RecallForIman from "./Components/ProjectManagement/FreeRecallGrading/RecallForIman.js";
+import ResponsesProgress from "./Components/ProjectManagement/FreeRecallGrading/ResponsesProgress.js";
 import {
   applicationsSubmittedState,
   emailState,
@@ -543,6 +544,7 @@ const AppRouter = props => {
                 <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
                 <Route path="ScheduleInstructor/" element={<ScheduleUnknownInstructorPage />} />
                 <Route path="Activities/RecallForIman" element={<RecallForIman />} />
+                <Route path="Activities/responses-progress" element={<ResponsesProgress />} />
               </>
             </>
           )}
