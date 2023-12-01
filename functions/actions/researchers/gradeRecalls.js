@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
           const grade = !!(phrase.grades || [])[researcherIdx];
           const phraseIdx = conditionUpdates.phrases.findIndex(p => p.phrase === phrase.phrase && !p.deleted);
           console.log({ phraseIdx }, phrase);
-          if (phraseIdx !== -1 && !conditionUpdates.phrases[phraseIdx].researchers.includes(fullname)) {
+          if (phraseIdx !== -1 && !(conditionUpdates.phrases[phraseIdx].researchers || []).includes(fullname)) {
             conditionUpdates.phrases[phraseIdx].researchers = [
               ...new Set([...(conditionUpdates.phrases[phraseIdx].researchers || []), fullname])
             ];
