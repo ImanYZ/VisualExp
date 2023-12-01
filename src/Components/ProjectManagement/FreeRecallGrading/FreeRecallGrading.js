@@ -326,17 +326,17 @@ const FreeRecallGrading = props => {
   if (!selectedGrade && !processing) {
     return (
       <Box>
-        {errorProcessing ? (
-          <Alert severity="error" size="large">
-            <AlertTitle>Error</AlertTitle>
-            There was an issue processing your request; please try to refresh the page or contact Iman to solve the bug.
-          </Alert>
-        ) : (
+        {/* {errorProcessing ? ( */}
+        <Alert severity="error" size="large">
+          <AlertTitle>Error</AlertTitle>
+          There was an issue processing your request; please try to refresh the page or contact Iman to solve the bug.
+        </Alert>
+        {/* ) : (
           <Alert severity="info" size="large">
             <AlertTitle>Info</AlertTitle>
             You've graded all the recalls from participants
           </Alert>
-        )}
+        )} */}
       </Box>
     );
   }
