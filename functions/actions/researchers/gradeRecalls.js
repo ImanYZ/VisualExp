@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
       docId: recallGrade.docId,
       project: recallGrade.project
     });
-    // await researcherDoc.ref.update(researcherData);
+    await researcherDoc.ref.update(researcherData);
 
     return res.status(200).json({
       message: "grade recalls updated"
