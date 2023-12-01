@@ -66,6 +66,7 @@ const FreeRecallGrading = props => {
   const setHideLeaderBoard = useSetRecoilState(hideLeaderBoardState);
   const [selectedGrade, setSelectedGrade] = useState(null);
   const [recallGradesList, setRecallGradesList] = useState([]);
+
   const loadedRecallGrades = async () => {
     try {
       setProcessing(true);
@@ -86,10 +87,17 @@ const FreeRecallGrading = props => {
       console.log(error);
     }
   };
+  const getMajority = (phrase, upvotes, downvotes) => {
+    if (phrase.hasOwnProperty("majority")) {
+      return phrase.majority ? "YES" : "NO";
+    }
+    if (upvotes < 3 && downvotes < 3) return null;
 
+    return upvotes > downvotes ? "YES" : "NO";
+  };
   useEffect(() => {
-    // Retrieve a free-recall response that is not evaluated by four
-    // researchers yet.
+    // Retrieve a free-recall response that doesn't have the majority
+
     if (firebase && fullname && project) {
       return loadedRecallGrades();
     }
@@ -111,6 +119,9 @@ const FreeRecallGrading = props => {
     }
   };
 
+  const handleNext = () => {
+    getNextRecall();
+  };
   useEffect(() => {
     if (!recallGradesList.length || processing) return;
     for (let recall of recallGradesList) {
@@ -124,8 +135,12 @@ const FreeRecallGrading = props => {
         if (data && data.length > 0) {
           recall.phrases = recall.phrases.filter(p => {
             const phraseIdx = data.findIndex(_p => p.phrase === _p.phrase);
+            const upVotes = (p.grades || []).filter(grade => grade).length;
+            const downVotes = (p.grades || []).filter(grade => !grade).length;
             return (
-              (data[phraseIdx].researchers || []).length < 4 && !(data[phraseIdx].researchers || []).includes(fullname)
+              (data[phraseIdx].researchers || []).length < 4 &&
+              !(data[phraseIdx].researchers || []).includes(fullname) &&
+              !getMajority(p, upVotes, downVotes)
             );
           });
           setRecallGradesList(recallGradesList => {
@@ -148,6 +163,15 @@ const FreeRecallGrading = props => {
             }
             return _recallGradesList;
           });
+          if (
+            selectedGrade &&
+            selectedGrade.docId === recall.docId &&
+            selectedGrade.session === recall.session &&
+            selectedGrade.conditionIdx === recall.conditionIdx &&
+            recall.phrases.length === 0
+          ) {
+            getNextRecall();
+          }
           setSelectedGrade(r => {
             if (
               r &&
@@ -159,15 +183,6 @@ const FreeRecallGrading = props => {
             }
             return r;
           });
-          if (
-            selectedGrade &&
-            selectedGrade.docId === recall.docId &&
-            selectedGrade.session === recall.session &&
-            selectedGrade.conditionIdx === recall.conditionIdx &&
-            recall.phrases.length === 0
-          ) {
-            getNextRecall();
-          }
         }
       });
     }
@@ -406,16 +421,22 @@ const FreeRecallGrading = props => {
             </div>
           );
         })}
-        <Button
-          onClick={handleSubmit}
-          className="Button"
-          variant="contained"
-          color="success"
-          disabled={submitting || !(selectedGrade?.phrases || []).length}
-          id="recall-submit"
-        >
-          {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
-        </Button>
+        {selectedGrade?.phrases.length > 0 ? (
+          <Button
+            onClick={handleSubmit}
+            className="Button"
+            variant="contained"
+            color="success"
+            disabled={submitting || !(selectedGrade?.phrases || []).length}
+            id="recall-submit"
+          >
+            {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
+          </Button>
+        ) : (
+          <Button onClick={handleNext} className="Button" variant="contained" color="success">
+            Next
+          </Button>
+        )}
         <div
           style={{
             display: "flex",
