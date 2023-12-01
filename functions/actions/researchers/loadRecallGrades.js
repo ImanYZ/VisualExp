@@ -89,7 +89,7 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
               satisfiedphrases: phrasesSatisfied,
               originalText: passagesByIds[conditionItem.passage].text,
               ...conditionItem,
-              phrases: [...phrasesWithMajority, ...phrasesSatisfied],
+              phrases: [...notSatisfiedphrases, ...phrasesSatisfied],
               priority,
               conditionIdx
             });
