@@ -16,6 +16,16 @@ module.exports = async (req, res) => {
     update the recall grades accoding to the vote of the researcher 
     */
     const { session, conditionIdx, phrases } = recallGrade;
+    phrases.forEach(p => {
+      const researcherIdx = (p.researchers || []).indexOf(fullname);
+      if (researcherIdx === -1) {
+        p.researchers = [...new Set([...(p.researchers || []), fullname])];
+        p.grades.push(false);
+      }
+    });
+
+    console.log(phrases);
+
     const recallGradeRef = dbReal.ref(`/recallGradesV2/${recallGrade.docId}/sessions/${session}/${conditionIdx}`);
     await recallGradeRef.transaction(conditionUpdates => {
       if (conditionUpdates !== null) {
@@ -23,8 +33,13 @@ module.exports = async (req, res) => {
           const researcherIdx = (phrase.researchers || []).indexOf(fullname);
           const grade = !!(phrase.grades || [])[researcherIdx];
           const phraseIdx = conditionUpdates.phrases.findIndex(p => p.phrase === phrase.phrase && !p.deleted);
-          conditionUpdates.phrases[phraseIdx].researchers = [...new Set([...phrase.researchers, fullname])];
-          conditionUpdates.phrases[phraseIdx].grades = [...(conditionUpdates.phrases[phraseIdx].grades || []), grade];
+          console.log({ phraseIdx }, phrase);
+          if (phraseIdx !== -1 && !conditionUpdates.phrases[phraseIdx].researchers.includes(fullname)) {
+            conditionUpdates.phrases[phraseIdx].researchers = [
+              ...new Set([...(conditionUpdates.phrases[phraseIdx].researchers || []), fullname])
+            ];
+            conditionUpdates.phrases[phraseIdx].grades = [...(conditionUpdates.phrases[phraseIdx].grades || []), grade];
+          }
         }
       }
       return conditionUpdates;
@@ -39,6 +54,10 @@ module.exports = async (req, res) => {
       createdAt: new Date(),
       researcher: fullname,
       gradingNum: 1,
+      gradedPhrases: phrases,
+      session,
+      conditionIdx,
+      docId: recallGrade.docId,
       project: recallGrade.project
     });
     await researcherDoc.ref.update(researcherData);
