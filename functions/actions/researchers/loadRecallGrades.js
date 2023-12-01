@@ -25,8 +25,8 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
     const _conditionItems = [];
     Object.entries(recall.sessions).map(async ([session, conditionItems]) => {
       (Array.isArray(conditionItems) ? conditionItems || [] : []).forEach((conditionItem, conditionIdx) => {
-        conditionItem.phrases = conditionItem.phrases.filter(p =>
-          passagesByIds[conditionItem.passage].phrases.includes(p.phrase)
+        conditionItem.phrases = conditionItem.phrases.filter(
+          p => passagesByIds[conditionItem.passage].phrases.includes(p.phrase) && !p.deleted
         );
         conditionItem.phrases.forEach(p => {
           if (!p.hasOwnProperty("researchers")) {
@@ -41,7 +41,7 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
           .split(" ")
           .filter(w => w.trim());
         if (recall.user !== fullname && filtered.length > 2) {
-          const phrasesSatisfied = conditionItem.phrases.filter(phrase => {
+          let phrasesSatisfied = conditionItem.phrases.filter(phrase => {
             const schemaE = booleanByphrase[phrase.phrase] ? booleanByphrase[phrase.phrase][0].schema : [];
             return (
               !phrase.deleted &&
@@ -71,6 +71,14 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
             return getMajority(p, upVotes, downVotes);
           }).length;
 
+          let priority = phrasesSatisfied.length > 0 ? phrasesWithMajority / phrasesSatisfied.length : 0;
+
+          phrasesSatisfied = phrasesSatisfied.filter(p => {
+            const upVotes = (p.grades || []).filter(grade => grade).length;
+            const downVotes = (p.grades || []).filter(grade => !grade).length;
+            return !getMajority(p, upVotes, downVotes);
+          });
+
           if (phrasesSatisfied.length > 0) {
             _conditionItems.push({
               docId: recall.id,
@@ -81,7 +89,8 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
               satisfiedphrases: phrasesSatisfied,
               originalText: passagesByIds[conditionItem.passage].text,
               ...conditionItem,
-              priority: phrasesWithMajority / phrasesSatisfied.length,
+              phrases: [...phrasesWithMajority, ...phrasesSatisfied],
+              priority,
               conditionIdx
             });
           }
