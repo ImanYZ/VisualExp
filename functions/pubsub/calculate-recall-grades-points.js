@@ -26,7 +26,7 @@ module.exports = async context => {
       const recallsDocs = await dbReal.ref("/recallGradesV2").once("value");
       const recallsData = recallsDocs.val();
 
-      for (let recallId of recallsData) {
+      for (let recallId in recallsData) {
         const recallgrade = recallsData[recallId];
         const researchersPointsProject = researchersPoints[recallgrade.project];
         const sessions = recallgrade.sessions;
@@ -36,8 +36,8 @@ module.exports = async context => {
             const conditionItem = sessionItem[conditionItemIdx];
             for (let phrase of conditionItem.phrases) {
               if ([...phrasesPassage[conditionItem.passage]].includes(phrase.phrase) && !phrase.deleted) {
-                const researchers = phrase.researchers;
-                const grades = phrase.grades;
+                const researchers = phrase.researchers || [];
+                const grades = phrase?.grades || [];
                 const majority = getMajority(grades);
                 if (majority !== null) {
                   for (let researcherIdx = 0; researcherIdx < researchers.length; researcherIdx++) {
