@@ -26,7 +26,6 @@ module.exports = async context => {
           inst.major?.includes("sycho") &&
           (inst.newReminders || 0) < 4
       );
-    // console.log(instructors);
     for (let instructor of instructors) {
       const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructor;
       const topic = interestedTopic

@@ -75,7 +75,6 @@ module.exports = async context => {
       ...emails.filter(e => e.reason === "administrator")
     ];
     console.log(emails.length);
-    let counter = 0;
     for (let emailData of emails) {
       const emailDoc = await db.collection("emails").doc(emailData.id).get();
       const _emailData = emailDoc.data();
@@ -87,7 +86,6 @@ module.exports = async context => {
         sent === false &&
         email !== "ouhrac@gmail.com"
       ) {
-        counter++;
         console.log("sending email to", email, "for", reason, "with id", emailData.id);
         try {
           sendMail(mailOptions).then(
@@ -146,7 +144,6 @@ module.exports = async context => {
         await delay(waitTime);
       }
     }
-    console.log(counter);
 
     console.log("Done");
   } catch (error) {
