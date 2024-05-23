@@ -1,13 +1,12 @@
 const { db, batchSet, commitBatch } = require("../admin");
-const { instMailOptions } = require("../helpers/instructorsMailOptions");
+// const { instMailOptions } = require("../helpers/instructorsMailOptions");
+const { communityLeadOptions } = require("../helpers/communityLeadOptions");
 
 module.exports = async context => {
   try {
     const instructorDocs = await db
       .collection("instructors")
       .where("no", "==", false)
-      .where("yes", "==", false)
-      .where("scheduled", "==", false)
       .where("deleted", "==", false)
       .get();
     const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
@@ -18,11 +17,14 @@ module.exports = async context => {
       })
       .filter(
         inst =>
-          ((inst?.upVotes || 0) - (inst?.downVotes || 0) >= 1 || inst.scraped) &&
           (!inst.nextReminder || inst.nextReminder.toDate().getTime() < new Date().getTime()) &&
           !emails.includes(inst.email) &&
-          inst.interestedTopic &&
-          inst.reminders < 4
+          (inst.upVotes || 0) >= 3 &&
+          (inst.downVotes || 0) <= 0 &&
+          !inst.deleted &&
+          !inst.no &&
+          inst.major?.includes("sycho") &&
+          (inst.newReminders || 0) < 4
       );
     for (let instructor of instructors) {
       const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructor;
@@ -38,7 +40,15 @@ module.exports = async context => {
       if (instructor.hasOwnProperty("introducedBy")) {
         introducedBy = instructor.introducedBy;
       }
-      const mailOptions = instMailOptions(email, topic, prefix, lastname, instructor.id, introducedBy, randomNumber);
+      const mailOptions = communityLeadOptions(
+        email,
+        topic,
+        prefix,
+        lastname,
+        instructor.id,
+        introducedBy,
+        randomNumber
+      );
       const emailRef = db.collection("emails").doc();
       await batchSet(emailRef, {
         mailOptions,
