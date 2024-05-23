@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const { Timestamp, FieldValue } = require("@google-cloud/firestore");
 const { nextWeek } = require("../utils");
 const { delay } = require("../helpers/common");
+const { google } = require("googleapis");
 
 const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) => {
   if (ignore) return true;
@@ -30,15 +31,37 @@ const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) 
   return false;
 };
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAILPASS
-  }
-});
+const sendMail = async mailOptions => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("sendMail");
+      const oAuth2Client = new google.auth.OAuth2(
+        process.env.CLIENT_ID,
+        process.env.CLIENT_SECRET,
+        process.env.REDIRECT_URI
+      );
+      oAuth2Client.setCredentials({
+        refresh_token: process.env.REFRESH_TOKEN
+      });
+      const accessToken = await oAuth2Client.getAccessToken();
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          type: "OAuth2",
+          user: "community@1cademy.com",
+          clientId: process.env.CLIENT_ID,
+          clientSecret: process.env.CLIENT_SECRET,
+          refreshToken: process.env.REFRESH_TOKEN,
+          accessToken: accessToken
+        }
+      });
+      const result = await transporter.sendMail(mailOptions);
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 module.exports = async context => {
   try {
@@ -51,6 +74,8 @@ module.exports = async context => {
       ...emails.filter(e => e.reason === "instructor"),
       ...emails.filter(e => e.reason === "administrator")
     ];
+    console.log(emails.length);
+    let counter = 0;
     for (let emailData of emails) {
       const emailDoc = await db.collection("emails").doc(emailData.id).get();
       const _emailData = emailDoc.data();
@@ -62,19 +87,18 @@ module.exports = async context => {
         sent === false &&
         email !== "ouhrac@gmail.com"
       ) {
+        counter++;
         console.log("sending email to", email, "for", reason, "with id", emailData.id);
         try {
-          transporter.sendMail(mailOptions, async (error, data) => {
-            if (error) {
-              console.log("sendMail", { error });
-              throw error;
-            } else {
+          sendMail(mailOptions).then(
+            async result => {
               const emailRef = db.collection("emails").doc(emailData.id);
+              console.log("result", result);
               if (reason === "instructor") {
                 const instructorRef = db.collection("instructors").doc(documentId);
                 await instructorRef.update({
                   emailedAt: Timestamp.fromDate(new Date()),
-                  reminders: FieldValue.increment(1),
+                  newReminders: FieldValue.increment(1),
                   nextReminder: Timestamp.fromDate(nextWeek()),
                   updatedAt: Timestamp.fromDate(new Date()),
                   emailNumber: emailData.emailNumber
@@ -105,20 +129,25 @@ module.exports = async context => {
                 sent: true,
                 sentAt: Timestamp.fromDate(new Date())
               });
+            },
+            rejected => {
+              console.log(rejected);
+              throw rejected;
             }
-          });
+          );
         } catch (error) {
           if (error.code === "EAUTH") {
             break;
           }
         }
-
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // we have  waitTime by a random integer between 10 to 40 seconds.
         const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
         await delay(waitTime);
       }
     }
+    console.log(counter);
+
     console.log("Done");
   } catch (error) {
     console.log(error);
