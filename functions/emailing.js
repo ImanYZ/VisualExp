@@ -76,6 +76,14 @@ const loadUmichLogo = res => {
   readStream.pipe(res);
 };
 
+const load1CademyLogo = res => {
+  const file = storage.bucket("visualexp-a7d2c.appspot.com").file("1cademyLogo.gif");
+  let readStream = file.createReadStream();
+
+  res.setHeader("content-type", "image/gif");
+  readStream.pipe(res);
+};
+
 // When an individual opens their email, we should log it in contacts collection.
 const emailOpenedIndividual = async fullname => {
   const contactRef = db.collection("contacts").doc(fullname);
@@ -108,7 +116,7 @@ const emailOpenedInstructor = async instructorId => {
 // 2) Return the UMSI logo as a response stream.
 exports.loadImageProfessor = (req, res) => {
   emailOpenedInstructor(req.params.instructorId);
-  loadUmichLogo(res);
+  load1CademyLogo(res);
 };
 
 // When an administrator opens their email, we should log it in administrators collection.
@@ -245,7 +253,6 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians"
 };
 
-
 // Logs that the administrator clicked Yes in their email.
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
 // allow write: if request.auth != null
@@ -339,8 +346,6 @@ exports.administratorLater = async (req, res) => {
     return res.status(500).json({ err });
   }
 };
-
-
 
 // Logs that the instructor clicked Yes in their email.
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
