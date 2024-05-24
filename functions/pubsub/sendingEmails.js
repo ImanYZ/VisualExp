@@ -36,12 +36,12 @@ const sendMail = async mailOptions => {
     try {
       console.log("sendMail");
       const oAuth2Client = new google.auth.OAuth2(
-        process.env.CLIENT_ID,
-        process.env.CLIENT_SECRET,
-        process.env.REDIRECT_URI
+        process.env.GMAIL_CLIENT_ID,
+        process.env.GMAIL_CLIENT_SECRET,
+        process.env.GMAIL_REDIRECT_URI
       );
       oAuth2Client.setCredentials({
-        refresh_token: process.env.REFRESH_TOKEN
+        refresh_token: process.env.GMAIL_REFRESH_TOKEN
       });
       const accessToken = await oAuth2Client.getAccessToken();
       const transporter = nodemailer.createTransport({
@@ -49,9 +49,9 @@ const sendMail = async mailOptions => {
         auth: {
           type: "OAuth2",
           user: "community@1cademy.com",
-          clientId: process.env.CLIENT_ID,
-          clientSecret: process.env.CLIENT_SECRET,
-          refreshToken: process.env.REFRESH_TOKEN,
+          clientId: process.env.GMAIL_CLIENT_ID,
+          clientSecret: process.env.GMAIL_CLIENT_SECRET,
+          refreshToken: process.env.GMAIL_REFRESH_TOKEN,
           accessToken: accessToken
         }
       });
