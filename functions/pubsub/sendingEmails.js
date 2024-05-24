@@ -5,6 +5,41 @@ const nodemailer = require("nodemailer");
 const { Timestamp, FieldValue } = require("@google-cloud/firestore");
 const { nextWeek } = require("../utils");
 const { delay } = require("../helpers/common");
+const { google } = require("googleapis");
+
+const oAuth2Client = new google.auth.OAuth2(
+  process.env.GMAIL_CLIENT_ID,
+  process.env.GMAIL_CLIENT_SECRET,
+  process.env.GMAIL_REDIRECT_URI
+);
+
+oAuth2Client.setCredentials({
+  refresh_token: process.env.GMAIL_REFRESH_TOKEN
+});
+
+const sendMail = async mailOptions => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("sendMail");
+      const accessToken = await oAuth2Client.getAccessToken();
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          type: "OAuth2",
+          user: "community@1cademy.com",
+          clientId: process.env.GMAIL_CLIENT_ID,
+          clientSecret: process.env.GMAIL_CLIENT_SECRET,
+          refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+          accessToken: accessToken
+        }
+      });
+      const result = await transporter.sendMail(mailOptions);
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) => {
   if (ignore) return true;
@@ -30,16 +65,6 @@ const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) 
   return false;
 };
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAILPASS
-  }
-});
-
 module.exports = async context => {
   try {
     const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
@@ -64,11 +89,8 @@ module.exports = async context => {
       ) {
         console.log("sending email to", email, "for", reason, "with id", emailData.id);
         try {
-          transporter.sendMail(mailOptions, async (error, data) => {
-            if (error) {
-              console.log("sendMail", { error });
-              throw error;
-            } else {
+          sendMail(mailOptions).then(async result => {
+            if (result) {
               const emailRef = db.collection("emails").doc(emailData.id);
               if (reason === "instructor") {
                 const instructorRef = db.collection("instructors").doc(documentId);

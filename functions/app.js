@@ -15,6 +15,7 @@ const getOngoingResearcherEvent = require("./actions/intreview/getOngoingResearc
 const ongoingEvents = require("./actions/intreview/ongoingEvents");
 const deleteEvent = require("./actions/intreview/deleteEvent");
 const scheduleLifeLog = require("./actions/intreview/scheduleLifeLog");
+const inviteInstructors = require("./pubsub/inviteInstructors");
 
 const {
   retrieveData,
@@ -109,7 +110,7 @@ app.post("/checkEntreviewStatus", checkEntreviewStatus);
 app.post("/recordAudio", recordAudio);
 app.post("/assignThematicPoints", assignThematicPoints);
 // Knowledge endpoints
-
+app.post("/inviteInstructors", inviteInstructors);
 // Misinformation Experiment
 // app.get("/card", card);
 // app.get("/image*", image);
