@@ -96,7 +96,7 @@ module.exports = async context => {
                 const instructorRef = db.collection("instructors").doc(documentId);
                 await instructorRef.update({
                   emailedAt: Timestamp.fromDate(new Date()),
-                  reminders: FieldValue.increment(1),
+                  newReminders: FieldValue.increment(1),
                   nextReminder: Timestamp.fromDate(nextWeek()),
                   updatedAt: Timestamp.fromDate(new Date()),
                   emailNumber: emailData.emailNumber
