@@ -36,7 +36,7 @@ const RecallForIman = props => {
   const [errorLoading, setErrorLoading] = useState(false);
   const [gradingPhrase, setGradingPhrase] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [majorityDecision, setMajorityDecision] = useState(false);
+  const [majorityDecision, setMajorityDecision] = useState(true);
 
   useEffect(() => {
     const checkEditor = async () => {
@@ -428,7 +428,7 @@ const RecallForIman = props => {
               return <>{grade} </>;
             })}
           </Paper>
-          <Box>Mentioned Sententces</Box>
+          <Box>Mentioned Sentences</Box>
           {currentBot.sentences.length > 0 ? (
             <ul>
               {currentBot.sentences.map((sentence, index) => (
