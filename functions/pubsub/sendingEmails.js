@@ -7,6 +7,40 @@ const { nextWeek } = require("../utils");
 const { delay } = require("../helpers/common");
 const { google } = require("googleapis");
 
+const oAuth2Client = new google.auth.OAuth2(
+  process.env.GMAIL_CLIENT_ID,
+  process.env.GMAIL_CLIENT_SECRET,
+  process.env.GMAIL_REDIRECT_URI
+);
+
+oAuth2Client.setCredentials({
+  refresh_token: process.env.GMAIL_REFRESH_TOKEN
+});
+
+const sendMail = async mailOptions => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("sendMail");
+      const accessToken = await oAuth2Client.getAccessToken();
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          type: "OAuth2",
+          user: "community@1cademy.com",
+          clientId: process.env.GMAIL_CLIENT_ID,
+          clientSecret: process.env.GMAIL_CLIENT_SECRET,
+          refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+          accessToken: accessToken
+        }
+      });
+      const result = await transporter.sendMail(mailOptions);
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) => {
   if (ignore) return true;
   state = state.split(";")[1] || "";
@@ -31,38 +65,6 @@ const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) 
   return false;
 };
 
-const sendMail = async mailOptions => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      console.log("sendMail");
-      const oAuth2Client = new google.auth.OAuth2(
-        process.env.GMAIL_CLIENT_ID,
-        process.env.GMAIL_CLIENT_SECRET,
-        process.env.GMAIL_REDIRECT_URI
-      );
-      oAuth2Client.setCredentials({
-        refresh_token: process.env.GMAIL_REFRESH_TOKEN
-      });
-      const accessToken = await oAuth2Client.getAccessToken();
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          type: "OAuth2",
-          user: "community@1cademy.com",
-          clientId: process.env.GMAIL_CLIENT_ID,
-          clientSecret: process.env.GMAIL_CLIENT_SECRET,
-          refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-          accessToken: accessToken
-        }
-      });
-      const result = await transporter.sendMail(mailOptions);
-      resolve(result);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
 module.exports = async context => {
   try {
     const emailsDocs = await db.collection("emails").where("sent", "==", false).get();
@@ -74,7 +76,6 @@ module.exports = async context => {
       ...emails.filter(e => e.reason === "instructor"),
       ...emails.filter(e => e.reason === "administrator")
     ];
-    console.log(emails.length);
     for (let emailData of emails) {
       const emailDoc = await db.collection("emails").doc(emailData.id).get();
       const _emailData = emailDoc.data();
@@ -88,10 +89,9 @@ module.exports = async context => {
       ) {
         console.log("sending email to", email, "for", reason, "with id", emailData.id);
         try {
-          sendMail(mailOptions).then(
-            async result => {
+          sendMail(mailOptions).then(async result => {
+            if (result) {
               const emailRef = db.collection("emails").doc(emailData.id);
-              console.log("result", result);
               if (reason === "instructor") {
                 const instructorRef = db.collection("instructors").doc(documentId);
                 await instructorRef.update({
@@ -127,24 +127,20 @@ module.exports = async context => {
                 sent: true,
                 sentAt: Timestamp.fromDate(new Date())
               });
-            },
-            rejected => {
-              console.log(rejected);
-              throw rejected;
             }
-          );
+          });
         } catch (error) {
           if (error.code === "EAUTH") {
             break;
           }
         }
+
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // we have  waitTime by a random integer between 10 to 40 seconds.
         const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
         await delay(waitTime);
       }
     }
-
     console.log("Done");
   } catch (error) {
     console.log(error);
