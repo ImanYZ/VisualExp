@@ -143,7 +143,17 @@ module.exports = async (req, res) => {
     }
 
     noMajority = noMajority.filter(gradeMajority => gradeMajority.grades.length !== 0);
-    majorityDifferentThanBot = majorityDifferentThanBot.filter(gradeMajority => gradeMajority.grades.length !== 0);
+    majorityDifferentThanBot = majorityDifferentThanBot
+      .filter(gradeMajority => gradeMajority.grades.length !== 0)
+      .sort((a, b) => {
+        if (a.hasOwnProperty("majority") && !b.hasOwnProperty("majority")) {
+          return 1;
+        }
+        if (!a.hasOwnProperty("majority") && b.hasOwnProperty("majority")) {
+          return -1;
+        }
+        return 0;
+      });
 
     return res.status(200).send({
       noMajority,
