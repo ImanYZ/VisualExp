@@ -257,15 +257,15 @@ const Auth = props => {
         </Box>
       ) : (
         <>
-          <h2>Sign the Consent Form to Get Started!</h2>
+          {/*     <h2>Sign the Consent Form to Get Started!</h2>
           <p>
             Please read the consent form on the left carefully. By creating and account or signing into this website,
             you sign the consent form and allow us to analyze your data collected throughout this study.
-          </p>
-          <Alert severity="error">
+          </p> */}
+          {/*        <Alert severity="error">
             Please only use your Gmail address to create an account. You can also use your school email address, only if
             your school email is provided by Google.
-          </Alert>
+          </Alert> */}
           <Box sx={{ width: "100%" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={isSignUp} onChange={switchSignUp} aria-label="basic tabs" variant="fullWidth">

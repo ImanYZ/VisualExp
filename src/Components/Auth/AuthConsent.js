@@ -1,15 +1,15 @@
 import React from "react";
 
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
+// import Paper from "@mui/material/Paper";
+// import Grid from "@mui/material/Grid";
 
 import Auth from "./Auth";
 import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
-import ConsentDocument from "./ConsentDocument";
-import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
+// import ConsentDocument from "./ConsentDocument";
+// import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
 import AuthSurvey from "./AuthSurvey";
-import ConsentSurvey from "./ConsentSurvey";
+// import ConsentSurvey from "./ConsentSurvey";
 import RouterNav from "../../Components/RouterNav/RouterNav";
 import "./ConsentDocument.css";
 
@@ -25,65 +25,22 @@ const AuthConsent = props => {
   return (
     <>
       <RouterNav />
-      <Grid
-        container
-        spacing={{ xs: 1, md: 2.2 }}
+      <Box
         sx={{
+          display: "flex",
+          justifyContent: "center",
           width: "100%",
-          height: "100vh",
-          overflowY: { xs: "auto", md: "hidden" },
-          overflowX: "hidden"
+          marginTop: "20px"
         }}
       >
-        <Grid
-          item
-          xs={12}
-          md={8}
-          style={{
-            overflowY: "hidden",
-            overflowX: "hidden"
+        <Box
+          sx={{
+            width: "500px"
           }}
         >
-          <Paper
-            sx={{
-              overflowY: "auto",
-              overflowX: "hidden",
-              margin: "10px 0px 25px 10px",
-              width: "100%",
-              height: "100vh"
-            }}
-          >
-            {props.project && props.project === "StudentCoNoteSurvey" ? (
-              <ConsentStudentCoNoteSurvey />
-            ) : props.project && props.project === "OnlineCommunities" ? (
-              <ConsentSurvey />
-            ) : (
-              <ConsentDocument />
-            )}
-          </Paper>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          md={4}
-          style={{
-            overflowY: "hidden",
-            overflowX: "hidden"
-          }}
-        >
-          <Paper
-            sx={{
-              overflowY: "auto",
-              overflowX: "hidden",
-              margin: "10px 0px 25px 0px",
-              width: "100%",
-              height: "100vh"
-            }}
-          >
-            {authComponent}
-          </Paper>
-        </Grid>
-      </Grid>
+          {authComponent}
+        </Box>
+      </Box>
     </>
   );
 };
