@@ -3,6 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import RecallForIman from "./Components/ProjectManagement/FreeRecallGrading/RecallForIman.js";
 import ResponsesProgress from "./Components/ProjectManagement/FreeRecallGrading/ResponsesProgress.js";
+import ManageResearchers from "./Components/ProjectManagement/ManageResearchers/ManageResearchers.js";
+
 import {
   applicationsSubmittedState,
   emailState,
@@ -103,8 +105,14 @@ const AppRouter = props => {
   const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
+  const [manageResearchers, setManageResearchers] = useState(false);
+
   const processAuth = async user => {
     try {
+      const tokenResult = await user.getIdTokenResult();
+      const customClaims = tokenResult.claims;
+      setManageResearchers(customClaims.manageR);
+
       const uEmail = user.email.toLowerCase();
       const users = await db.collection("users").where("email", "==", uEmail).get();
       let isSurvey = false;
@@ -545,6 +553,16 @@ const AppRouter = props => {
                 <Route path="ScheduleInstructor/" element={<ScheduleUnknownInstructorPage />} />
                 <Route path="Activities/RecallForIman" element={<RecallForIman />} />
                 <Route path="Activities/responses-progress" element={<ResponsesProgress />} />
+                <Route
+                  path="Activities/manage-researchers"
+                  element={
+                    manageResearchers ? (
+                      <ManageResearchers />
+                    ) : (
+                      <div className="Error">You don't have permission to open this page!</div>
+                    )
+                  }
+                />
               </>
             </>
           )}
