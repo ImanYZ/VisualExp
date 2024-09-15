@@ -6,7 +6,7 @@ import {
   query,
   where,
   onSnapshot,
-  addDoc,
+  setDoc,
   updateDoc,
   doc
 } from "firebase/firestore";
@@ -27,6 +27,7 @@ import {
   Box,
   Alert
 } from "@mui/material";
+import RouterNav from "../../RouterNav/RouterNav";
 
 const ManageResearchers = () => {
   const [researchers, setResearchers] = useState([]);
@@ -103,6 +104,9 @@ const ManageResearchers = () => {
         return;
       }
 
+      const userDoc = userSnapshot.docs[0];
+      const fullName = userDoc.data().firstname + " " + userDoc.data().lastname;
+
       const existingResearcherQuery = query(collection(db, "researchers"), where("email", "==", newEmail));
       const existingResearcherSnapshot = await getDocs(existingResearcherQuery);
 
@@ -116,7 +120,8 @@ const ManageResearchers = () => {
           researchers.map(r => (r.email === newEmail ? { ...r, projects: { Autograding: { active: true } } } : r))
         );
       } else {
-        const researcherRef = await addDoc(collection(db, "researchers"), {
+        const researcherRef = doc(db, "researchers", fullName);
+        await setDoc(researcherRef, {
           email: newEmail,
           projects: {
             Autograding: {
@@ -130,7 +135,7 @@ const ManageResearchers = () => {
           {
             id: researcherRef.id,
             email: newEmail,
-            fullname: null,
+            fullname: fullName,
             projects: { Autograding: { active: true } }
           }
         ]);
@@ -167,82 +172,85 @@ const ManageResearchers = () => {
   };
 
   return (
-    <Box sx={{ p: "13px", height: "98vh", overflow: "auto" }}>
-      <h2>Manage Researchers for Autograding</h2>
-      <Button variant="contained" color="primary" onClick={() => setShowModal(true)}>
-        Add Researcher
-      </Button>
+    <>
+      <RouterNav />
+      <Box sx={{ p: "13px", height: "90vh", overflow: "auto" }}>
+        <h2>Manage Researchers for Autograding</h2>
+        <Button variant="contained" color="primary" onClick={() => setShowModal(true)}>
+          Add Researcher
+        </Button>
 
-      <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Researcher</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {researchers.map(researcher => (
-              <TableRow key={researcher.id}>
-                <TableCell>{researcher.fullname || "Loading..."}</TableCell>
-                <TableCell>{researcher.email}</TableCell>
-
-                <TableCell>
-                  <Button variant="contained" color="success" onClick={() => confirmRemoveResearcher(researcher)}>
-                    Remove
-                  </Button>
-                </TableCell>
+        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Researcher</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Action</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {researchers.map(researcher => (
+                <TableRow key={researcher.id}>
+                  <TableCell>{researcher.fullname || "Loading..."}</TableCell>
+                  <TableCell>{researcher.email}</TableCell>
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)}>
-        <DialogContent sx={{ width: "500px" }}>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="outlined"
-            value={newEmail}
-            onChange={e => setNewEmail(e.target.value)}
-          />
-        </DialogContent>
-        {error && <Alert severity="error">{error}</Alert>}
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setShowModal(false);
-              setError(null);
-              setNewEmail("");
-            }}
-            color="primary"
-          >
-            Cancel
-          </Button>
-          <Button onClick={handleAddResearcher} color="primary">
-            Add Researcher
-          </Button>
-        </DialogActions>
-      </Dialog>
+                  <TableCell>
+                    <Button variant="contained" color="success" onClick={() => confirmRemoveResearcher(researcher)}>
+                      Remove
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-      <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
-        <DialogTitle>Confirm Remove Researcher</DialogTitle>
-        <DialogContent>Are you sure you want to remove this researcher?</DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowConfirmDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleRemoveResearcher} color="error">
-            Remove
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+        <Dialog open={showModal} onClose={() => setShowModal(false)}>
+          <DialogContent sx={{ width: "500px" }}>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="outlined"
+              value={newEmail}
+              onChange={e => setNewEmail(e.target.value)}
+            />
+          </DialogContent>
+          {error && <Alert severity="error">{error}</Alert>}
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                setError(null);
+                setNewEmail("");
+              }}
+              color="primary"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleAddResearcher} color="primary">
+              Add Researcher
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
+          <DialogTitle>Confirm Remove Researcher</DialogTitle>
+          <DialogContent>Are you sure you want to remove this researcher?</DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowConfirmDialog(false)} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleRemoveResearcher} color="error">
+              Remove
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </>
   );
 };
 

@@ -79,7 +79,9 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
             return !getMajority(p, upVotes, downVotes);
           });
 
-          if (phrasesSatisfied.length > 0) {
+          if (phrasesSatisfied.length > 0 && notSatisfiedphrases.length > 0) {
+            const phrases = [...notSatisfiedphrases, ...phrasesSatisfied];
+            delete conditionItem.phrases;
             _conditionItems.push({
               docId: recall.id,
               session,
@@ -89,7 +91,7 @@ const getRecallConditionsByRecallGrade = (recall, fullname, booleanByphrase, pas
               satisfiedphrases: phrasesSatisfied,
               originalText: passagesByIds[conditionItem.passage].text,
               ...conditionItem,
-              phrases: [...notSatisfiedphrases, ...phrasesSatisfied],
+              phrases: phrases,
               priority,
               conditionIdx
             });
