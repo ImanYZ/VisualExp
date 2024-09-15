@@ -206,7 +206,8 @@ const AppRouter = props => {
       } else {
         // if current user a researcher
         const researcherData = researcherDoc.data();
-        if (researcherData.isAdmin) {
+
+        if (researcherData?.isAdmin) {
           setIsAdmin(true);
         }
 
