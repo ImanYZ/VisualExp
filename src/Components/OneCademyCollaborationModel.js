@@ -31,6 +31,9 @@ import Drawer from "@mui/material/Drawer";
 import EditIcon from "@mui/icons-material/Edit";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useThemeContext } from "../ThemeContext";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch"; // Import Switch
 
 const d3 = require("d3");
 
@@ -78,8 +81,9 @@ const OneCademyCollaborationModel = () => {
   const [listOfDiagrams, setListOfDiagrams] = useState([]);
   const [editingDiagram, setEditingDiagram] = useState(false);
   const [editor, setEditor] = useState(true);
-
+  const { darkMode, toggleTheme } = useThemeContext();
   const theme = useTheme();
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const ColorBox = props => {
     return (
@@ -357,7 +361,7 @@ const OneCademyCollaborationModel = () => {
       buttonBody
         .append("xhtml:button")
         .style("background", "transparent")
-        .style("color", "black")
+        .style("color", darkMode ? "white" : "black")
         .style("border", "none")
         .style("font-weight", "bold")
         .style("width", "100%")
@@ -474,7 +478,7 @@ const OneCademyCollaborationModel = () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoded, allNodes, visibleNodes]);
+  }, [nodesLoded, allNodes, visibleNodes, darkMode]);
 
   const AddNewNode = second => {
     setTitle("");
@@ -1046,7 +1050,7 @@ const OneCademyCollaborationModel = () => {
     setOpenAddModal(false);
   };
   return (
-    <Box sx={{ height: "100vh", overflowY: "scroll" }}>
+    <Box sx={{ height: "100vh", overflowY: "scroll", backgroundColor: darkMode ? "#272727" : "" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
         <DialogTitle sx={{ fontSize: "15px" }}> Update the diagram name:</DialogTitle>
         <DialogContent sx={{ width: "500px", mt: "5px" }}>
@@ -1114,7 +1118,7 @@ const OneCademyCollaborationModel = () => {
             onClick={handleOpenSidBar}
           />
           <Box sx={{ direction: "ltr" }}>
-            <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
+            <Paper sx={{ position: "sticky", top: "0", zIndex: "1", p: 1, ml: "5px" }}>
               {" "}
               <Typography
                 sx={{
@@ -1124,7 +1128,7 @@ const OneCademyCollaborationModel = () => {
                 Choose nodes to show their causal relations.
               </Typography>{" "}
               Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
-            </Box>
+            </Paper>
 
             {allNodes.map((node, index) => (
               <ListItem
@@ -1511,6 +1515,11 @@ const OneCademyCollaborationModel = () => {
                   >
                     Reset
                   </Button>
+                  <FormControlLabel
+                    control={<Switch checked={darkMode} onChange={toggleTheme} />}
+                    label={darkMode ? "Dark Mode" : "Light Mode"}
+                    sx={{ mb: "15px", color: darkMode ? "white" : "black" }}
+                  />
                   {editor && (
                     <Button
                       sx={{
@@ -1569,7 +1578,7 @@ const OneCademyCollaborationModel = () => {
                           label="diagram"
                           value={selectedDiagram.name}
                           onChange={handlChangeDiagram}
-                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
                         >
                           {[...listOfDiagrams].map(diagram => (
                             <MenuItem key={diagram.id} value={diagram.name} sx={{ display: "center" }}>
@@ -1612,7 +1621,7 @@ const OneCademyCollaborationModel = () => {
                   />
                 )}
                 <Box sx={{ direction: "ltr" }}>
-                  <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
+                  <Paper sx={{ position: "sticky", top: "0", zIndex: "1", p: 1, ml: "5px" }}>
                     {" "}
                     <Typography
                       sx={{
@@ -1622,7 +1631,7 @@ const OneCademyCollaborationModel = () => {
                       Choose nodes to show their causal relations.
                     </Typography>{" "}
                     Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
-                  </Box>
+                  </Paper>
 
                   {allNodes.map((node, index) => (
                     <ListItem
