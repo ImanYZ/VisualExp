@@ -5,14 +5,16 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import AppRouter from "./AppRouter";
 import reportWebVitals from "./reportWebVitals";
-
+import { ThemeProviderWrapper } from "./ThemeContext";
 import "./index.css";
 
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
       <Router>
-        <AppRouter />
+        <ThemeProviderWrapper>
+          <AppRouter />
+        </ThemeProviderWrapper>
       </Router>
     </RecoilRoot>
   </React.StrictMode>,
