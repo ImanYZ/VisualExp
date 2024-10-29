@@ -110,6 +110,7 @@ module.exports = async (req, res) => {
               if (majority !== null && majority !== botGrade) {
                 majorityDifferentThanBot.push({
                   ...phraseItem,
+                  majority,
                   botGrade,
                   response: conditionItem.response,
                   session: session,

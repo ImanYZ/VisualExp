@@ -2,15 +2,7 @@ g.type-PO>rect {
   fill: #4caf50;
 }
 
-g.type-NO>rect {
-  fill: #cc0119;
-}
-g.type-DF>rect {
-  fill: #1976d2;
-}
-g.type-ST>rect {
-  fill: #3e2723;
-}
+
 
 .type-ST text,
 .type-NO text,
