@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
 import { useRecoilValue } from "recoil";
 import { emailState, firebaseState } from "../store/AuthAtoms";
 import Button from "@mui/material/Button";
@@ -33,8 +34,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useThemeContext } from "../ThemeContext";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch"; // Import Switch
-
+import Switch from "@mui/material/Switch"; 
+import AddNodeTypeModal from "./CollaborativeModel/AddNodeTypeModal";
 const d3 = require("d3");
 
 const legends = [
@@ -43,6 +44,11 @@ const legends = [
   { text: "Known Negative Effect", color: "#A91BE4" },
   { text: "Hypothetical Negative Effect", color: "#E4451B" }
 ];
+// const NODE_TYPES = ["Positive Outcome", "Negative Outcome", "Design Features"];
+
+const getColor = (nodeType, nodeTypes) => {
+  return nodeTypes[nodeType]?.color || "";
+};
 
 const OneCademyCollaborationModel = () => {
   const firebase = useRecoilValue(firebaseState);
@@ -82,6 +88,9 @@ const OneCademyCollaborationModel = () => {
   const [editingDiagram, setEditingDiagram] = useState(false);
   const [editor, setEditor] = useState(true);
   const { darkMode, toggleTheme } = useThemeContext();
+  const [nodeTypes, setNodeTypes] = useState({});
+  const [isModalAddTypeOpen, setIsModalAddTypeOpen] = useState(false);
+
   const theme = useTheme();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -93,7 +102,7 @@ const OneCademyCollaborationModel = () => {
           justifyContent: "center",
           alignItems: "center",
           bgcolor: props.color,
-          color: "primary.contrastText",
+          color: "white",
           fontSize: 13,
           borderRadius: 2,
           maxWidth: 90,
@@ -151,6 +160,26 @@ const OneCademyCollaborationModel = () => {
     //   .attr("font-size", "15px")
     //   .text(order);
   }
+
+  useEffect(() => {
+    const unsubscribe = firebase.db.collection("nodeTypes").onSnapshot(snapshot => {
+      const newNodeTypes = {};
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        newNodeTypes[data.type] = doc.data();
+      });
+      setNodeTypes(newNodeTypes);
+    });
+
+    return unsubscribe;
+  }, [firebase]);
+  const saveNewType = (type, color) => {
+    const newTypeRef = firebase.db.collection("nodeTypes").doc();
+    newTypeRef.set({
+      type: type,
+      color
+    });
+  };
   useEffect(() => {
     const _listOfDiagrams = [...listOfDiagrams];
     const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
@@ -286,7 +315,8 @@ const OneCademyCollaborationModel = () => {
               ? "type-NO"
               : collabModelNode.type === "Positive Outcome"
               ? "type-PO"
-              : "type-DF"
+              : "type-DF",
+          style: `fill: ${getColor(collabModelNode.type, nodeTypes)}`
         });
       }
     }
@@ -348,29 +378,50 @@ const OneCademyCollaborationModel = () => {
       let nodeLabel = nodeElement.select("rect");
       let nodeBBox = nodeLabel.node().getBBox();
 
+      nodeElement
+        .style("cursor", "pointer")
+        .on("mouseover", function () {
+          nodeLabel.style("fill-opacity", 0.8);
+        })
+        .on("mouseout", function () {
+          nodeLabel.style("fill-opacity", 1);
+        });
       let button = nodeElement
         .append("foreignObject")
         .attr("width", 20)
         .attr("height", 20)
-        .attr("x", nodeBBox.width / 2 - 9)
-        .attr("y", -nodeBBox.height / 2 - 9)
-        .attr("class", "hide-button");
+        .attr("x", nodeBBox.width / 2 - 10)
+        .attr("y", -nodeBBox.height / 2 - 10)
+        .attr("class", "hide-button")
+        .style("cursor", "pointer");
 
       let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
       buttonBody
         .append("xhtml:button")
-        .style("background", "transparent")
-        .style("color", darkMode ? "white" : "black")
-        .style("border", "none")
+        .style("background", "white")
+        .style("color", "black")
+        .style("border", "1px solid black")
+        .style("border-radius", "50%")
+        .style("width", "20px")
+        .style("height", "20px")
         .style("font-weight", "bold")
-        .style("width", "100%")
-        .style("height", "100%")
+        .style("font-size", "12px")
+        .style("line-height", "18px")
+        .style("text-align", "center")
+        .style("padding", "0")
         .text("X")
         .on("click", function (e) {
           e.stopPropagation();
           removeNode(v);
+        })
+        .on("mouseover", function () {
+          d3.select(this).style("background", "orange");
+        })
+        .on("mouseout", function () {
+          d3.select(this).style("background", "white");
         });
+
       if (selectedNode || openAddNode) {
         let button2 = nodeElement
           .append("foreignObject")
@@ -395,6 +446,7 @@ const OneCademyCollaborationModel = () => {
             .style("line-height", "2px")
             .style("padding", "0")
             .style("text-align", "center")
+            .style("cursor", "pointer")
             .text("-")
             .on("click", function (e) {
               e.stopPropagation();
@@ -414,6 +466,7 @@ const OneCademyCollaborationModel = () => {
             .style("line-height", "2px")
             .style("padding", "0")
             .style("text-align", "center")
+            .style("cursor", "pointer")
             .text("+")
             .on("click", function (e) {
               e.stopPropagation();
@@ -478,7 +531,7 @@ const OneCademyCollaborationModel = () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoded, allNodes, visibleNodes, darkMode]);
+  }, [nodesLoded, allNodes, visibleNodes, darkMode, nodeTypes]);
 
   const AddNewNode = second => {
     setTitle("");
@@ -1164,11 +1217,7 @@ const OneCademyCollaborationModel = () => {
             onClick={handleLegend}
           />
           <Grid container spacing={1} sx={{ mt: "50px", ml: "30px" }}>
-            {[
-              { text: "Input", color: "#1976d2" },
-              { text: "Positive Outcome", color: "#4caf50" },
-              { text: "Negative Outcome", color: "#cc0119" }
-            ].map((resource, index) => (
+            {Object.values(nodeTypes).map((resource, index) => (
               <Grid item xs={12} sm={4} md={3}>
                 <Box
                   sx={{
@@ -1186,9 +1235,9 @@ const OneCademyCollaborationModel = () => {
                     width: "100%",
                     height: "40px"
                   }}
-                  key={resource.text + index}
+                  key={resource.type + index}
                 >
-                  {resource.text}
+                  {resource.type}
                 </Box>
               </Grid>
             ))}
@@ -1295,13 +1344,32 @@ const OneCademyCollaborationModel = () => {
               )}
               {visibleNodes.length > 0 && !isMobile && (
                 <Box sx={{ display: "flex" }}>
-                  {[
-                    { text: "Input", color: "#1976d2" },
-                    { text: "Positive Outcome", color: "#4caf50" },
-                    { text: "Negative Outcome", color: "#cc0119" }
-                  ].map((resource, index) => (
-                    <ColorBox key={resource.text + index} text={resource.text} color={resource.color} />
+                  {Object.values(nodeTypes).map((resource, index) => (
+                    <ColorBox key={resource.type + index} text={resource.type} color={resource.color} />
                   ))}
+                  <IconButton
+                    sx={{
+                      display: "flex",
+
+                      alignItems: "center",
+                      fontSize: 13,
+                      borderRadius: 2,
+                      maxWidth: 90,
+                      ml: 6,
+                      mr: 0.5,
+                      mb: 0.5,
+                      textAlign: "center",
+                      width: "190px",
+                      height: "40px",
+                      backgroundColor: "orange"
+                    }}
+                    onClick={() => {
+                      setIsModalAddTypeOpen(true);
+                    }}
+                    variant="contained"
+                  >
+                    <AddIcon sx={{ color: "white" }} />
+                  </IconButton>
                   {[
                     { text: "Known Positive Effect", color: "#56E41B" },
                     { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
@@ -1422,11 +1490,11 @@ const OneCademyCollaborationModel = () => {
                           onChange={e => {
                             setType(e.target.value);
                           }}
-                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
                         >
-                          {["Positive Outcome", "Negative Outcome", "Design Features"].map((row, index) => (
-                            <MenuItem key={row + index} value={row} sx={{ display: "center" }}>
-                              {row}
+                          {Object.values(nodeTypes).map((row, index) => (
+                            <MenuItem key={row.type + index} value={row.type} sx={{ display: "center" }}>
+                              {row.type}
                             </MenuItem>
                           ))}
                         </Select>
@@ -1440,7 +1508,7 @@ const OneCademyCollaborationModel = () => {
                           onChange={e => {
                             setChildrenIds(e.target.value);
                           }}
-                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
                         >
                           {allNodes.map(node => (
                             <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
@@ -1660,6 +1728,13 @@ const OneCademyCollaborationModel = () => {
           </Grid>
         </Grid>
       </Box>
+      <AddNodeTypeModal
+        open={isModalAddTypeOpen}
+        onClose={() => {
+          setIsModalAddTypeOpen(false);
+        }}
+        onSave={saveNewType}
+      />
     </Box>
   );
 };
