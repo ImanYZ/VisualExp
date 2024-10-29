@@ -46,13 +46,8 @@ const legends = [
 ];
 // const NODE_TYPES = ["Positive Outcome", "Negative Outcome", "Design Features"];
 
-const getColor = nodeType => {
-  const NODE_TYPES = {
-    "Design Features": { text: "Design Features", color: "#1976d2" },
-    "Positive Outcome": { text: "Positive Outcome", color: "#4caf50" },
-    "Negative Outcome": { text: "Negative Outcome", color: "#cc0119" }
-  };
-  return NODE_TYPES[nodeType].color;
+const getColor = (nodeType, nodeTypes) => {
+  return nodeTypes[nodeType]?.color || "";
 };
 
 const OneCademyCollaborationModel = () => {
@@ -321,7 +316,7 @@ const OneCademyCollaborationModel = () => {
               : collabModelNode.type === "Positive Outcome"
               ? "type-PO"
               : "type-DF",
-          style: `fill: ${getColor(collabModelNode.type)}`
+          style: `fill: ${getColor(collabModelNode.type, nodeTypes)}`
         });
       }
     }
@@ -513,7 +508,7 @@ const OneCademyCollaborationModel = () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoded, allNodes, visibleNodes, darkMode]);
+  }, [nodesLoded, allNodes, visibleNodes, darkMode, nodeTypes]);
 
   const AddNewNode = second => {
     setTitle("");
