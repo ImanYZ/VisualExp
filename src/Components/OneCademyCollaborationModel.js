@@ -434,31 +434,32 @@ const OneCademyCollaborationModel = () => {
 
       let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
-      buttonBody
-        .append("xhtml:button")
-        .style("background", "white")
-        .style("color", "black")
-        .style("border", "1px solid black")
-        .style("border-radius", "50%")
-        .style("width", "20px")
-        .style("height", "20px")
-        .style("font-weight", "bold")
-        .style("font-size", "12px")
-        .style("line-height", "18px")
-        .style("text-align", "center")
-        .style("padding", "0")
-        .text("X")
-        .on("click", function (e) {
-          e.stopPropagation();
-          removeNode(v);
-        })
-        .on("mouseover", function () {
-          d3.select(this).style("background", "orange");
-        })
-        .on("mouseout", function () {
-          d3.select(this).style("background", "white");
-        });
-
+      if (editor) {
+        buttonBody
+          .append("xhtml:button")
+          .style("background", "white")
+          .style("color", "black")
+          .style("border", "1px solid black")
+          .style("border-radius", "50%")
+          .style("width", "20px")
+          .style("height", "20px")
+          .style("font-weight", "bold")
+          .style("font-size", "12px")
+          .style("line-height", "18px")
+          .style("text-align", "center")
+          .style("padding", "0")
+          .text("X")
+          .on("click", function (e) {
+            e.stopPropagation();
+            removeNode(v);
+          })
+          .on("mouseover", function () {
+            d3.select(this).style("background", "orange");
+          })
+          .on("mouseout", function () {
+            d3.select(this).style("background", "white");
+          });
+      }
       if (selectedNode || openAddNode) {
         let button2 = nodeElement
           .append("foreignObject")
