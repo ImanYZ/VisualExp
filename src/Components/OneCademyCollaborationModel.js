@@ -15,7 +15,7 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Typography } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
@@ -36,6 +36,8 @@ import { useThemeContext } from "../ThemeContext";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import AddNodeTypeModal from "./CollaborativeModel/AddNodeTypeModal";
+import GetAppIcon from "@mui/icons-material/GetApp";
+
 const d3 = require("d3");
 
 const legends = [
@@ -56,9 +58,9 @@ const OneCademyCollaborationModel = () => {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Positive Outcome");
   const [nodesChanges, setNodesChanges] = useState([]);
-  const [nodesLoded, setNodesLoded] = useState(false);
+  const [nodesLoaded, setNodesLoaded] = useState(false);
   const svgRef = useRef();
-  const [allNodes, setAllNodes] = useState([]);
+  const [allNodes, setAllNodes] = useState({});
   const [explanation, setExplanation] = useState("");
   const [label, setLabel] = useState("");
   const [explanationLink, setExplanationLink] = useState("");
@@ -78,7 +80,7 @@ const OneCademyCollaborationModel = () => {
   const [stepLink, setStepLink] = useState(0);
   const [maxDepth, setMaxDepth] = useState(0);
   const [openSideBar, setOpenSideBar] = useState(false);
-  const [ingnorOrder, setIngnorOrder] = useState(true);
+  const [ignoreOrder, setIgnoreOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
   const [openLegend, setOpenLegend] = useState(false);
   const [selectedDiagram, setSelectedDiagram] = useState({});
@@ -266,69 +268,54 @@ const OneCademyCollaborationModel = () => {
 
   useEffect(() => {
     let collabModelNodesQuery = firebase.db.collection("collabModelNodes");
-    const _allNodes = [...allNodes];
+    const _allNodes = {};
     const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
       for (let change of changes) {
         const data = change.doc.data();
         if (change.type === "added") {
           if (!data.deleted) {
-            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-            if (findIndex === -1) {
-              _allNodes.push({ id: change.doc.id, ...data });
-            } else {
-              _allNodes[findIndex] = { id: change.doc.id, ...data };
-            }
-          } else if (data.deleted) {
-            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-            if (findIndex !== -1) {
-              _allNodes.splice(findIndex, 1);
-            }
+            _allNodes[change.doc.id] = { ...data, id: change.doc.id };
+          } else {
+            delete _allNodes[change.doc.id];
           }
         } else if (change.type === "modified") {
           if (!data.deleted) {
-            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-            if (findIndex !== -1) {
-              _allNodes[findIndex] = { id: change.doc.id, ...data };
-            }
-          } else if (data.deleted) {
-            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-            if (findIndex !== -1) {
-              _allNodes.splice(findIndex, 1);
-            }
+            _allNodes[change.doc.id] = { ...data, id: change.doc.id };
+          } else {
+            delete _allNodes[change.doc.id];
           }
         } else if (change.type === "removed") {
-          const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-          if (findIndex !== -1) {
-            _allNodes.splice(findIndex, 1);
-          }
+          delete _allNodes[change.doc.id];
         }
       }
       setNodesChanges(oldChanges => [...oldChanges, ...changes]);
-      setNodesLoded(true);
+      setNodesLoaded(true);
       setLoadData(false);
-      _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
       setAllNodes(_allNodes);
-      setShowAll(_allNodes.length === visibleNodes.length);
+      setShowAll(Object.keys(_allNodes).length === visibleNodes.length);
     });
     return () => {
       collabModelNodesSnapshot();
-      setNodesLoded(false);
+      setNodesLoaded(false);
       setLoadData(false);
     };
   }, [firebase, loadData, selectedDiagram]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (!allNodes.length) return;
-    const researchersDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
-    if (researchersDoc.docs.length) {
-      const resData = researchersDoc.docs[0].data();
-      setEditor(resData.hasOwnProperty("isEditor") && resData.isEditor);
-    } else {
-      setEditor(false);
-    }
+  useEffect(() => {
+    const checkEditor = async () => {
+      const researchersDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
+      if (researchersDoc.docs.length) {
+        const resData = researchersDoc.docs[0].data();
+        setEditor(resData.hasOwnProperty("isEditor") && resData.isEditor);
+      } else {
+        setEditor(false);
+      }
+    };
+    checkEditor();
+  }, [firebase]);
 
+  useEffect(() => {
     var g = new dagreD3.graphlib.Graph({ compound: true })
       .setGraph({ rankdir: "LR", isMultigraph: true })
       .setDefaultEdgeLabel(function () {
@@ -336,56 +323,55 @@ const OneCademyCollaborationModel = () => {
       });
     d3.select("#graphGroup").selectAll("*").remove();
     setNodesChanges([]);
-    for (let collabModelNode of allNodes) {
-      if (
-        visibleNodes.includes(collabModelNode.id) &&
-        !collabModelNode.deleted &&
-        !g.nodes().includes(collabModelNode.id)
-      ) {
-        g.setNode(collabModelNode.id, {
-          label: collabModelNode.title,
+    for (let visibleNode of visibleNodes) {
+      if (allNodes[visibleNode] && !g.nodes().includes(visibleNode)) {
+        const nodeData = allNodes[visibleNode];
+        console.log("visibleNode ==>", visibleNode, nodeData);
+        g.setNode(nodeData.id, {
+          label: nodeData.title,
           class:
-            selectedNode === collabModelNode.id
+            selectedNode === nodeData.id
               ? "type-ST"
-              : collabModelNode.type === "Negative Outcome"
+              : nodeData.type === "Negative Outcome"
               ? "type-NO"
-              : collabModelNode.type === "Positive Outcome"
+              : nodeData.type === "Positive Outcome"
               ? "type-PO"
               : "type-DF",
-          style: `fill: ${getColor(collabModelNode.type, nodeTypes)}`
+          style: `fill: ${getColor(nodeData.type, nodeTypes)}`
         });
       }
     }
     let _maxDepth = 0;
-    for (let collabModelNode of allNodes) {
-      if (!collabModelNode.children || !collabModelNode.children.length) continue;
-      for (let elementChild of collabModelNode.children) {
+    for (let visibleNode of visibleNodes) {
+      const nodeData = allNodes[visibleNode];
+      if (!nodeData?.children || nodeData.children.length === 0) continue;
+      for (let elementChild of nodeData.children) {
         if (_maxDepth < elementChild?.order) {
           _maxDepth = elementChild?.order;
         }
         if (
           !elementChild.deleted &&
           visibleNodes.includes(elementChild.id) &&
-          visibleNodes.includes(collabModelNode.id) &&
-          !collabModelNode.deleted
+          visibleNodes.includes(nodeData.id) &&
+          !nodeData.deleted
         ) {
           let color = legends.find(legend => legend.text === elementChild.type)?.color || "";
           let _arrowheadStyle = `fill: ${color}`;
           let _style = `stroke: ${color}; stroke-width: 2px;`;
           // if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
-          //   _style = `stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;`;
+          //   _style = stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;;
           // }
-          if (selectedLink.v === collabModelNode.id && selectedLink.w === elementChild.id) {
+          if (selectedLink.v === nodeData.id && selectedLink.w === elementChild.id) {
             _style =
               "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
             _arrowheadStyle = "fill: #212121";
           }
           if (
-            ingnorOrder ||
+            ignoreOrder ||
             showAll ||
             (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)
           ) {
-            g.setEdge(collabModelNode.id, elementChild.id, {
+            g.setEdge(nodeData.id, elementChild.id, {
               curve: d3.curveBasis,
               style: _style,
               arrowheadStyle: _arrowheadStyle,
@@ -549,9 +535,9 @@ const OneCademyCollaborationModel = () => {
     if (editor) {
       edges.each(function (edgeData) {
         var edgeElement = d3.select(this);
-        const nodeIdx = allNodes.findIndex(node => node.id === edgeData.v);
-        const childIdx = allNodes[nodeIdx].children.findIndex(child => child.id === edgeData.w);
-        const order = allNodes[nodeIdx].children[childIdx].order;
+        const nodeData = allNodes[edgeData.v];
+        const childIdx = nodeData.children.findIndex(child => child.id === edgeData.w);
+        const order = nodeData.children[childIdx].order;
         addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order);
       });
     }
@@ -564,12 +550,12 @@ const OneCademyCollaborationModel = () => {
       });
     }
 
-    setNodesLoded(false);
+    setNodesLoaded(false);
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoded, allNodes, visibleNodes, darkMode, nodeTypes]);
+  }, [nodesLoaded, allNodes, visibleNodes, darkMode, nodeTypes]);
 
   const AddNewNode = second => {
     setTitle("");
@@ -706,12 +692,13 @@ const OneCademyCollaborationModel = () => {
 
   const deleteNode = async () => {
     if (!selectedNode) return;
-    const _allnodes = [...allNodes];
+    const _allnodes = { ...allNodes };
     const _listOfDiagrams = [...listOfDiagrams];
     const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
     const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
     let _visibleNodes = [...visibleNodes];
-    for (let node of _allnodes) {
+    for (let nodeId in _allnodes) {
+      const node = _allnodes[nodeId];
       if (node.id === selectedNode) {
         node.deleted = true;
       }
@@ -730,7 +717,8 @@ const OneCademyCollaborationModel = () => {
       }
     }
     await firebase.db.runTransaction(async t => {
-      for (let node of _allnodes) {
+      for (let nodeId in _allnodes) {
+        const node = _allnodes[nodeId];
         const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
         t.update(nodeRef, { children: node.children, deleted: node?.deleted || false });
       }
@@ -765,7 +753,7 @@ const OneCademyCollaborationModel = () => {
   const handleVisibileNodes = async node => {
     let _visibleNodes = visibleNodes;
     setShowAll(false);
-    setIngnorOrder(true);
+    setIgnoreOrder(true);
     const _listOfDiagrams = [...listOfDiagrams];
     const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
     const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
@@ -775,12 +763,14 @@ const OneCademyCollaborationModel = () => {
     } else {
       _visibleNodes.push(node.id);
       const childrens = node.children.filter(child => !child?.deleted);
-      const parents = allNodes.filter(_node => _node.children.some(child => child.id === node.id && !child?.deleted));
+      const parents = Object.values(allNodes).filter(_node =>
+        _node.children.some(child => child.id === node.id && !child?.deleted)
+      );
       _visibleNodes = [..._visibleNodes, ...childrens.map(child => child.id), ...parents.map(parent => parent.id)];
     }
 
     let _showall = true;
-    for (let node of allNodes) {
+    for (let node of Object.values(allNodes)) {
       if (!_visibleNodes.includes(node.id)) {
         _showall = false;
         break;
@@ -835,7 +825,7 @@ const OneCademyCollaborationModel = () => {
       const child = children.find(child => child.id === childId);
       if (child.order !== linkOrder) {
         if (child.order === 0 || Number.isNaN(child.order)) {
-          for (let node of allNodes) {
+          for (let node of Object.values(allNodes)) {
             const _children = node.children;
             for (let _child of _children) {
               if (_child.order >= linkOrder) {
@@ -852,7 +842,7 @@ const OneCademyCollaborationModel = () => {
             t.update(nodeRef, { children: _children });
           }
         } else if (linkOrder === 0) {
-          for (let node of allNodes) {
+          for (let node of Object.values(allNodes)) {
             const _children = node.children;
             for (let _child of _children) {
               if (_child.order >= child.order) {
@@ -869,7 +859,7 @@ const OneCademyCollaborationModel = () => {
             t.update(nodeRef, { children: _children });
           }
         } else {
-          for (let node of allNodes) {
+          for (let node of Object.values(allNodes)) {
             const _children = node.children;
 
             if (child.order < linkOrder) {
@@ -954,11 +944,7 @@ const OneCademyCollaborationModel = () => {
       _visibleNodes = [];
       setShowAll(false);
     } else {
-      for (let node of allNodes) {
-        if (!_visibleNodes.includes(node.id)) {
-          _visibleNodes.push(node.id);
-        }
-      }
+      _visibleNodes.push(...Object.keys(allNodes));
       setShowAll(true);
     }
     _listOfDiagrams[_diagram].nodes = _visibleNodes;
@@ -980,7 +966,7 @@ const OneCademyCollaborationModel = () => {
 
   const nextLink = () => {
     const _visibleNodes = [];
-    allNodes.forEach(node => {
+    Object.values(allNodes).forEach(node => {
       node.children.forEach(child => {
         if (stepLink + 1 >= child.order && child.order !== 0) {
           if (!_visibleNodes.includes(child.id)) {
@@ -996,11 +982,11 @@ const OneCademyCollaborationModel = () => {
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
     setShowAll(false);
-    setIngnorOrder(false);
+    setIgnoreOrder(false);
   };
   const previousLink = () => {
     const _visibleNodes = [];
-    allNodes.forEach(node => {
+    Object.values(allNodes).forEach(node => {
       node.children.forEach(child => {
         if (stepLink - 1 >= child.order && child.order !== 0) {
           if (!_visibleNodes.includes(child.id)) {
@@ -1016,7 +1002,7 @@ const OneCademyCollaborationModel = () => {
     setStepLink(prevActiveStep => (prevActiveStep - 1 > 0 ? prevActiveStep - 1 : 0));
     setLoadData(true);
     setShowAll(false);
-    setIngnorOrder(false);
+    setIgnoreOrder(false);
   };
 
   const deleteLink = async () => {
@@ -1028,7 +1014,7 @@ const OneCademyCollaborationModel = () => {
       const nodeData = nodeDoc.data();
       const childIdx = nodeData.children.findIndex(child => child.id === childId);
       const childp = nodeData.children[childIdx];
-      for (let node of allNodes) {
+      for (let node of Object.values(allNodes)) {
         let _children = node.children;
         for (let _child of _children) {
           if (_child.order > childp.order) {
@@ -1069,7 +1055,7 @@ const OneCademyCollaborationModel = () => {
   };
   const resetOrder = () => {
     const _visibleNodes = [];
-    allNodes.forEach(node => {
+    Object.values(allNodes).forEach(node => {
       node.children.forEach(child => {
         if (1 >= child.order && child.order !== 0) {
           if (!_visibleNodes.includes(child.id)) {
@@ -1085,7 +1071,7 @@ const OneCademyCollaborationModel = () => {
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
     setShowAll(false);
-    setIngnorOrder(false);
+    setIgnoreOrder(false);
   };
   const handleOpenSidBar = () => {
     setOpenSideBar(old => !old);
@@ -1099,7 +1085,7 @@ const OneCademyCollaborationModel = () => {
     setSelectedDiagram(_diagram);
     setVisibleNodes(_diagram.nodes);
     setShowAll(false);
-    setNodesLoded(false);
+    setNodesLoaded(false);
   };
 
   const handleEditDiagram = async () => {
@@ -1149,6 +1135,40 @@ const OneCademyCollaborationModel = () => {
     setNewDiagramName("");
     setOpenAddModal(false);
   };
+  const downloadSvg = () => {
+    const svgElement = svgRef.current;
+    if (svgElement) {
+      const clone = svgElement.cloneNode(true);
+      const svgStyles = document.createElement("style");
+      const cssRules = Array.from(document.styleSheets)
+        .reduce((acc, styleSheet) => {
+          try {
+            return acc.concat(Array.from(styleSheet.cssRules));
+          } catch {
+            return acc; // Ignore CSS rules we can't access
+          }
+        }, [])
+        .map(rule => rule.cssText)
+        .join(" ");
+
+      svgStyles.textContent = cssRules;
+      clone.insertBefore(svgStyles, clone.firstChild);
+
+      const svgData = new XMLSerializer().serializeToString(clone);
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "graph.svg";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+      URL.revokeObjectURL(url);
+    }
+  };
+
   return (
     <Box sx={{ height: "100vh", overflowY: "scroll", backgroundColor: darkMode ? "#272727" : "" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
@@ -1230,7 +1250,7 @@ const OneCademyCollaborationModel = () => {
               Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
             </Paper>
 
-            {allNodes.map((node, index) => (
+            {Object.values(allNodes).map((node, index) => (
               <ListItem
                 key={node.id}
                 disablePadding
@@ -1574,7 +1594,7 @@ const OneCademyCollaborationModel = () => {
                           }}
                           sx={{ width: "100%", border: "1px", borderColor: "white" }}
                         >
-                          {allNodes.map(node => (
+                          {Object.values(allNodes).map(node => (
                             <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
                               {node.title}
                             </MenuItem>
@@ -1652,6 +1672,12 @@ const OneCademyCollaborationModel = () => {
                     label={darkMode ? "Dark Mode" : "Light Mode"}
                     sx={{ mb: "15px", color: darkMode ? "white" : "black" }}
                   />
+                  <Tooltip title={"Download as SVG"}>
+                    <IconButton variant="contained" onClick={downloadSvg} sx={{ width: "40px", height: "40px" }}>
+                      <GetAppIcon />
+                    </IconButton>
+                  </Tooltip>
+
                   {editor && (
                     <Button
                       sx={{
@@ -1765,27 +1791,29 @@ const OneCademyCollaborationModel = () => {
                     Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
                   </Paper>
 
-                  {allNodes.map((node, index) => (
-                    <ListItem
-                      key={node.title + index}
-                      disablePadding
-                      sx={{
-                        "&$selected": {
-                          backgroundColor: "orange",
-                          zIndex: 100,
-                          ml: 9
-                        }
-                      }}
-                    >
-                      <Checkbox
-                        checked={visibleNodes.includes(node.id)}
-                        onClick={() => {
-                          handleVisibileNodes(node);
+                  {Object.values(allNodes)
+                    .sort((a, b) => (a.title > b.title ? 1 : -1))
+                    .map((node, index) => (
+                      <ListItem
+                        key={node.title + index}
+                        disablePadding
+                        sx={{
+                          "&$selected": {
+                            backgroundColor: "orange",
+                            zIndex: 100,
+                            ml: 9
+                          }
                         }}
-                      />
-                      <ListItemText id={node.title} primary={`${node.title}`} />
-                    </ListItem>
-                  ))}
+                      >
+                        <Checkbox
+                          checked={visibleNodes.includes(node.id)}
+                          onClick={() => {
+                            handleVisibileNodes(node);
+                          }}
+                        />
+                        <ListItemText id={node.title} primary={`${node.title}`} />
+                      </ListItem>
+                    ))}
                 </Box>
               </Paper>
             )}
