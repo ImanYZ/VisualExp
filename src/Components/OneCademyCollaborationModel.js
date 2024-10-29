@@ -34,7 +34,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useThemeContext } from "../ThemeContext";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch"; // Import Switch
+import Switch from "@mui/material/Switch"; 
 import AddNodeTypeModal from "./CollaborativeModel/AddNodeTypeModal";
 const d3 = require("d3");
 
@@ -378,29 +378,50 @@ const OneCademyCollaborationModel = () => {
       let nodeLabel = nodeElement.select("rect");
       let nodeBBox = nodeLabel.node().getBBox();
 
+      nodeElement
+        .style("cursor", "pointer")
+        .on("mouseover", function () {
+          nodeLabel.style("fill-opacity", 0.8);
+        })
+        .on("mouseout", function () {
+          nodeLabel.style("fill-opacity", 1);
+        });
       let button = nodeElement
         .append("foreignObject")
         .attr("width", 20)
         .attr("height", 20)
-        .attr("x", nodeBBox.width / 2 - 9)
-        .attr("y", -nodeBBox.height / 2 - 9)
-        .attr("class", "hide-button");
+        .attr("x", nodeBBox.width / 2 - 10)
+        .attr("y", -nodeBBox.height / 2 - 10)
+        .attr("class", "hide-button")
+        .style("cursor", "pointer");
 
       let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
       buttonBody
         .append("xhtml:button")
-        .style("background", "transparent")
-        .style("color", darkMode ? "white" : "black")
-        .style("border", "none")
+        .style("background", "white")
+        .style("color", "black")
+        .style("border", "1px solid black")
+        .style("border-radius", "50%")
+        .style("width", "20px")
+        .style("height", "20px")
         .style("font-weight", "bold")
-        .style("width", "100%")
-        .style("height", "100%")
+        .style("font-size", "12px")
+        .style("line-height", "18px")
+        .style("text-align", "center")
+        .style("padding", "0")
         .text("X")
         .on("click", function (e) {
           e.stopPropagation();
           removeNode(v);
+        })
+        .on("mouseover", function () {
+          d3.select(this).style("background", "orange");
+        })
+        .on("mouseout", function () {
+          d3.select(this).style("background", "white");
         });
+
       if (selectedNode || openAddNode) {
         let button2 = nodeElement
           .append("foreignObject")
@@ -425,6 +446,7 @@ const OneCademyCollaborationModel = () => {
             .style("line-height", "2px")
             .style("padding", "0")
             .style("text-align", "center")
+            .style("cursor", "pointer")
             .text("-")
             .on("click", function (e) {
               e.stopPropagation();
@@ -444,6 +466,7 @@ const OneCademyCollaborationModel = () => {
             .style("line-height", "2px")
             .style("padding", "0")
             .style("text-align", "center")
+            .style("cursor", "pointer")
             .text("+")
             .on("click", function (e) {
               e.stopPropagation();
@@ -1467,7 +1490,7 @@ const OneCademyCollaborationModel = () => {
                           onChange={e => {
                             setType(e.target.value);
                           }}
-                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
                         >
                           {Object.values(nodeTypes).map((row, index) => (
                             <MenuItem key={row.type + index} value={row.type} sx={{ display: "center" }}>
@@ -1485,7 +1508,7 @@ const OneCademyCollaborationModel = () => {
                           onChange={e => {
                             setChildrenIds(e.target.value);
                           }}
-                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
                         >
                           {allNodes.map(node => (
                             <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
