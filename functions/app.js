@@ -46,6 +46,8 @@ const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
 const participantsRouter = require("./api/participants");
 const adminRouter = require("./api/administrator");
+const generateCollabDiagram = require("./api/generateCollabDiagram");
+const improveCollabDiagram = require("./api/improveCollabDiagram");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -111,6 +113,10 @@ app.post("/recordAudio", recordAudio);
 app.post("/assignThematicPoints", assignThematicPoints);
 // Knowledge endpoints
 app.post("/inviteInstructors", inviteInstructors);
+
+app.post("/generateCollabDiagram", generateCollabDiagram);
+app.post("/improveCollabDiagram", improveCollabDiagram);
+
 // Misinformation Experiment
 // app.get("/card", card);
 // app.get("/image*", image);

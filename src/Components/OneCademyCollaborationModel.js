@@ -1,5 +1,14 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import { LoadingButton } from "@mui/lab";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import CircularProgress from "@mui/material/CircularProgress";
+import LinearProgress from "@mui/material/LinearProgress";
+import CloseIcon from "@mui/icons-material/Close";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import BedtimeIcon from "@mui/icons-material/Bedtime";
 import { useRecoilValue } from "recoil";
 import { emailState, firebaseState } from "../store/AuthAtoms";
 import Button from "@mui/material/Button";
@@ -23,9 +32,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import LegendToggleIcon from "@mui/icons-material/LegendToggle";
-import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Drawer from "@mui/material/Drawer";
@@ -34,10 +41,12 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useThemeContext } from "../ThemeContext";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import AddNodeTypeModal from "./CollaborativeModel/AddNodeTypeModal";
 import GetAppIcon from "@mui/icons-material/GetApp";
-
+import CollabTree from "./CollabTree/CollabTree";
+import useConfirmDialog from "../hooks/useConfirmDialog";
+import usePromptDialog from "../hooks/usePromptDialog";
+import axios from "axios";
 const d3 = require("d3");
 
 const legends = [
@@ -48,56 +57,78 @@ const legends = [
 ];
 // const NODE_TYPES = ["Positive Outcome", "Negative Outcome", "Design Features"];
 
-const getColor = (nodeType, nodeTypes) => {
-  return nodeTypes[nodeType]?.color || "";
+const getColor = (nodeType, nodeTypes, factor) => {
+  console.log(
+    "nodeTypes[nodeType.toLowerCase()]?.color",
+    nodeType.toLowerCase(),
+    nodeTypes[nodeType.toLowerCase()]?.color
+  );
+  const color = nodeTypes[nodeType.toLowerCase()]?.color || "";
+  return changeAlphaColor(color, factor);
+};
+
+const changeAlphaColor = (color, factor) => {
+  let hex = color.replace("#", "");
+  if (hex.length === 3)
+    hex = hex
+      .split("")
+      .map(x => x + x)
+      .join("");
+  if (hex.length === 6)
+    return `rgba(${parseInt(hex.slice(0, 2), 16)}, ${parseInt(hex.slice(2, 4), 16)}, ${parseInt(
+      hex.slice(4, 6),
+      16
+    )}, ${factor})`;
+  if (hex.length === 8)
+    return `rgba(${parseInt(hex.slice(0, 2), 16)}, ${parseInt(hex.slice(2, 4), 16)}, ${parseInt(
+      hex.slice(4, 6),
+      16
+    )}, ${(parseInt(hex.slice(6, 8), 16) / 255) * factor})`;
+  return hex;
+};
+
+const NODE_TYPES = "nodeTypes";
+const COLLAB_MODEL_NODES = "collabModelNodes";
+const GROUPS = "groups";
+const LINKS = "links";
+const NODES = "nodes";
+const DIAGRAMS = "diagrams";
+const LINKS_TYPES = {
+  "known positive": { text: "Known Positive Effect", color: "#4caf50" },
+  "hypothetical positive": { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+  "known negative": { text: "Known Negative Effect", color: "#A91BE4" },
+  "hypothetical negative": { text: "Hypothetical Negative Effect", color: "#E4451B" }
 };
 
 const OneCademyCollaborationModel = () => {
   const firebase = useRecoilValue(firebaseState);
-  const [openAddNode, setOpenAddNode] = useState(false);
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("Positive Outcome");
-  const [nodesChanges, setNodesChanges] = useState([]);
-  const [nodesLoaded, setNodesLoaded] = useState(false);
   const svgRef = useRef();
-  const [allNodes, setAllNodes] = useState({});
-  const [explanation, setExplanation] = useState("");
-  const [label, setLabel] = useState("");
-  const [explanationLink, setExplanationLink] = useState("");
-  const [popoverType, setPopoverType] = useState("");
-  const [childrenIds, setChildrenIds] = useState([]);
-  const [loadData, setLoadData] = useState(false);
-  const [selectedNode, setSelectedNode] = useState("");
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [visibleNodes, setVisibleNodes] = useState([]);
-  const [openModifyLink, setOpenModifyLink] = useState(false);
-  const [typeLink, setTypeLink] = useState("");
-  const [selectedLink, setSelectedLink] = useState({});
-  const [showAll, setShowAll] = useState(false);
-  const email = useRecoilValue(emailState);
-  const [zoomState, setZoomState] = useState(null);
-  const [linkOrder, setLinkOrder] = useState(0);
-  const [stepLink, setStepLink] = useState(0);
-  const [maxDepth, setMaxDepth] = useState(0);
-  const [openSideBar, setOpenSideBar] = useState(false);
-  const [ignoreOrder, setIgnoreOrder] = useState(true);
-  const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
-  const [openLegend, setOpenLegend] = useState(false);
-  const [selectedDiagram, setSelectedDiagram] = useState({});
-  const [newDiagramName, setNewDiagramName] = useState("");
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [listOfDiagrams, setListOfDiagrams] = useState([]);
-  const [editingDiagram, setEditingDiagram] = useState(false);
-  const [editor, setEditor] = useState(true);
   const { darkMode, toggleTheme } = useThemeContext();
+
+  const [newNode, setNewNode] = useState(null);
+
+  const [selectedLink, setSelectedLink] = useState(null);
+  const [zoomState, setZoomState] = useState(null);
+  const [openSideBar, setOpenSideBar] = useState(false);
+  const [selectedDiagram, setSelectedDiagram] = useState({ id: "", title: "" });
   const [nodeTypes, setNodeTypes] = useState({});
   const [isModalAddTypeOpen, setIsModalAddTypeOpen] = useState(false);
   const [editNodeType, setEditNodeType] = useState(null);
+  const [groups, setGroups] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [nodes, setNodes] = useState({});
+  const [selectedGroups, setSelectedGroups] = useState(new Set());
+  const [diagrams, setDiagrams] = useState([]);
+
+  const { promptIt, ConfirmDialog, confirmIt } = useConfirmDialog();
+  const { promptItDiagram, PromptDialog } = usePromptDialog();
+  const [loadingResponse, setLoadingResponse] = useState(false);
 
   const theme = useTheme();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const editor = true;
+
   const ColorBox = props => {
     return (
       <Box
@@ -134,7 +165,7 @@ const OneCademyCollaborationModel = () => {
       </Box>
     );
   };
-  function addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order) {
+  const addPencilButton = (edgeElement, edgeData, pencilButtonsGroup) => {
     let edgeLabel = edgeElement.select("path");
     let edgePath = edgeLabel.node();
     let pathLength = edgePath.getTotalLength();
@@ -163,25 +194,23 @@ const OneCademyCollaborationModel = () => {
       .text("✏️")
       .on("click", function (e) {
         e.stopPropagation();
-        setSelectedLink({});
         modifyLink(edgeData);
       });
-    // pencilButtonsGroup
-    //   .append("text")
-    //   .attr("class", "custom-text-color")
-    //   .attr("x", point.x)
-    //   .attr("y", point.y + 14)
-    //   .attr("font-family", "Arial, sans-serif")
-    //   .attr("font-size", "15px")
-    //   .text(order);
-  }
+    pencilButtonsGroup
+      .append("text")
+      .attr("class", "custom-text-color")
+      .attr("x", point.x)
+      .attr("y", point.y + 14)
+      .attr("font-family", "Arial, sans-serif")
+      .attr("font-size", "15px");
+  };
 
   useEffect(() => {
-    const unsubscribe = firebase.db.collection("nodeTypes").onSnapshot(snapshot => {
+    const unsubscribe = firebase.db.collection(NODE_TYPES).onSnapshot(snapshot => {
       const newNodeTypes = {};
       snapshot.forEach(doc => {
         const data = doc.data();
-        newNodeTypes[data.type] = { ...doc.data(), id: doc.id };
+        newNodeTypes[data.type.toLowerCase()] = { ...doc.data(), id: doc.id };
       });
       setNodeTypes(newNodeTypes);
     });
@@ -191,14 +220,14 @@ const OneCademyCollaborationModel = () => {
 
   const saveNewType = async (type, color, editedNodeType) => {
     if (editedNodeType) {
-      const nodeTypeRef = firebase.db.collection("nodeTypes").doc(editedNodeType.id);
+      const nodeTypeRef = firebase.db.collection(NODE_TYPES).doc(editedNodeType.id);
       nodeTypeRef.update({
         type,
         color
       });
 
       const nodesDocsSnapshot = await firebase.db
-        .collection("collabModelNodes")
+        .collection(COLLAB_MODEL_NODES)
         .where("type", "==", editedNodeType.type)
         .get();
 
@@ -210,110 +239,86 @@ const OneCademyCollaborationModel = () => {
 
       await batch.commit();
     } else {
-      const newTypeRef = firebase.db.collection("nodeTypes").doc();
+      const newTypeRef = firebase.db.collection(NODE_TYPES).doc();
       await newTypeRef.set({
         type: type,
         color
       });
     }
   };
-
-  useEffect(() => {
-    const _listOfDiagrams = [...listOfDiagrams];
-    const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
-    const diagramsListcSnapshot = diagramsListQuery.onSnapshot(snapshot => {
-      const changes = snapshot.docChanges();
-      for (let change of changes) {
-        if (change.type === "added") {
-          const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
-          if (findIndex === -1) {
-            _listOfDiagrams.push({ ...change.doc.data(), id: change.doc.id });
-          } else {
-            _listOfDiagrams[findIndex] = { ...change.doc.data(), id: change.doc.id };
-          }
-        } else if (change.type === "modified") {
-          const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
-          if (findIndex !== -1) {
-            _listOfDiagrams[findIndex] = {
-              ...change.doc.data(),
-              id: change.doc.id
-            };
-          }
-        } else if (change.type === "removed") {
-          const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
-          if (findIndex !== -1) {
-            _listOfDiagrams.splice(findIndex, 1);
-          }
-        }
-      }
-      setListOfDiagrams(_listOfDiagrams);
-      if (Object.keys(selectedDiagram).length > 0) {
-        const _indexD = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
-        if (_indexD !== -1) {
-          setVisibleNodes(_listOfDiagrams[_indexD]?.nodes || []);
-          setSelectedDiagram(listOfDiagrams[_indexD] || {});
+  const processGroupChanges = (prev, changes, object = false) => {
+    const _prev = object ? { ...prev } : [...prev];
+    console.log("changes ==>", changes);
+    changes.forEach(change => {
+      const index = object ? -1 : _prev.findIndex(group => group.id === change.doc.id);
+      if (change.type === "added" || change.type === "modified") {
+        if (object) {
+          _prev[change.doc.id] = { ...change.doc.data(), id: change.doc.id };
+        } else if (index === -1) {
+          _prev.push({ ...change.doc.data(), id: change.doc.id });
         } else {
-          setSelectedDiagram(_listOfDiagrams[0] || {});
-          setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
+          _prev[index] = { ...change.doc.data(), id: change.doc.id };
         }
-      } else {
-        setSelectedDiagram(_listOfDiagrams[0] || {});
-        setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
+      } else if (change.type === "removed") {
+        if (object) {
+          delete _prev[change.doc.id];
+        } else if (index !== -1) {
+          _prev.splice(index, 1);
+        }
       }
     });
-    return () => {
-      diagramsListcSnapshot();
-    };
-  }, [firebase, selectedDiagram]);
+    return _prev;
+  };
 
   useEffect(() => {
-    let collabModelNodesQuery = firebase.db.collection("collabModelNodes");
-    const _allNodes = {};
-    const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
+    const diagramsQuery = firebase.db.collection(DIAGRAMS);
+    const unsubscribeDiagrams = diagramsQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
-      for (let change of changes) {
-        const data = change.doc.data();
-        if (change.type === "added") {
-          if (!data.deleted) {
-            _allNodes[change.doc.id] = { ...data, id: change.doc.id };
-          } else {
-            delete _allNodes[change.doc.id];
-          }
-        } else if (change.type === "modified") {
-          if (!data.deleted) {
-            _allNodes[change.doc.id] = { ...data, id: change.doc.id };
-          } else {
-            delete _allNodes[change.doc.id];
-          }
-        } else if (change.type === "removed") {
-          delete _allNodes[change.doc.id];
-        }
-      }
-      setNodesChanges(oldChanges => [...oldChanges, ...changes]);
-      setNodesLoaded(true);
-      setLoadData(false);
-      setAllNodes(_allNodes);
-      setShowAll(Object.keys(_allNodes).length === visibleNodes.length);
+      setDiagrams(prev => processGroupChanges(prev, changes));
     });
     return () => {
-      collabModelNodesSnapshot();
-      setNodesLoaded(false);
-      setLoadData(false);
+      unsubscribeDiagrams();
     };
-  }, [firebase, loadData, selectedDiagram]);
+  }, [firebase.db]);
 
   useEffect(() => {
-    const checkEditor = async () => {
-      const researchersDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
-      if (researchersDoc.docs.length) {
-        const resData = researchersDoc.docs[0].data();
-        setEditor(resData.hasOwnProperty("isEditor") && resData.isEditor);
-      } else {
-        setEditor(false);
-      }
+    console.log("selectedDiagram?.id =====>", selectedDiagram?.id);
+    if (!selectedDiagram?.id) {
+      console.log(diagrams, "diagrams");
+      setSelectedDiagram(diagrams[0]);
+    }
+  }, [diagrams, selectedDiagram?.id]);
+
+  useEffect(() => {
+    if (!selectedDiagram?.id) return;
+
+    const groupsQuery = firebase.db.collection(GROUPS).where("diagrams", "array-contains", selectedDiagram.id);
+    const linksQuery = firebase.db.collection(LINKS).where("diagrams", "array-contains", selectedDiagram.id);
+    const nodesQuery = firebase.db.collection(NODES).where("diagrams", "array-contains", selectedDiagram.id);
+
+    const unsubscribeGroups = groupsQuery.onSnapshot(snapshot => {
+      const changes = snapshot.docChanges();
+      setGroups(prev => processGroupChanges(prev, changes));
+    });
+
+    const unsubscribeLinks = linksQuery.onSnapshot(snapshot => {
+      const changes = snapshot.docChanges();
+      setLinks(prev => processGroupChanges(prev, changes));
+    });
+
+    const unsubscribeNodes = nodesQuery.onSnapshot(snapshot => {
+      const changes = snapshot.docChanges();
+      setNodes(prev => processGroupChanges(prev, changes, true));
+    });
+
+    return () => {
+      unsubscribeGroups();
+      unsubscribeLinks();
+      unsubscribeNodes();
     };
-    checkEditor();
-  }, [firebase]);
+  }, [firebase.db, selectedDiagram?.id]);
+
+  console.log("groups", groups, links, nodes);
 
   useEffect(() => {
     var g = new dagreD3.graphlib.Graph({ compound: true })
@@ -322,66 +327,56 @@ const OneCademyCollaborationModel = () => {
         return {};
       });
     d3.select("#graphGroup").selectAll("*").remove();
-    setNodesChanges([]);
-    for (let visibleNode of visibleNodes) {
-      if (allNodes[visibleNode] && !g.nodes().includes(visibleNode)) {
-        const nodeData = allNodes[visibleNode];
-        console.log("visibleNode ==>", visibleNode, nodeData);
+    console.log("useEffect", {
+      nodes,
+      darkMode,
+      nodeTypes
+    });
+
+    for (let visibleNodeId in nodes) {
+      if (nodes[visibleNodeId] && !g.nodes().includes(visibleNodeId)) {
+        const nodeData = nodes[visibleNodeId];
+        const isBlurred = !selectedGroups.has(nodeData.groups[0].id) && !newNode;
+        let nodeColor = getColor(nodeData.nodeType, nodeTypes, isBlurred ? 0.1 : 1);
+        const textColor = changeAlphaColor(!darkMode && isBlurred ? "#000000" : "#fff", isBlurred ? 0.1 : 1);
+
         g.setNode(nodeData.id, {
-          label: nodeData.title,
-          class:
-            selectedNode === nodeData.id
-              ? "type-ST"
-              : nodeData.type === "Negative Outcome"
-              ? "type-NO"
-              : nodeData.type === "Positive Outcome"
-              ? "type-PO"
-              : "type-DF",
-          style: `fill: ${getColor(nodeData.type, nodeTypes)}`
+          label: nodeData.label,
+          class: `${"type-PO"}`,
+          style: `fill: ${nodeColor};`,
+          labelStyle: `fill: ${textColor};`
         });
       }
     }
-    let _maxDepth = 0;
-    for (let visibleNode of visibleNodes) {
-      const nodeData = allNodes[visibleNode];
-      if (!nodeData?.children || nodeData.children.length === 0) continue;
-      for (let elementChild of nodeData.children) {
-        if (_maxDepth < elementChild?.order) {
-          _maxDepth = elementChild?.order;
+
+    for (let { source, target, polarity, certainty } of links) {
+      if (target && source) {
+        const isHighlighted =
+          (selectedGroups.has(nodes[source]?.groups[0]?.id) && selectedGroups.has(nodes[target]?.groups[0]?.id)) ||
+          !!newNode;
+        const color = LINKS_TYPES[`${certainty.trim()} ${polarity.trim()}`]?.color || "";
+
+        const adjustedColor = changeAlphaColor(color, isHighlighted ? 1 : 0.1);
+
+        let _arrowheadStyle = `fill: ${adjustedColor};`;
+        let _style = `stroke: ${adjustedColor}; stroke-width: 2px;`;
+
+        if (selectedLink?.v === source && selectedLink?.w === target) {
+          _style = "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); opacity: 1;";
+          _arrowheadStyle = "fill: #212121; opacity: 1;";
         }
-        if (
-          !elementChild.deleted &&
-          visibleNodes.includes(elementChild.id) &&
-          visibleNodes.includes(nodeData.id) &&
-          !nodeData.deleted
-        ) {
-          let color = legends.find(legend => legend.text === elementChild.type)?.color || "";
-          let _arrowheadStyle = `fill: ${color}`;
-          let _style = `stroke: ${color}; stroke-width: 2px;`;
-          // if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
-          //   _style = stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;;
-          // }
-          if (selectedLink.v === nodeData.id && selectedLink.w === elementChild.id) {
-            _style =
-              "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
-            _arrowheadStyle = "fill: #212121";
-          }
-          if (
-            ignoreOrder ||
-            showAll ||
-            (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)
-          ) {
-            g.setEdge(nodeData.id, elementChild.id, {
-              curve: d3.curveBasis,
-              style: _style,
-              arrowheadStyle: _arrowheadStyle,
-              label: elementChild?.label || ""
-            });
-          }
+
+        if (g.nodes().includes(source) && g.nodes().includes(target)) {
+          g.setEdge(source, target, {
+            curve: d3.curveBasis,
+            style: _style,
+            arrowheadStyle: _arrowheadStyle,
+            label: ""
+          });
         }
       }
     }
-    setMaxDepth(_maxDepth);
+
     g.nodes().forEach(function (v) {
       var node = g.node(v);
       if (node) {
@@ -420,7 +415,7 @@ const OneCademyCollaborationModel = () => {
 
       let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
-      if (editor) {
+      /*   if (editor) {
         buttonBody
           .append("xhtml:button")
           .style("background", "white")
@@ -445,8 +440,8 @@ const OneCademyCollaborationModel = () => {
           .on("mouseout", function () {
             d3.select(this).style("background", "white");
           });
-      }
-      if (selectedNode || openAddNode) {
+      } */
+      if (!!newNode) {
         let button2 = nodeElement
           .append("foreignObject")
           .attr("width", 20)
@@ -456,25 +451,49 @@ const OneCademyCollaborationModel = () => {
           .attr("class", "hide-button");
 
         var buttonBody2 = button2.append("xhtml:body").style("margin", "0px").style("padding", "0px");
-        if (childrenIds.includes(v)) {
+        const tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("class", "tooltip")
+          .style("position", "absolute")
+          .style("visibility", "hidden")
+          .style("background-color", "rgba(0,0,0,0.7)")
+          .style("color", "white")
+          .style("padding", "5px")
+          .style("border-radius", "4px")
+          .style("font-size", "12px");
+
+        if (newNode.children.includes(v)) {
           buttonBody2
             .append("xhtml:button")
             .style("background", "white")
-            .style("color", "black")
             .style("border", "1px solid black")
             .style("border-radius", "50%")
             .style("width", "20px")
             .style("height", "20px")
-            .style("font-weight", "bold")
             .style("font-size", "25px")
-            .style("line-height", "2px")
+            .style("line-height", "10px")
             .style("padding", "0")
             .style("text-align", "center")
             .style("cursor", "pointer")
+            .style("padding-bottom", "3px")
             .text("-")
             .on("click", function (e) {
               e.stopPropagation();
               removeChild(v);
+              tooltip.style("visibility", "hidden");
+            })
+            .on("mouseover", function (event) {
+              d3.select(this).style("background", "#FFCC80"); // light orange
+              tooltip
+                .style("visibility", "visible")
+                .text("Remove as child")
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY + 10 + "px");
+            })
+            .on("mouseout", function () {
+              d3.select(this).style("background", "white");
+              tooltip.style("visibility", "hidden");
             });
         } else {
           buttonBody2
@@ -485,7 +504,6 @@ const OneCademyCollaborationModel = () => {
             .style("border-radius", "50%")
             .style("width", "20px")
             .style("height", "20px")
-            .style("font-weight", "bold")
             .style("font-size", "25px")
             .style("line-height", "2px")
             .style("padding", "0")
@@ -495,6 +513,19 @@ const OneCademyCollaborationModel = () => {
             .on("click", function (e) {
               e.stopPropagation();
               addChild(v);
+              tooltip.style("visibility", "hidden");
+            })
+            .on("mouseover", function (event) {
+              d3.select(this).style("background", "orange");
+              tooltip
+                .style("visibility", "visible")
+                .text("Add as child")
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY + 10 + "px");
+            })
+            .on("mouseout", function () {
+              d3.select(this).style("background", "white");
+              tooltip.style("visibility", "hidden");
             });
         }
       }
@@ -524,9 +555,9 @@ const OneCademyCollaborationModel = () => {
       svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
     }
 
-    const nodes = svg.selectAll("g.node");
+    const gNodes = svg.selectAll("g.node");
     if (editor) {
-      nodes.on("click", function (d) {
+      gNodes.on("click", function (d) {
         d.stopPropagation();
         modifyNode(d.target.__data__);
       });
@@ -535,606 +566,212 @@ const OneCademyCollaborationModel = () => {
     if (editor) {
       edges.each(function (edgeData) {
         var edgeElement = d3.select(this);
-        const nodeData = allNodes[edgeData.v];
-        const childIdx = nodeData.children.findIndex(child => child.id === edgeData.w);
-        const order = nodeData.children[childIdx].order;
-        addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order);
+        const nodeData = nodes[edgeData.v];
+        if (!nodeData) return;
+        /*  const childIdx = nodeData.children.findIndex(child => child.id === edgeData.w);
+        if (childIdx === -1) return;
+        const order = nodeData.children[childIdx].order; */
+        addPencilButton(edgeElement, edgeData, pencilButtonsGroup);
       });
     }
     if (!editor) {
       edges.on("click", function (d) {
-        setSelectedLink({});
+        setSelectedLink(null);
         showLinkDetails(d.target.__data__);
-        setOpenModifyLink(true);
-        setOpenAddNode(false);
       });
     }
 
-    setNodesLoaded(false);
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoaded, allNodes, visibleNodes, darkMode, nodeTypes]);
+  }, [selectedLink, darkMode, nodeTypes, nodes, links, selectedGroups, newNode]);
 
   const AddNewNode = second => {
-    setTitle("");
-    setType("");
-    setChildrenIds([]);
-    setSelectedNode("");
-    setSelectedLink({});
-    setDeleteDialogOpen(false);
-    setOpenAddNode(true);
-    setLoadData(true);
-    setOpenModifyLink(false);
+    setSelectedLink(null);
+    setNewNode({
+      label: "",
+      nodeType: "process variable",
+      isLeverage: false,
+      groups: [],
+      diagrams: [],
+      children: [],
+      nodeType: "",
+      new: true
+    });
   };
 
   const handleClose = () => {
-    setTitle("");
-    setType("");
-    setChildrenIds([]);
-    setSelectedNode("");
-    setOpenAddNode(false);
-    setSelectedLink({});
-    setDeleteDialogOpen(false);
-    setLoadData(true);
+    setSelectedLink(null);
+    setNewNode(null);
   };
 
   const handleSave = async () => {
-    const _visibleNodes = [...visibleNodes];
     try {
-      if (!selectedNode) {
-        const children = [];
-        for (let child of childrenIds) {
-          children.push({
-            id: child,
-            explanation: "",
-            type: "Hypothetical Positive Effect",
-            order: 0
-          });
-          _visibleNodes.push(child);
-        }
-        const collabModelRef = firebase.firestore().collection("collabModelNodes").doc();
-        await collabModelRef.set({
-          title,
-          type: type,
-          children
+      if (newNode?.new) {
+        const newNodeRef = firebase.db.collection(NODES).doc();
+        newNode.groups = newNode.groups.map(c => {
+          return {
+            label: c.label,
+            id: c.id
+          };
         });
-        _visibleNodes.push(collabModelRef.id);
-      } else {
-        const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-        const collabModelDoc = await collabModelRef.get();
-        const collabModelNode = collabModelDoc.data();
-        for (let childId of childrenIds) {
-          const idex = collabModelNode.children.findIndex(_child => _child.id === childId);
-          if (idex === -1) {
-            collabModelNode.children.push({
-              id: childId,
-              explanation: "",
-              type: "Hypothetical Positive Effect",
-              order: 0
-            });
-          } else if (
-            idex !== -1 &&
-            collabModelNode.children[idex].hasOwnProperty("deleted") &&
-            collabModelNode.children[idex]?.deleted
-          ) {
-            collabModelNode.children[idex].deleted = false;
-          }
-          if (_visibleNodes.includes(childId) && !collabModelNode.children[idex]?.deleted) {
-            _visibleNodes.push(childId);
-          }
-        }
-        for (let child of collabModelNode.children) {
-          if (!childrenIds.some(childId => childId === child.id)) {
-            for (let _child of collabModelNode.children) {
-              if (_child.id === child.id) continue;
-              if (_child.order > child.order && child.order !== 0) {
-                _child.order = parseInt(_child.order) - 1;
-              }
-            }
-            if (child.order > 0) {
-              for (let node of allNodes) {
-                if (node.id === selectedNode) continue;
-                const _children = node.children;
-                for (let _child of _children) {
-                  if (_child.order >= child.order) {
-                    _child.order = parseInt(_child.order) - 1;
-                  }
-                }
-                const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-                nodeRef.update({ children: _children });
-              }
-            }
-            child.deleted = true;
-            child.order = 0;
-          }
-        }
-        await collabModelRef.update({ title, type, children: collabModelNode.children });
-      }
-      const _listOfDiagrams = [...listOfDiagrams];
-      const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
-      const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
-      _listOfDiagrams[_diagram].nodes = [...new Set(_visibleNodes)];
-      await diagramRef.update({ nodes: _listOfDiagrams[_diagram].nodes });
-    } catch (error) {}
 
-    setVisibleNodes([...new Set(_visibleNodes)]);
-    setOpenAddNode(false);
-    setLoadData(true);
-    setTitle("");
-    setType("");
-    setChildrenIds([]);
-    setSelectedNode("");
-    setOpenAddNode(false);
-    setDeleteDialogOpen(false);
+        await newNodeRef.set({
+          label: newNode.label,
+          nodeType: newNode.nodeType,
+          diagrams: [selectedDiagram.id],
+          groups: newNode.groups,
+          id: newNodeRef.id
+        });
+        for (let child of newNode.children) {
+          const newLinkRef = firebase.db.collection("links").doc();
+          const newLink = {
+            source: newNodeRef.id,
+            target: child,
+            certainty: "known",
+            polarity: "positive",
+            diagrams: [selectedDiagram.id],
+            detail: ""
+          };
+          newLinkRef.set(newLink);
+        }
+      } else if (!!newNode.previous) {
+        const previousChildren = links.filter(c => c.source === newNode.id);
+        for (let previous of previousChildren) {
+          if (!newNode.children.includes(previous.target)) {
+            const linkRef = firebase.db.collection(LINKS).doc(previous.id);
+            linkRef.delete();
+          }
+        }
+        for (let child of newNode.children) {
+          const indx = previousChildren.findIndex(c => c.target === child);
+          if (indx === -1) {
+            const newLinkRef = firebase.db.collection("links").doc();
+            const newLink = {
+              source: newNode.id,
+              target: child,
+              certainty: "known",
+              polarity: "positive",
+              diagrams: [selectedDiagram.id],
+              detail: ""
+            };
+            newLinkRef.set(newLink);
+          }
+        }
+        const newNodeRef = firebase.db.collection(NODES).doc(newNode.id);
+
+        newNode.groups = newNode.groups.map(c => {
+          return {
+            label: c.label,
+            id: c.id
+          };
+        });
+        await newNodeRef.update({
+          label: newNode.label,
+          nodeType: newNode.nodeType,
+          diagrams: [selectedDiagram.id],
+          groups: newNode.groups,
+          id: newNodeRef.id
+        });
+      }
+      setNewNode(null);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const modifyNode = async nodeId => {
-    const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
-    const node = nodeDoc.data();
-    const childrenNodes = await firebase.firestore().collection("collabModelNodes").get();
-    const _children = [];
-    for (let _nodeDoc of childrenNodes.docs) {
-      if (node.children.some(child => child.id === _nodeDoc.id && !child.deleted)) {
-        _children.push(_nodeDoc.id);
+    const children = [];
+    for (let link of links) {
+      if (link.source === nodeId) {
+        children.push(link.target);
       }
     }
-    setChildrenIds(_children);
-    setTitle(node.title);
-    setType(node.type);
-    setSelectedNode(nodeId);
-    setSelectedLink({});
-    setOpenAddNode(true);
-    setOpenModifyLink(false);
-    setLoadData(true);
+    setNewNode({ ...nodes[nodeId], children, previous: true });
+    setSelectedLink(null);
   };
+  console.log(newNode, "newNode ==>");
 
   const deleteNode = async () => {
-    if (!selectedNode) return;
-    const _allnodes = { ...allNodes };
-    const _listOfDiagrams = [...listOfDiagrams];
-    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
-    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
-    let _visibleNodes = [...visibleNodes];
-    for (let nodeId in _allnodes) {
-      const node = _allnodes[nodeId];
-      if (node.id === selectedNode) {
-        node.deleted = true;
-      }
-      const index = node.children.findIndex(child => child.id === selectedNode && !child?.deleted);
-      if (index !== -1) {
-        const oldOrder = node.children[index].order;
-        node.children[index].deleted = true;
-        node.children[index].order = 0;
-        for (let node of _allnodes) {
-          for (let _child of node.children) {
-            if (_child.order > oldOrder && !_child?.deleted) {
-              _child.order = parseInt(_child.order) - 1;
-            }
-          }
-        }
-      }
+    if (!newNode) return;
+    if (await confirmIt("Are you sure you want to delete this node?", "Delete", "Keep")) {
+      const nodeRef = firebase.db.collection(NODES).doc(newNode.id);
+      nodeRef.delete();
+      setNewNode(null);
     }
-    await firebase.db.runTransaction(async t => {
-      for (let nodeId in _allnodes) {
-        const node = _allnodes[nodeId];
-        const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-        t.update(nodeRef, { children: node.children, deleted: node?.deleted || false });
-      }
-    });
-    _visibleNodes = _visibleNodes.filter(node => node !== selectedNode);
-    if (_diagram !== -1 && editor) {
-      _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
-      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
-    }
-    setVisibleNodes(_visibleNodes);
-    setOpenAddNode(false);
-    setDeleteDialogOpen(false);
-    setLoadData(true);
-    setSelectedNode("");
   };
 
   const showLinkDetails = async data => {
-    const nodeId = data.v;
+    /*    const nodeId = data.v;
     const childId = data.w;
-    const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
+    const nodeDoc = await firebase.firestore().collection(COLLAB_MODEL_NODES).doc(nodeId).get();
     const nodeData = nodeDoc.data();
     const children = nodeData.children;
     const child = children.find(child => child.id === childId);
     setExplanationLink(child.explanation);
-    setPopoverType(child.type);
     if (child.explanation !== "") {
       setSelectedLink(data);
-    }
-    setLoadData(true);
-  };
-
-  const handleVisibileNodes = async node => {
-    let _visibleNodes = visibleNodes;
-    setShowAll(false);
-    setIgnoreOrder(true);
-    const _listOfDiagrams = [...listOfDiagrams];
-    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
-    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
-
-    if (_visibleNodes.includes(node.id)) {
-      _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
-    } else {
-      _visibleNodes.push(node.id);
-      const childrens = node.children.filter(child => !child?.deleted);
-      const parents = Object.values(allNodes).filter(_node =>
-        _node.children.some(child => child.id === node.id && !child?.deleted)
-      );
-      _visibleNodes = [..._visibleNodes, ...childrens.map(child => child.id), ...parents.map(parent => parent.id)];
-    }
-
-    let _showall = true;
-    for (let node of Object.values(allNodes)) {
-      if (!_visibleNodes.includes(node.id)) {
-        _showall = false;
-        break;
-      }
-    }
-    if (_diagram !== -1 && editor) {
-      _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
-      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
-    }
-    setListOfDiagrams(_listOfDiagrams);
-    // setZoomState(null);
-    setShowAll(_showall);
-    setVisibleNodes([...new Set(_visibleNodes)]);
-    setLoadData(true);
-    setStepLink(0);
-  };
-
-  const handleCloseLink = () => {
-    setOpenModifyLink(false);
-    setExplanation("");
-    setTypeLink("");
-    setSelectedLink({});
-    setLoadData(true);
-    setLinkOrder(0);
+    } */
   };
 
   const modifyLink = async data => {
+    console.log(data, "data== >");
     const nodeId = data.v;
     const childId = data.w;
-    const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
-    const nodeData = nodeDoc.data();
-    const children = nodeData.children;
-    const child = children.find(child => child.id === childId);
-    setExplanation(child.explanation);
-    setTypeLink(child.type);
-    setSelectedLink(data);
-    setLinkOrder(child.order);
-    setOpenModifyLink(true);
-    setOpenAddNode(false);
-    setLoadData(true);
-    setSelectedNode("");
+    const link = links.find(link => link.source === nodeId && link.target === childId);
+
+    setSelectedLink({ ...link, ...data });
+    setNewNode(null);
   };
 
   const handleSaveLink = async () => {
     await firebase.db.runTransaction(async t => {
-      const nodeId = selectedLink.v;
-      const childId = selectedLink.w;
-      const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
-      const nodeDoc = await t.get(nodeRef);
-      const nodeData = nodeDoc.data();
-      const children = nodeData.children;
-      const child = children.find(child => child.id === childId);
-      if (child.order !== linkOrder) {
-        if (child.order === 0 || Number.isNaN(child.order)) {
-          for (let node of Object.values(allNodes)) {
-            const _children = node.children;
-            for (let _child of _children) {
-              if (_child.order >= linkOrder) {
-                _child.order = parseInt(_child.order) + 1;
-              }
-              if (nodeId === node.id && _child.id === child.id) {
-                _child.order = linkOrder;
-                _child.explanation = explanation;
-                _child.label = label;
-                _child.type = typeLink;
-              }
-            }
-            const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-            t.update(nodeRef, { children: _children });
-          }
-        } else if (linkOrder === 0) {
-          for (let node of Object.values(allNodes)) {
-            const _children = node.children;
-            for (let _child of _children) {
-              if (_child.order >= child.order) {
-                _child.order = parseInt(_child.order) - 1;
-              }
-              if (nodeId === node.id && _child.id === child.id) {
-                _child.order = linkOrder;
-                _child.explanation = explanation;
-                _child.label = label;
-                _child.type = typeLink;
-              }
-            }
-            const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-            t.update(nodeRef, { children: _children });
-          }
-        } else {
-          for (let node of Object.values(allNodes)) {
-            const _children = node.children;
-
-            if (child.order < linkOrder) {
-              for (let _child of _children) {
-                if (_child.order === 7) {
-                  debugger;
-                }
-                if (_child.order > child.order && _child.order <= linkOrder) {
-                  _child.order = parseInt(_child.order) - 1;
-                } else if (_child.order === child.order) {
-                  _child.order = linkOrder;
-                  _child.explanation = explanation;
-                  _child.label = label;
-                  _child.type = typeLink;
-                }
-              }
-            }
-            if (linkOrder < child.order) {
-              for (let _child of _children) {
-                if (_child.order >= linkOrder && _child.order < child.order) {
-                  _child.order = parseInt(_child.order) + 1;
-                } else if (_child.order === child.order) {
-                  _child.order = linkOrder;
-                  _child.explanation = explanation;
-                  _child.label = label;
-                  _child.type = typeLink;
-                }
-              }
-            }
-            const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-            t.update(nodeRef, { children: _children });
-          }
-        }
-      } else if (child.order === linkOrder) {
-        const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
-        const _children = nodeData.children;
-        const child = _children.find(child => child.id === childId);
-        child.explanation = explanation;
-        child.type = typeLink;
-        child.label = label;
-        t.update(nodeRef, { children: _children });
-      }
-      if (linkOrder > stepLink) {
-        setStepLink(linkOrder);
-      }
-      setLinkOrder(0);
-      setOpenModifyLink(false);
-      setSelectedLink({});
-      setExplanation("");
-      setTypeLink("");
-      setLoadData(true);
-    });
-  };
-
-  const removeNode = async nodeId => {
-    const _visibleNodes = visibleNodes;
-    const _listOfDiagrams = [...listOfDiagrams];
-    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
-    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
-    if (_visibleNodes.includes(nodeId)) {
-      _visibleNodes.splice(_visibleNodes.indexOf(nodeId), 1);
-    }
-    if (editor && _diagram !== -1) {
-      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
-    }
-    setVisibleNodes([...new Set(_visibleNodes)]);
-    setLoadData(true);
-  };
-  const handleExplanationChanges = e => {
-    setExplanation(e.currentTarget.value);
-  };
-  const handleLabelChange = e => {
-    setLabel(e.currentTarget.value);
-  };
-
-  const showAllNodes = async () => {
-    let _visibleNodes = visibleNodes;
-    const _listOfDiagrams = [...listOfDiagrams];
-    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
-    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
-    if (showAll) {
-      _visibleNodes = [];
-      setShowAll(false);
-    } else {
-      _visibleNodes.push(...Object.keys(allNodes));
-      setShowAll(true);
-    }
-    _listOfDiagrams[_diagram].nodes = _visibleNodes;
-    if (editor && _diagram !== -1) {
-      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
-    }
-    setVisibleNodes(_visibleNodes);
-    setLoadData(true);
-    setStepLink(0);
-    setZoomState(null);
-  };
-
-  const handleInputValidation = event => {
-    const value = event.target.value;
-    const cleanedValue = value.replace(/[^0-9.]+/g, "");
-    event.target.value = cleanedValue;
-    setLinkOrder(parseInt(cleanedValue));
-  };
-
-  const nextLink = () => {
-    const _visibleNodes = [];
-    Object.values(allNodes).forEach(node => {
-      node.children.forEach(child => {
-        if (stepLink + 1 >= child.order && child.order !== 0) {
-          if (!_visibleNodes.includes(child.id)) {
-            _visibleNodes.push(child.id);
-          }
-          if (!_visibleNodes.includes(node.id)) {
-            _visibleNodes.push(node.id);
-          }
-        }
+      const linkRef = firebase.db.collection("links").doc(selectedLink.id);
+      linkRef.update({
+        certainty: selectedLink.certainty,
+        detail: selectedLink.detail,
+        polarity: selectedLink.polarity
       });
-    });
-    setStepLink(prevActiveStep => (prevActiveStep + 1 < maxDepth ? prevActiveStep + 1 : maxDepth));
-    setVisibleNodes(_visibleNodes);
-    setLoadData(true);
-    setShowAll(false);
-    setIgnoreOrder(false);
-  };
-  const previousLink = () => {
-    const _visibleNodes = [];
-    Object.values(allNodes).forEach(node => {
-      node.children.forEach(child => {
-        if (stepLink - 1 >= child.order && child.order !== 0) {
-          if (!_visibleNodes.includes(child.id)) {
-            _visibleNodes.push(child.id);
-          }
-          if (!_visibleNodes.includes(node.id)) {
-            _visibleNodes.push(node.id);
-          }
-        }
-      });
-    });
-    setVisibleNodes(_visibleNodes);
-    setStepLink(prevActiveStep => (prevActiveStep - 1 > 0 ? prevActiveStep - 1 : 0));
-    setLoadData(true);
-    setShowAll(false);
-    setIgnoreOrder(false);
-  };
 
-  const deleteLink = async () => {
-    await firebase.db.runTransaction(async t => {
-      const nodeId = selectedLink.v;
-      const childId = selectedLink.w;
-      const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
-      const nodeDoc = await nodeRef.get();
-      const nodeData = nodeDoc.data();
-      const childIdx = nodeData.children.findIndex(child => child.id === childId);
-      const childp = nodeData.children[childIdx];
-      for (let node of Object.values(allNodes)) {
-        let _children = node.children;
-        for (let _child of _children) {
-          if (_child.order > childp.order) {
-            _child.order = parseInt(_child.order) - 1;
-          }
-          if (nodeId === node.id && _child.id === childId) {
-            _child.order = 0;
-            _child.deleted = true;
-          }
-        }
-        const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-        t.update(nodeRef, { children: _children });
-      }
+      setSelectedLink(null);
     });
-
-    setDeleteDialogLinkOpen(false);
-    setOpenModifyLink(false);
-    setExplanation("");
-    setTypeLink("");
-    setSelectedLink({});
-    setLinkOrder(null);
-    setLoadData(true);
   };
 
   const addChild = child => {
-    const _childIds = childrenIds;
-    if (_childIds.includes(child)) return;
-    _childIds.push(child);
-    setChildrenIds(_childIds);
-    setLoadData(true);
+    setNewNode(prev => {
+      const _prev = { ...prev };
+      if (!_prev.children.includes(child)) {
+        _prev.children.push(child);
+      }
+      return _prev;
+    });
   };
   const removeChild = child => {
-    const _childIds = childrenIds;
-    if (!_childIds.includes(child)) return;
-    _childIds.splice(_childIds.indexOf(child), 1);
-    setChildrenIds(_childIds);
-    setLoadData(true);
-  };
-  const resetOrder = () => {
-    const _visibleNodes = [];
-    Object.values(allNodes).forEach(node => {
-      node.children.forEach(child => {
-        if (1 >= child.order && child.order !== 0) {
-          if (!_visibleNodes.includes(child.id)) {
-            _visibleNodes.push(child.id);
-          }
-          if (!_visibleNodes.includes(node.id)) {
-            _visibleNodes.push(node.id);
-          }
-        }
-      });
+    setNewNode(prev => {
+      const _prev = { ...prev };
+      if (_prev.children.includes(child)) {
+        _prev.children.splice(_prev.children.indexOf(child), 1);
+      }
+      return _prev;
     });
-    setStepLink(1);
-    setVisibleNodes(_visibleNodes);
-    setLoadData(true);
-    setShowAll(false);
-    setIgnoreOrder(false);
   };
+
   const handleOpenSidBar = () => {
     setOpenSideBar(old => !old);
     setZoomState(null);
   };
-  const handleLegend = () => {
-    setOpenLegend(old => !old);
-  };
-  const handlChangeDiagram = event => {
-    const _diagram = listOfDiagrams.find(diagram => diagram.name === event.target.value);
+
+  const handleChangeDiagram = event => {
+    const _diagram = diagrams.find(diagram => diagram.title === event.target.value);
+    console.log("_diagram ==>", _diagram, event.target.value);
     setSelectedDiagram(_diagram);
-    setVisibleNodes(_diagram.nodes);
-    setShowAll(false);
-    setNodesLoaded(false);
+    setGroups([]);
+    setNodes([]);
+    setLinks([]);
+    setSelectedGroups(new Set());
   };
 
-  const handleEditDiagram = async () => {
-    try {
-      setEditingDiagram(true);
-      const _listOfDiagrams = [...listOfDiagrams];
-      const index = _listOfDiagrams.findIndex(d => d.id === selectedDiagram.id);
-      _listOfDiagrams[index].name = newDiagramName;
-      const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
-      await diagramRef.update({ name: newDiagramName });
-      setListOfDiagrams(_listOfDiagrams);
-      setSelectedDiagram(_listOfDiagrams[index]);
-      setOpenEditModal(false);
-      setEditingDiagram(false);
-      setNewDiagramName("");
-    } catch (error) {}
-  };
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-  };
-
-  const handlNewDiagramName = event => {
-    setNewDiagramName(event.target.value);
-  };
-  const editDiagram = () => {
-    setNewDiagramName(selectedDiagram.name);
-    setOpenEditModal(true);
-  };
-
-  const addNewDiagram = () => {
-    setNewDiagramName("");
-    setOpenAddModal(true);
-  };
-  const handleCloseAddModal = () => setOpenAddModal(false);
-
-  const handleAddDiagram = () => {
-    if (listOfDiagrams.findIndex(d => d.name === newDiagramName) === -1) {
-      const ref = firebase.db.collection("collabModelDiagrams").doc();
-      ref.set({
-        name: newDiagramName,
-        nodes: []
-      });
-      const _listOfDiagrams = [...listOfDiagrams];
-      _listOfDiagrams.push({ id: ref.id, name: newDiagramName, nodes: [] });
-      setListOfDiagrams(_listOfDiagrams);
-    }
-    setNewDiagramName("");
-    setOpenAddModal(false);
-  };
   const downloadSvg = () => {
     const svgElement = svgRef.current;
     if (svgElement) {
@@ -1168,658 +805,681 @@ const OneCademyCollaborationModel = () => {
       URL.revokeObjectURL(url);
     }
   };
+  const generateNewDiagram = async () => {
+    try {
+      const documentDetailed = await promptItDiagram("Generate a new diagram:", "Generate", "Cancel");
+
+      console.log(documentDetailed);
+      if (!documentDetailed.trim()) return;
+      setLoadingResponse(true);
+
+      const r = await axios.post("/api/generateCollabDiagram", { documentDetailed });
+      console.log(r.data.response, "generateCollabDiagram");
+      setLoadingResponse(true);
+
+      const response = r.data.response;
+      console.log("response ==>", response);
+
+      const newDiagramRef = firebase.db.collection("diagrams").doc();
+
+      for (let group of response.groupHierarchy) {
+        const groupRef = firebase.db.collection("groups").doc();
+        const id = groupRef.id;
+        group.id = id;
+        groupRef.set({
+          id,
+          createdAt: new Date(),
+          ...group,
+          diagrams: [newDiagramRef.id]
+        });
+      }
+      for (let node of response["nodes"]) {
+        const nodeRef = firebase.db.collection("nodes").doc();
+        const id = nodeRef.id;
+        const _groups = node.groups.map(c => {
+          return {
+            id: response.groupHierarchy.find(g => g.label === c).id,
+            label: response.groupHierarchy.find(g => g.label === c).label
+          };
+        });
+        node.groups = _groups;
+        node.id = id;
+        const _node = {
+          ...node,
+          createdAt: new Date()
+        };
+        console.log("_node ==>", _node);
+        nodeRef.set({
+          ..._node,
+          diagrams: [newDiagramRef.id]
+        });
+      }
+      for (let link of response["links"]) {
+        link.source = response["nodes"].find(c => c.label === link.source)?.id || "";
+        link.target = response["nodes"].find(c => c.label === link.target)?.id || "";
+        const linkRef = firebase.db.collection("links").doc();
+        linkRef.set({ ...link, diagrams: [newDiagramRef.id] });
+      }
+      console.log(response);
+      setLoadingResponse(false);
+      const diagramName = await promptIt("What do you want to call the diagram?", "Ok");
+      newDiagramRef.set({
+        title: diagramName,
+        id: newDiagramRef.id
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingResponse(false);
+    }
+  };
+  const improveDiagram = async () => {
+    console.log("first");
+    const response = await promptItDiagram("Improve the diagram:", "improve", "cancel");
+    /*   const documentDetailed = await promptIt("Enter the prompt bellow", "Start");
+    console.log("documentDetailed ==>", documentDetailed); */
+  };
+  console.log("selectedLink ==>", selectedLink);
+
+  const deleteLink = async () => {
+    if (await confirmIt("Are you sure you want to delete the link?", "Delete", "Keep")) {
+      if (selectedLink) {
+        const linkRef = firebase.db.collection("links").doc(selectedLink.id);
+        linkRef.delete();
+        setSelectedLink(null);
+      }
+    }
+  };
+  console.log("newNode.groups", newNode, groups);
 
   return (
-    <Box sx={{ height: "100vh", overflowY: "scroll", backgroundColor: darkMode ? "#272727" : "" }}>
-      <Dialog open={openEditModal} onClose={handleCloseEditModal}>
-        <DialogTitle sx={{ fontSize: "15px" }}> Update the diagram name:</DialogTitle>
-        <DialogContent sx={{ width: "500px", mt: "5px" }}>
-          <TextField
-            label="Diagram name"
-            variant="outlined"
-            value={newDiagramName}
-            onChange={handlNewDiagramName}
-            fullWidth
-            multiline
-            rows={3}
-            sx={{ width: "95%", m: 0.5 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button disabled={editingDiagram} variant="contained" onClick={handleEditDiagram}>
-            Update
-          </Button>
-          <Button onClick={handleCloseEditModal}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={openAddModal} onClose={handleCloseAddModal}>
-        <DialogTitle sx={{ fontSize: "15px" }}> Add new diagram:</DialogTitle>
-        <DialogContent sx={{ width: "500px", mt: "5px" }}>
-          <TextField
-            label="Diagram name"
-            variant="outlined"
-            value={newDiagramName}
-            onChange={handlNewDiagramName}
-            fullWidth
-            multiline
-            rows={3}
-            sx={{ width: "95%", m: 0.5 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" onClick={handleAddDiagram}>
-            Add
-          </Button>
-          <Button onClick={handleCloseAddModal}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-      <Box>
-        <Drawer
-          PaperProps={{
-            style: {
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-              top: 0,
-              left: 0
-            }
-          }}
-          open={openSideBar && isMobile}
-        >
-          {" "}
-          <CloseIcon
-            sx={{
-              position: "fixed",
-              top: "3%",
-              right: "3%",
-              zIndex: "1000"
-            }}
-            onClick={handleOpenSidBar}
-          />
-          <Box sx={{ direction: "ltr" }}>
-            <Paper sx={{ position: "sticky", top: "0", zIndex: "1", p: 1, ml: "5px" }}>
-              {" "}
-              <Typography
+    <Box sx={{ backgroundColor: darkMode ? "#272727" : "" }}>
+      {diagrams.length > 0 ? (
+        <Box>
+          <Grid container spacing={2} direction="row-reverse">
+            <Grid item xs={openSideBar && !isMobile ? 9 : 12} sx={{ height: "110vh", overflowY: "scroll" }}>
+              <Box
+                id="graphPaper"
                 sx={{
-                  fontWeight: "bold"
+                  ml: isMobile ? "9px" : "",
+                  height: isMobile ? "530px" : "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column"
                 }}
+                elevation={4}
               >
-                Choose nodes to show their causal relations.
-              </Typography>{" "}
-              Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
-            </Paper>
-
-            {Object.values(allNodes).map((node, index) => (
-              <ListItem
-                key={node.id}
-                disablePadding
-                sx={{
-                  "&$selected": {
-                    backgroundColor: "orange",
-                    zIndex: 100,
-                    ml: 9
-                  }
-                }}
-              >
-                <Checkbox
-                  checked={visibleNodes.includes(node.id)}
-                  onClick={() => {
-                    handleVisibileNodes(node);
-                  }}
-                />
-                <ListItemText id={node.title} primary={`${node.title}`} />
-              </ListItem>
-            ))}
-          </Box>
-        </Drawer>
-        <Drawer open={openLegend}>
-          <CloseIcon
-            sx={{
-              position: "fixed",
-              top: "3%",
-              right: "3%",
-              zIndex: "1000"
-            }}
-            onClick={handleLegend}
-          />
-          <Grid container spacing={1} sx={{ mt: "50px", ml: "30px" }}>
-            {Object.values(nodeTypes).map((resource, index) => (
-              <Grid item xs={12} sm={4} md={3}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    bgcolor: resource.color,
-                    color: "primary.contrastText",
-                    fontSize: 13,
-                    borderRadius: 2,
-                    maxWidth: 90,
-                    mr: 0.5,
-                    mb: 0.5,
-                    textAlign: "center",
-                    width: "100%",
-                    height: "40px"
-                  }}
-                  key={resource.type + index}
-                >
-                  {resource.type}
-                </Box>
-              </Grid>
-            ))}
-            {[
-              { text: "Known Positive Effect", color: "#56E41B" },
-              { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
-              { text: "Known Negative Effect", color: "#A91BE4" },
-              { text: "Hypothetical Negative Effect", color: "#E4451B" }
-            ].map((resource, index) => (
-              <Grid item xs={12} sm={6} md={3} style={{ marginInline: "14px" }}>
-                <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
-                  {resource.text}
-                </Typography>
-              </Grid>
-            ))}
-          </Grid>
-        </Drawer>
-      </Box>
-
-      <Box /* sx={{ height: "calc(100vh - 10px)", overflow: "auto" }} */>
-        <Dialog open={deleteDialogOpen} onClose={handleClose}>
-          <DialogActions>
-            <Button onClick={deleteNode}>Confirm</Button>
-            <Button
-              onClick={() => {
-                setDeleteDialogOpen(false);
-              }}
-              autoFocus
-            >
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={deleteDialogLinkOpen} onClose={handleClose}>
-          <DialogActions>
-            <Button onClick={deleteLink}>Confirm</Button>
-            <Button
-              onClick={() => {
-                setDeleteDialogLinkOpen(false);
-              }}
-              autoFocus
-            >
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Grid container spacing={2} direction="row-reverse">
-          <Grid item xs={openSideBar && !isMobile ? 9 : 12}>
-            <Paper
-              id="graphPaper"
-              sx={{
-                mt: "10px",
-                mr: "9px",
-                ml: isMobile ? "9px" : "",
-                height: isMobile ? "530px" : "90vh",
-                width: "600",
-                display: "flex",
-                justifyContent: "center",
-                flexDirection: "column"
-              }}
-              elevation={4}
-            >
-              {visibleNodes.length > 0 ? (
-                <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
-              ) : (
-                <div
-                  style={{
-                    padding: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
-                  <Typography align="center" variant="h7">
-                    To show the nodes in the diagram, check them in the list.
-                  </Typography>
-                </div>
-              )}
-              {!openSideBar && (
-                <MenuIcon
-                  sx={{
-                    position: "absolute",
-                    top: "5%",
-                    left: "10px",
-                    zIndex: "1000",
-                    transform: "translateY(-50%)"
-                  }}
-                  onClick={handleOpenSidBar}
-                />
-              )}
-
-              {!openLegend && isMobile && (
-                <LegendToggleIcon
-                  sx={{
-                    position: "absolute",
-                    top: "1%",
-                    right: "10px",
-                    zIndex: "1000",
-                    transform: "translateX(-50%)"
-                  }}
-                  onClick={handleLegend}
-                />
-              )}
-              {visibleNodes.length > 0 && !isMobile && (
-                <Box sx={{ display: "flex" }}>
-                  {Object.values(nodeTypes).map((resource, index) => (
-                    <ColorBox
-                      id={resource.id}
-                      key={resource.type + index}
-                      text={resource.type}
-                      color={resource.color}
-                    />
-                  ))}
-                  {editor && (
-                    <IconButton
-                      sx={{
-                        display: "flex",
-
-                        alignItems: "center",
-                        fontSize: 13,
-                        borderRadius: 2,
-                        maxWidth: 90,
-                        ml: 6,
-                        mr: 0.5,
-                        mb: 0.5,
-                        textAlign: "center",
-                        width: "190px",
-                        height: "40px",
-                        backgroundColor: "orange"
-                      }}
-                      onClick={() => {
-                        setIsModalAddTypeOpen(true);
-                      }}
-                      variant="contained"
-                    >
-                      <AddIcon sx={{ color: "white" }} />
-                    </IconButton>
-                  )}
-                  {[
-                    { text: "Known Positive Effect", color: "#56E41B" },
-                    { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
-                    { text: "Known Negative Effect", color: "#A91BE4" },
-                    { text: "Hypothetical Negative Effect", color: "#E4451B" }
-                  ].map((resource, index) => (
-                    <Box style={{ marginInline: "14px" }}>
-                      <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                      <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
-                        {resource.text}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Paper>
-            <Box sx={{ ml: "14px", mt: "14px" }}>
-              {openModifyLink && editor && (
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <TextField
-                    label="Explanation"
-                    variant="outlined"
-                    value={explanation}
-                    onChange={handleExplanationChanges}
-                    fullWidth
-                    multiline
-                    rows={3}
-                    sx={{ width: "95%", m: 0.5 }}
-                  />
-                  <TextField
-                    label="Label"
-                    variant="outlined"
-                    value={label}
-                    onChange={handleLabelChange}
-                    fullWidth
-                    multiline
-                    rows={1}
-                    sx={{ width: "95%", m: 0.5 }}
-                  />
-                  <Box sx={{ display: "flex", flexDirection: "inline" }}>
-                    <Box
-                      component="form"
-                      sx={{
-                        "& > :not(style)": { m: 0.5, width: "25ch" }
-                      }}
-                      noValidate
-                      autoComplete="off"
-                    >
-                      <FormControl>
-                        <InputLabel>Type</InputLabel>
-                        <Select
-                          value={typeLink}
-                          label="Type"
-                          onChange={e => {
-                            setTypeLink(e.target.value);
-                          }}
-                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
-                        >
-                          {[
-                            "Known Positive Effect",
-                            "Hypothetical Positive Effect",
-                            "Known Negative Effect",
-                            "Hypothetical Negative Effect"
-                          ].map((row, index) => (
-                            <MenuItem key={row + index} value={row} sx={{ display: "center" }}>
-                              {row}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      {/* <TextField
-                        label="Order"
-                        type="number"
-                        value={linkOrder}
-                        inputProps={{
-                          min: "1",
-                          step: "1"
-                        }}
-                        onChange={handleInputValidation}
-                      /> */}
-                    </Box>
-                    <Box sx={{ mt: "15px" }}>
-                      <Button onClick={handleSaveLink}>Save</Button>
-                      <Button onClick={handleCloseLink} autoFocus>
-                        Cancel
-                      </Button>
-                      <IconButton
-                        color="error"
-                        onClick={() => {
-                          setDeleteDialogLinkOpen(true);
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-              {openModifyLink && !editor && explanationLink !== "" && (
-                <Typography sx={{ p: 2 }}>{explanationLink}</Typography>
-              )}
-              {openAddNode && (
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <TextField
-                    label="Title"
-                    variant="outlined"
-                    value={title}
-                    fullWidth
-                    sx={{ width: "95%", m: 0.5 }}
-                    onChange={e => {
-                      setTitle(e.currentTarget.value);
-                    }}
-                  />
-                  <Box sx={{ display: "flex", flexDirection: "inline" }}>
-                    <Box
-                      component="form"
-                      sx={{
-                        "& > :not(style)": { m: 0.5, width: "25ch" }
-                      }}
-                      noValidate
-                      autoComplete="off"
-                    >
-                      <FormControl>
-                        <InputLabel>Type</InputLabel>
-                        <Select
-                          value={type}
-                          label="Type"
-                          onChange={e => {
-                            setType(e.target.value);
-                          }}
-                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
-                        >
-                          {Object.values(nodeTypes).map((row, index) => (
-                            <MenuItem key={row.type + index} value={row.type} sx={{ display: "center" }}>
-                              {row.type}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <FormControl>
-                        <InputLabel>children</InputLabel>
-                        <Select
-                          label="children"
-                          value={childrenIds}
-                          multiple
-                          onChange={e => {
-                            setChildrenIds(e.target.value);
-                          }}
-                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
-                        >
-                          {Object.values(allNodes).map(node => (
-                            <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
-                              {node.title}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Box>
-                    <Box sx={{ mt: "14px" }}>
-                      <Button onClick={handleSave}>Save</Button>
-                      <Button onClick={handleClose} autoFocus>
-                        Cancel
-                      </Button>
-                      <IconButton
-                        color="error"
-                        onClick={() => {
-                          setDeleteDialogOpen(true);
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-              <Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    flexWrap: "wrap"
-                  }}
-                >
-                  <Button
-                    sx={{
-                      ml: ["15px", "30px"],
-                      mb: "20px",
-                      flexGrow: 1,
-                      justifyContent: "center"
-                    }}
-                    variant="contained"
-                    onClick={previousLink}
-                    disabled={true /* stepLink === 0 */}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    sx={{
-                      ml: ["15px", "30px"],
-                      mb: "20px",
-                      flexGrow: 1,
-                      justifyContent: "center"
-                    }}
-                    variant="contained"
-                    onClick={nextLink}
-                    disabled={true /* stepLink === maxDepth */}
-                  >
-                    Next
-                  </Button>
-                  <Button
-                    sx={{
-                      ml: ["15px", "30px"],
-                      mb: "20px",
-                      mr: "30px",
-                      flexGrow: 1,
-                      justifyContent: "center"
-                    }}
-                    variant="contained"
-                    onClick={resetOrder}
-                    disabled={true /* stepLink <= 1 */}
-                  >
-                    Reset
-                  </Button>
-                  <FormControlLabel
-                    control={<Switch checked={darkMode} onChange={toggleTheme} />}
-                    label={darkMode ? "Dark Mode" : "Light Mode"}
-                    sx={{ mb: "15px", color: darkMode ? "white" : "black" }}
-                  />
-                  <Tooltip title={"Download as SVG"}>
-                    <IconButton variant="contained" onClick={downloadSvg} sx={{ width: "40px", height: "40px" }}>
-                      <GetAppIcon />
-                    </IconButton>
-                  </Tooltip>
-
-                  {editor && (
-                    <Button
-                      sx={{
-                        mr: "30px",
-                        ml: ["15px", "30px"],
-                        mb: "20px",
-                        flexGrow: 1,
-                        justifyContent: "center"
-                      }}
-                      variant="contained"
-                      onClick={AddNewNode}
-                    >
-                      Add New Node
-                    </Button>
-                  )}
-                  {editor && (
-                    <Button
-                      sx={{
-                        mr: "30px",
-                        ml: ["15px", "30px"],
-                        mb: "20px",
-                        flexGrow: 1,
-                        justifyContent: "center"
-                      }}
-                      variant="contained"
-                      onClick={addNewDiagram}
-                    >
-                      Add New Diagram
-                    </Button>
-                  )}
-                  {editor && Object.keys(selectedDiagram).length > 0 && !openModifyLink && !openAddNode && (
-                    <EditIcon
-                      sx={{
-                        mb: "20px",
-                        justifyContent: "center"
-                      }}
-                      onClick={editDiagram}
-                    />
-                  )}
-
-                  {!openModifyLink &&
-                    !openAddNode &&
-                    Object.keys(selectedDiagram).length > 0 &&
-                    listOfDiagrams.length > 0 && (
-                      <FormControl
-                        sx={{
-                          ml: ["15px", "30px"],
-                          mr: ["15px", "30px"],
-                          mb: "20px",
-                          flexGrow: 1,
-                          justifyContent: "center"
-                        }}
-                      >
-                        <InputLabel>diagram</InputLabel>
-                        <Select
-                          label="diagram"
-                          value={selectedDiagram.name}
-                          onChange={handlChangeDiagram}
-                          sx={{ width: "100%", border: "1px", borderColor: "white" }}
-                        >
-                          {[...listOfDiagrams].map(diagram => (
-                            <MenuItem key={diagram.id} value={diagram.name} sx={{ display: "center" }}>
-                              {diagram.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                </Box>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={openSideBar && !isMobile ? 3 : 0}>
-            {openSideBar && (
-              <Paper
-                sx={{
-                  height: "100vh",
-                  mb: "10px",
-                  overflow: "auto",
-                  direction: "rtl",
-                  "&::-webkit-scrollbar": {
-                    width: "10px"
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "rgba(0, 0, 0, 0.2)",
-                    borderRadius: "5px"
-                  }
-                }}
-              >
-                {openSideBar && !isMobile && (
-                  <ArrowBackIosNewIcon
+                {Object.keys(nodes).length > 0 && <svg id="graphGroup" width="100%" height="100%" ref={svgRef}></svg>}
+                {!openSideBar && (
+                  <IconButton
                     sx={{
                       position: "absolute",
                       top: "3%",
+                      left: "10px",
                       zIndex: "1000",
                       transform: "translateY(-50%)"
                     }}
                     onClick={handleOpenSidBar}
-                  />
+                  >
+                    <MenuIcon sx={{ fontSize: "35px" }} />
+                  </IconButton>
                 )}
-                <Box sx={{ direction: "ltr" }}>
-                  <Paper sx={{ position: "sticky", top: "0", zIndex: "1", p: 1, ml: "5px" }}>
-                    {" "}
-                    <Typography
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "3%",
+                    right: "10px",
+                    zIndex: "1000",
+                    transform: "translateY(-50%)",
+                    display: "flex",
+                    gap: "22px"
+                  }}
+                >
+                  {" "}
+                  <Tooltip title={"Generate a diagram"} sx={{ mt: "3px" }}>
+                    {loadingResponse ? (
+                      <Box
+                        sx={{
+                          width: "35px",
+                          height: "35px",
+                          border: "1px solid gray",
+                          borderRadius: "10px",
+                          alignItems: "center",
+                          display: "flex",
+                          justifyContent: "center"
+                        }}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : (
+                      <IconButton
+                        variant="contained"
+                        onClick={generateNewDiagram}
+                        sx={{ width: "35px", height: "35px", border: "1px solid gray", borderRadius: "10px" }}
+                      >
+                        <AutoFixHighIcon />
+                      </IconButton>
+                    )}
+                  </Tooltip>
+                  {/* <Tooltip title={"Improve Diagram"} sx={{ mt: "3px" }}>
+                  {loadingResponse ? (
+                    <Box
                       sx={{
-                        fontWeight: "bold"
+                        width: "35px",
+                        height: "35px",
+                        border: "1px solid gray",
+                        borderRadius: "10px",
+                        alignItems: "center",
+                        display: "flex",
+                        justifyContent: "center"
                       }}
                     >
-                      Choose nodes to show their causal relations.
-                    </Typography>{" "}
-                    Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
-                  </Paper>
-
-                  {Object.values(allNodes)
-                    .sort((a, b) => (a.title > b.title ? 1 : -1))
-                    .map((node, index) => (
-                      <ListItem
-                        key={node.title + index}
-                        disablePadding
+                      <CircularProgress size={24} />
+                    </Box>
+                  ) : (
+                    <IconButton
+                      variant="contained"
+                      onClick={improveDiagram}
+                      sx={{ width: "35px", height: "35px", border: "1px solid gray", borderRadius: "10px" }}
+                    >
+                      <AutoAwesomeIcon />
+                    </IconButton>
+                  )}
+                </Tooltip> */}
+                  <Tooltip title={"Add new node"}>
+                    {loadingResponse ? (
+                      <Box
                         sx={{
-                          "&$selected": {
-                            backgroundColor: "orange",
-                            zIndex: 100,
-                            ml: 9
+                          width: "35px",
+                          height: "35px",
+                          border: "1px solid gray",
+                          borderRadius: "10px",
+                          alignItems: "center",
+                          display: "flex",
+                          justifyContent: "center"
+                        }}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : (
+                      <IconButton
+                        variant="contained"
+                        onClick={AddNewNode}
+                        sx={{ width: "35px", height: "35px", border: "1px solid gray", borderRadius: "10px" }}
+                        disabled={newNode?.new}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    )}
+                  </Tooltip>
+                  <Box sx={{ alignItems: "center", display: "flex", justifyContent: "space-between" }}></Box>
+                  {diagrams.length > 0 && (
+                    <FormControl sx={{}}>
+                      <InputLabel>Diagram</InputLabel>
+                      <Select
+                        label="diagram"
+                        value={selectedDiagram?.title || ""}
+                        onChange={handleChangeDiagram}
+                        sx={{
+                          width: "200px",
+                          border: "1px",
+                          borderColor: "white",
+                          borderRadius: "25px",
+                          p: 0,
+                          "& .MuiSelect-select": {
+                            padding: 0,
+                            p: "10px"
                           }
                         }}
                       >
-                        <Checkbox
-                          checked={visibleNodes.includes(node.id)}
-                          onClick={() => {
-                            handleVisibileNodes(node);
+                        {[...diagrams].map(diagram => (
+                          <MenuItem key={diagram.id} value={diagram.title} sx={{ display: "center" }}>
+                            {diagram.title}
+                          </MenuItem>
+                        ))}
+                        {/*   <MenuItem
+                        key={"diagram.id"}
+                        value={""}
+                        sx={{
+                          display: "center",
+                          backgroundColor: "orange",
+                          borderRadius: "25px",
+                          alignItems: "center",
+                          textAlign: "center"
+                        }}
+                      >
+                        <AddIcon /> <Typography>Add diagram</Typography>
+                      </MenuItem> */}
+                      </Select>
+                    </FormControl>
+                  )}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      flexWrap: "wrap",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Tooltip title={"Download as SVG"}>
+                      <IconButton
+                        variant="contained"
+                        onClick={downloadSvg}
+                        sx={{ width: "35px", height: "35px", border: "1px solid gray", borderRadius: "10px" }}
+                      >
+                        <GetAppIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <FormControlLabel
+                    control={
+                      <Tooltip title={darkMode ? "Turn on the light" : "Turn off the light"}>
+                        <Box
+                          onClick={toggleTheme}
+                          sx={{
+                            border: "1px solid gray",
+                            borderRadius: "10px",
+                            p: 0.5,
+                            pb: 0.3,
+                            ":hover": {
+                              backgroundColor: !darkMode ? "#e0e0e0" : "gray"
+                            }
                           }}
-                        />
-                        <ListItemText id={node.title} primary={`${node.title}`} />
-                      </ListItem>
-                    ))}
+                        >
+                          {darkMode ? <WbSunnyIcon sx={{ color: "white" }} /> : <BedtimeIcon sx={{ color: "gray" }} />}
+                        </Box>
+                      </Tooltip>
+                    }
+                  />
                 </Box>
-              </Paper>
-            )}
+                {!!newNode && (
+                  <Paper
+                    sx={{
+                      position: "absolute",
+                      top: "13%",
+                      right: "10px",
+                      zIndex: "1000",
+                      transform: "translateY(-50%)",
+                      display: "flex",
+                      gap: "22px",
+                      p: "9px",
+                      backgroundColor: darkMode ? "#272727" : "#d0d0d0",
+                      borderRadius: "25px"
+                    }}
+                  >
+                    <Box sx={{ display: "flex", flexDirection: "column", borderRadius: "20px" }}>
+                      <Typography sx={{ paddingBottom: "13px" }}>
+                        {!!newNode?.new ? "Add new node:" : `Modify the node ${newNode.label}:`}
+                      </Typography>
+                      <TextField
+                        label="Title"
+                        variant="outlined"
+                        value={newNode.label}
+                        fullWidth
+                        sx={{ width: "95%", m: 0.5 }}
+                        onChange={e => {
+                          setNewNode(prev => {
+                            const _prev = { ...prev };
+                            _prev.label = e.target?.value || "";
+                            return _prev;
+                          });
+                        }}
+                      />
+                      <Box sx={{ display: "flex", flexDirection: "inline" }}>
+                        <Box
+                          component="form"
+                          sx={{
+                            "& > :not(style)": { m: 0.5, width: "25ch" }
+                          }}
+                          noValidate
+                          autoComplete="off"
+                        >
+                          <FormControl>
+                            <InputLabel>Type</InputLabel>
+                            <Select
+                              value={newNode.nodeType.toLowerCase()}
+                              label="Type"
+                              onChange={e => {
+                                setNewNode(prev => {
+                                  const _prev = { ...prev };
+                                  _prev.nodeType = e.target.value;
+                                  return _prev;
+                                });
+                              }}
+                              sx={{ width: "100%", border: "1px", borderColor: "white" }}
+                            >
+                              {Object.values(nodeTypes).map((row, index) => (
+                                <MenuItem
+                                  key={row.type + index}
+                                  value={row.type.toLowerCase()}
+                                  sx={{ display: "center" }}
+                                >
+                                  {row.type}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormControl>
+                            <InputLabel>children</InputLabel>
+                            <Select
+                              label="children"
+                              value={newNode.children}
+                              multiple
+                              onChange={e => {
+                                setNewNode(prev => {
+                                  const _prev = { ...prev };
+                                  _prev.children = e.target.value;
+                                  return _prev;
+                                });
+                              }}
+                              sx={{ width: "100%", border: "1px", borderColor: "white" }}
+                            >
+                              {Object.values(nodes).map(node => (
+                                <MenuItem key={node.id + node.label} value={node.id} sx={{ display: "center" }}>
+                                  {node.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormControl>
+                            <InputLabel>Groups</InputLabel>
+                            <Select
+                              label="Groups"
+                              value={newNode.groups.map(g => g.id)} // Map selected groups to their IDs
+                              multiple
+                              onChange={e => {
+                                setNewNode(prev => ({
+                                  ...prev,
+                                  groups: groups.filter(g => e.target.value.includes(g.id)) // Get full objects based on selected IDs
+                                }));
+                              }}
+                              sx={{ width: "100%", border: "1px", borderColor: "white" }}
+                            >
+                              {groups.map(group => (
+                                <MenuItem key={group.id} value={group.id} sx={{ display: "center" }}>
+                                  {group.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                        <Box sx={{ mt: "14px", display: "flex", gap: "7px", width: "500px", mx: "14px" }}>
+                          <Button
+                            onClick={handleSave}
+                            variant="contained"
+                            sx={{ borderRadius: "25px" }}
+                            disabled={
+                              !newNode.label.trim() ||
+                              !newNode.children.length ||
+                              !newNode.nodeType.trim() ||
+                              !newNode.groups.length
+                            }
+                          >
+                            {!!newNode?.new ? "Add" : "Save"}
+                          </Button>
+
+                          <Button onClick={handleClose} autoFocus sx={{ borderRadius: "25px" }}>
+                            Cancel
+                          </Button>
+                          {!newNode?.new && (
+                            <Button
+                              color="error"
+                              onClick={deleteNode}
+                              variant="contained"
+                              sx={{ borderRadius: "25px", ml: "auto" }}
+                            >
+                              Delete Node
+                            </Button>
+                          )}
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Paper>
+                )}
+                {selectedLink && (
+                  <Paper
+                    sx={{
+                      position: "absolute",
+                      top: "23%",
+                      right: "10px",
+                      zIndex: "1000",
+                      transform: "translateY(-50%)",
+                      display: "flex",
+                      gap: "22px",
+                      p: "9px",
+                      width: "500px",
+                      flexDirection: "column",
+                      borderRadius: "15px",
+                      backgroundColor: darkMode ? "#272727" : "#d0d0d0"
+                    }}
+                    elevation={4}
+                  >
+                    <Box sx={{ display: "flex", gap: "10px" }}>
+                      <Typography sx={{ fontWeight: "bold", fontSize: "19px" }}>
+                        Editing the link:{" "}
+                        <strong style={{ color: "orange" }}>{nodes[selectedLink.source].label}</strong>
+                      </Typography>
+                      <ArrowForwardIcon />
+                      <Typography>
+                        <strong style={{ color: "orange" }}>{nodes[selectedLink.target].label}</strong>
+                      </Typography>
+                    </Box>
+
+                    <TextField
+                      label="Detail"
+                      variant="outlined"
+                      value={selectedLink.detail}
+                      onChange={e => {
+                        setSelectedLink(prev => {
+                          const _prev = { ...prev };
+                          _prev.detail = e.target.value;
+                          return _prev;
+                        });
+                      }}
+                      fullWidth
+                      multiline
+                      rows={3}
+                      sx={{ width: "95%", m: 0.5 }}
+                    />
+                    <FormControl>
+                      <InputLabel>Certainty</InputLabel>
+                      <Select
+                        value={selectedLink.certainty}
+                        label="Certainty"
+                        onChange={e => {
+                          setSelectedLink(prev => {
+                            const _prev = { ...prev };
+                            _prev.certainty = e.target.value;
+                            return _prev;
+                          });
+                        }}
+                        sx={{ width: "100%", border: "1px", borderColor: "white" }}
+                      >
+                        {["known", "hypothetical"].map((row, index) => (
+                          <MenuItem key={row + index} value={row} sx={{ display: "center" }}>
+                            {row}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl>
+                      <InputLabel>Polarity</InputLabel>
+                      <Select
+                        value={selectedLink.polarity}
+                        label="Polarity"
+                        onChange={e => {
+                          setSelectedLink(prev => {
+                            const _prev = { ...prev };
+                            _prev.polarity = e.target.value;
+                            return _prev;
+                          });
+                        }}
+                        sx={{ width: "100%", border: "1px", borderColor: "white" }}
+                      >
+                        {["positive", "negative"].map((row, index) => (
+                          <MenuItem key={row + index} value={row} sx={{ display: "center" }}>
+                            {row}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Box sx={{ display: "flex", flexDirection: "inline", gap: "15px" }}>
+                      <Button onClick={handleSaveLink} variant="contained" sx={{ borderRadius: "25px" }}>
+                        Save
+                      </Button>{" "}
+                      <Button color="error" variant="contained" onClick={deleteLink} sx={{ borderRadius: "25px" }}>
+                        Delete Link
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setSelectedLink(null);
+                        }}
+                        autoFocus
+                        sx={{ borderRadius: "25px" }}
+                      >
+                        Cancel
+                      </Button>
+                    </Box>
+                  </Paper>
+                )}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: "0%",
+                    left: openSideBar ? "25%" : "10px",
+                    zIndex: "1000",
+                    transform: "translateY(-50%)"
+                  }}
+                >
+                  {Object.keys(nodes).length > 0 && !isMobile && (
+                    <Box sx={{ display: "flex" }}>
+                      {Object.values(nodeTypes).map((resource, index) => (
+                        <ColorBox
+                          id={resource.id}
+                          key={resource.type + index}
+                          text={resource.type}
+                          color={resource.color}
+                        />
+                      ))}
+                      {editor && (
+                        <Tooltip title="Add new node type">
+                          <IconButton
+                            sx={{
+                              display: "flex",
+                              borderRadius: "50%",
+                              alignItems: "center",
+                              fontSize: 13,
+                              ml: 6,
+                              mr: 0.5,
+                              textAlign: "center",
+                              width: "40px",
+                              height: "40px",
+                              backgroundColor: "orange"
+                            }}
+                            onClick={() => {
+                              setIsModalAddTypeOpen(true);
+                            }}
+                            variant="contained"
+                          >
+                            <AddIcon sx={{ color: "white" }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Box sx={{ gap: "13px", display: "flex", mx: "6px" }}>
+                        {Object.entries(LINKS_TYPES).map(resource => (
+                          <Box key={resource[0]} sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                            <TrendingFlatIcon style={{ fontSize: "40px", color: resource[1].color }} />
+                            <Typography sx={{ fontSize: "14px", color: resource[1].color }}>{resource[0]}</Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={openSideBar && !isMobile ? 3 : 0}>
+              {openSideBar && (
+                <Paper
+                  sx={{
+                    height: "100vh",
+                    overflowY: "auto",
+                    direction: "rtl",
+                    backgroundColor: darkMode ? "#4b4949" : "#f5f5f5",
+                    // borderRadius: 3,
+                    boxShadow: 3,
+                    borderRight: darkMode ? "1px solid white" : "1px solid black",
+                    "&::-webkit-scrollbar": {
+                      display: "none"
+                    }
+                  }}
+                >
+                  <Box
+                    sx={{
+                      direction: "ltr",
+                      "&::-webkit-scrollbar": {
+                        display: "none"
+                      },
+                      mb: 4
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 10,
+                        p: 1,
+                        backgroundColor: darkMode ? "#4b4949" : "#f5f5f5",
+                        borderBottom: darkMode ? "1px solid white" : "1px solid black"
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
+                          Choose groups to show their causal relations:
+                        </Typography>
+                        {openSideBar && !isMobile && (
+                          <IconButton
+                            sx={{
+                              boxShadow: 1,
+                              "&:hover": { backgroundColor: "#f0f0f0" }
+                            }}
+                            onClick={handleOpenSidBar}
+                          >
+                            <CloseIcon sx={{ "&:hover": { color: darkMode ? "black" : "" } }} />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Box>
+                    <Box>
+                      <CollabTree
+                        data={groups}
+                        setData={setGroups}
+                        setSelectedGroups={setSelectedGroups}
+                        selectedGroups={selectedGroups}
+                      />
+                      {/* <CheckBox checked={false} /> */}
+                    </Box>
+                  </Box>
+                </Paper>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            backgroundColor: darkMode ? "#272727" : "",
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <LoadingButton variant="contained" onClick={generateNewDiagram} loading={loadingResponse}>
+            Generate a diagram
+          </LoadingButton>
+        </Box>
+      )}
       {editor && (
         <AddNodeTypeModal
           open={isModalAddTypeOpen}
@@ -1831,6 +1491,8 @@ const OneCademyCollaborationModel = () => {
           editNodeType={editNodeType}
         />
       )}
+      {ConfirmDialog}
+      {PromptDialog}
     </Box>
   );
 };

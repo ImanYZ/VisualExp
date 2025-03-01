@@ -1,16 +1,14 @@
-const { Configuration } = require("openai");
-const { OpenAIApi } = require("openai");
+const { OpenAI } = require("openai");
+require("dotenv").config();
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? "",
   organization: process.env.OPENAI_API_ORG_ID ?? ""
 });
 
-const openai = new OpenAIApi(configuration);
-
 const sendPromptAndReceiveResponse = async ({ model, prompt }) => {
   try {
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions({
       model,
       temperature: 0,
       messages: [{ role: "user", content: prompt }]

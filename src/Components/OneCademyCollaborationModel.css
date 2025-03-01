@@ -12,7 +12,6 @@ g.type-PO>rect {
 }
 
 .node rect {
-  stroke: #ecf3ed;
   fill: #fff;
   stroke-width: 1.5px;
 }
@@ -24,5 +23,5 @@ g.type-PO>rect {
 }
 
 text.custom-text-color {
-  fill: #000000; 
+  fill: #000000;
 }
