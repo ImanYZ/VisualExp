@@ -114,8 +114,16 @@ const FreeRecallGrading = props => {
         r.conditionIdx === selectedGrade?.conditionIdx
     );
     if (recallIdx !== -1 && recallIdx < recallGradesList.length - 1) {
-      const newRecall = recallGradesList[recallIdx + 1];
-      setSelectedGrade(newRecall);
+      for (let i = recallIdx + 1; i < recallGradesList.length; i++) {
+        const nextRecall = recallGradesList[i];
+        if (nextRecall?.phrases?.length > 0) {
+          setSelectedGrade({
+            ...nextRecall,
+            phrases: nextRecall.phrases?.map(p => ({ ...p })) || []
+          });
+          break;
+        }
+      }
     } else {
       setSelectedGrade(null);
       await loadedRecallGrades();
@@ -166,27 +174,32 @@ const FreeRecallGrading = props => {
             }
             return _recallGradesList;
           });
+
           if (
             selectedGrade &&
             selectedGrade.docId === recall.docId &&
             selectedGrade.session === recall.session &&
-            selectedGrade.conditionIdx === recall.conditionIdx &&
-            recall.phrases.length === 0
+            selectedGrade.conditionIdx === recall.conditionIdx
           ) {
-            getNextRecall();
-            return;
-          }
-          setSelectedGrade(r => {
-            if (
-              r &&
-              r.docId === recall.docId &&
-              r.session === recall.session &&
-              r.conditionIdx === recall.conditionIdx
-            ) {
-              return recall;
+            if (recall.phrases.length === 0) {
+              getNextRecall();
+            } else {
+              setSelectedGrade(r => {
+                if (
+                  r &&
+                  r.docId === recall.docId &&
+                  r.session === recall.session &&
+                  r.conditionIdx === recall.conditionIdx
+                ) {
+                  return {
+                    ...recall,
+                    phrases: recall.phrases?.map(p => ({ ...p })) || []
+                  };
+                }
+                return r;
+              });
             }
-            return r;
-          });
+          }
         }
       });
     }
