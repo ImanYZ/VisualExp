@@ -242,9 +242,17 @@ const FreeRecallGrading = props => {
           r.session === selectedGrade.session &&
           r.conditionIdx === selectedGrade.conditionIdx
       );
-      if (recallIdx < recallGradesList.length - 1) {
-        const newRecall = recallGradesList[recallIdx + 1];
-        setSelectedGrade(newRecall);
+      if (recallIdx !== -1 && recallIdx < recallGradesList.length - 1) {
+        for (let i = recallIdx + 1; i < recallGradesList.length; i++) {
+          const nextRecall = recallGradesList[i];
+          if (nextRecall?.phrases?.length > 0) {
+            setSelectedGrade({
+              ...nextRecall,
+              phrases: nextRecall.phrases?.map(p => ({ ...p })) || []
+            });
+            break;
+          }
+        }
         setSubmitting(false);
       } else {
         await loadedRecallGrades();
