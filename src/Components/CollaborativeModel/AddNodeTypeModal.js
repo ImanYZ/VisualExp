@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import { ChromePicker } from "react-color";
 
-const AddNodeTypeModal = ({ open, onClose, onSave }) => {
+const AddNodeTypeModal = ({ open, onClose, onSave, editNodeType }) => {
   const [typeName, setTypeName] = useState("");
   const [color, setColor] = useState("#1976d2");
 
-  const handleSave = () => {
-    onSave(typeName, color);
+  useEffect(() => {
+    setTypeName(editNodeType?.type);
+    setColor(editNodeType?.color);
+  }, [editNodeType]);
+
+  const handleSave = async () => {
+    await onSave(typeName, color, editNodeType);
     setTypeName("");
     setColor("#1976d2");
     onClose();

@@ -76,6 +76,9 @@ const FreeRecallGrading = props => {
       setRecentParticipants(recentParticipants);
       await firebase.idToken();
       let response = await axios.post("/researchers/loadRecallGrades", { project });
+      // const filteredGrades = response.data.recallgrades?.filter((grade) => grade?.phrases?.length > 0);
+      // setRecallGradesList(filteredGrades);
+      // setSelectedGrade(filteredGrades[0] || null);
       let _recallGrade = response.data.recallgrades[0];
       setRecallGradesList(response.data.recallgrades);
       setSelectedGrade(_recallGrade || null);
@@ -111,8 +114,16 @@ const FreeRecallGrading = props => {
         r.conditionIdx === selectedGrade?.conditionIdx
     );
     if (recallIdx !== -1 && recallIdx < recallGradesList.length - 1) {
-      const newRecall = recallGradesList[recallIdx + 1];
-      setSelectedGrade(newRecall);
+      for (let i = recallIdx + 1; i < recallGradesList.length; i++) {
+        const nextRecall = recallGradesList[i];
+        if (nextRecall?.phrases?.length > 0) {
+          setSelectedGrade({
+            ...nextRecall,
+            phrases: nextRecall.phrases?.map(p => ({ ...p })) || []
+          });
+          break;
+        }
+      }
     } else {
       setSelectedGrade(null);
       await loadedRecallGrades();
@@ -163,26 +174,32 @@ const FreeRecallGrading = props => {
             }
             return _recallGradesList;
           });
+
           if (
             selectedGrade &&
             selectedGrade.docId === recall.docId &&
             selectedGrade.session === recall.session &&
-            selectedGrade.conditionIdx === recall.conditionIdx &&
-            recall.phrases.length === 0
+            selectedGrade.conditionIdx === recall.conditionIdx
           ) {
-            getNextRecall();
-          }
-          setSelectedGrade(r => {
-            if (
-              r &&
-              r.docId === recall.docId &&
-              r.session === recall.session &&
-              r.conditionIdx === recall.conditionIdx
-            ) {
-              return recall;
+            if (recall.phrases.length === 0) {
+              getNextRecall();
+            } else {
+              setSelectedGrade(r => {
+                if (
+                  r &&
+                  r.docId === recall.docId &&
+                  r.session === recall.session &&
+                  r.conditionIdx === recall.conditionIdx
+                ) {
+                  return {
+                    ...recall,
+                    phrases: recall.phrases?.map(p => ({ ...p })) || []
+                  };
+                }
+                return r;
+              });
             }
-            return r;
-          });
+          }
         }
       });
     }
@@ -225,9 +242,17 @@ const FreeRecallGrading = props => {
           r.session === selectedGrade.session &&
           r.conditionIdx === selectedGrade.conditionIdx
       );
-      if (recallIdx < recallGradesList.length - 1) {
-        const newRecall = recallGradesList[recallIdx + 1];
-        setSelectedGrade(newRecall);
+      if (recallIdx !== -1 && recallIdx < recallGradesList.length - 1) {
+        for (let i = recallIdx + 1; i < recallGradesList.length; i++) {
+          const nextRecall = recallGradesList[i];
+          if (nextRecall?.phrases?.length > 0) {
+            setSelectedGrade({
+              ...nextRecall,
+              phrases: nextRecall.phrases?.map(p => ({ ...p })) || []
+            });
+            break;
+          }
+        }
         setSubmitting(false);
       } else {
         await loadedRecallGrades();
