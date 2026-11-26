@@ -8,7 +8,7 @@ import Typography from "../components/Typography";
 import LandingLayout from "./LandingLayout";
 
 import AnimatediconLoop from "../../../../assets/AnimatediconLoop.gif";
-import backgroundImage from "../../../../assets/darkModeLibraryBackground.jpg";
+import backgroundImage from "../../../../assets/darkModeSiteBackground.jpg";
 
 export default function Landing() {
   const [checked, setChecked] = useState(false);

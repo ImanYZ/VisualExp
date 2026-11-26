@@ -296,7 +296,7 @@ const communitiesOrder = [
     ],
     allTime: [],
     weekly: [],
-    url: "/static/Communities/Health_Psychology.png",
+    url: "/static/Communities/Health_Psychology.jpg",
     title: "Health Psychology",
     width: "34%",
     leaders: [
@@ -358,7 +358,7 @@ const communitiesOrder = [
     ],
     allTime: [],
     weekly: [],
-    url: "/static/Communities/Disability_Studies.png",
+    url: "/static/Communities/Disability_Studies.jpg",
     title: "Disability Studies",
     width: "33%",
     leaders: [
@@ -1153,7 +1153,7 @@ const communitiesOrder = [
     ],
     allTime: [],
     weekly: [],
-    url: "/static/LibraryBackground.jpg",
+    url: "/static/SiteBackground.jpg",
     title: "Liaison Librarians",
     width: "50%",
     leaders: [
@@ -1281,7 +1281,7 @@ const communitiesOrder = [
     ],
     allTime: [],
     weekly: [],
-    url: "/static/Communities/AI_Language Models_in_Education.png",
+    url: "/static/Communities/AI_Language_Models_in_Education.jpg",
     title: "AI Language Models in Education",
     width: "33%",
     leaders: [
@@ -1361,7 +1361,7 @@ const communitiesOrder = [
     ],
     allTime: [],
     weekly: [],
-    url: "/static/Communities/Behavioral_Sciences.png",
+    url: "/static/Communities/Behavioral_Sciences.jpg",
     title: "Behavioral Sciences",
     width: "33%",
     leaders: [

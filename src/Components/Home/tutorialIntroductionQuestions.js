@@ -73,7 +73,6 @@ export default {
           institutions. These researchers and students share what they find helpful on 1Cademy and meet on a weekly
           basis to discuss their topics of interest.
         </p>
-        <img src="/static/tutorial/1CademyIntroductionFundamentals.png" width="100%" />
         <p>
           We learn about state-of-the-art topics and find connections that help us form new research ideas. With a
           node-based knowledge map system, 1Cademy helps us start learning from advanced topics and go backwards through
@@ -219,7 +218,6 @@ export default {
           Every node contains a header, footer, proposer, and type. There are several node types, including a concept
           node.
         </p>
-        <img src="/static/tutorial/WhatIsaNodeOn1Cademy.png" width="100%" />
         <p>
           A concept node defines a single concept of information and its definition. Relation nodes compare and explain
           a relationship between two topics or explain the relationship relating to multiple concepts. Reference nodes
@@ -903,7 +901,6 @@ export default {
           to.” Now all you have to do is click the node you would like to set as your community tag. When you exit out
           of your user profile, you will see that your leaderboard in the sidebar also reflects this change.
         </p>
-        <img src="/static/tutorial/ChangingYourDefaultCommunityTag.png" width="100%" />
       </div>
     ),
     questions: {
@@ -1414,7 +1411,6 @@ export default {
           the node, you can add your reason for adding the child reference node and ensure your tags are correct then
           click propose.
         </p>
-        <img src="/static/tutorial/ReferenceNodes.png" width="100%" />
         <p>
           Shown in the video are examples of videos, scholarly articles, books, webpages, and audio cited into reference
           nodes. You can cite the specific section of references within a specific node, including a concept, relation,
@@ -1593,7 +1589,6 @@ export default {
           version of this node and then pick the reference child node option and when I do I'll get a blank node that
           allows me to copy in the citation and the title
         </p>
-        <img src="/static/tutorial/GettingStartedAsaUser1.png" width="100%" />
         <p>
           I've already added my reference node so I'm going to go ahead and cancel that. Now that I've added my
           citation, I'm going to look at the information I want to summarize. So, there are two different kinds of
@@ -1612,7 +1607,6 @@ export default {
           because horizontal social structures is a concept, and I'll see a blank node pop up.
         </p>
         <img src="/static/tutorial/GettingStartedAsaUser2.png" width="100%" />
-        <img src="/static/tutorial/GettingStartedAsaUser3.png" width="100%" />
         <p>
           You want to title your node as specifically, clearly, and concisely as possible. I'm going to just title the
           child node by what i'm defining, which is the horizontal social structure and then I need to define it in my
@@ -1715,7 +1709,6 @@ export default {
           connected to foundational units of information. These foundational units need to be learned before one can
           move onto the new units.{" "}
         </p>
-        <img src="/static/tutorial/PrerequisiteLinkingon1Cademy2.png" width="100%" />
         <p>
           Prerequisite linking on 1Cademy is defined as: the nodes are organized in a hierarchy where what is needed to
           learn a concept is connected as a parent node. Looking at an example on the 1Cademy map, you can see that you
@@ -1861,12 +1854,10 @@ export default {
           it doesn't show up, but open access does and I know that open access offers prerequisite knowledge to my
           proposed node.
         </p>
-        <img src="/static/tutorial/DemonstrationofFindingtheImmediatePrerequisite1.png" width="100%" />
         <p>
           I click on open access to go to that node and here I can see what relationships it has by viewing the parent
           and child nodes. I can also navigate to this prerequisite node by browsing through the map.
         </p>
-        <img src="/static/tutorial/DemonstrationofFindingtheImmediatePrerequisite2.png" width="100%" />
         <p>
           Let's start with the node, types of librarianship and move over to the academic librarianship node, as I think
           this is a common topic in that field, then we move to topics in Academic Librarianship, which takes us to open
@@ -1951,7 +1942,6 @@ export default {
           When you click the pencil button, a list of child node types will pop up on the left-hand side. Then, select
           which type of node you want to propose, and a template will show up on your map.
         </p>
-        <img src="/static/tutorial/ProposingaChildNodeon1Cademy2.png" width="100%" />
         <p>
           {" "}
           Now you can fill in the title and the content in the new node template. Next, you will want to link a
@@ -1988,7 +1978,6 @@ export default {
           will see the edit or improve this node option, and beneath this list, you will see any currently pending
           proposals where you're welcome to vote on proposals.
         </p>
-        <img src="/static/tutorial/ProposinganEditon1Cademy1.png" width="100%" />
         <p>
           Select the “edit or improve this node option”, and you will be returned to your selected node, which is now
           available for editing. Here, you can change the title. This will open the search option on the left so you can
@@ -2215,7 +2204,6 @@ export default {
           1Cademy platform. Once you have found the specific topics your paper focuses on, use the search tool, or
           navigate through the nodes on the platform to find where your content will need to be added.
         </p>
-        <img src="/static/tutorial/SummarizingaPaperon1Cademy1.png" width="100%" />
         <p>
           The first thing you will add is a reference node. That way you can use this node when you're citing later
           nodes. Each broad topic on 1Cademy should have a reference parent node, and this is where you'll add the
@@ -2225,7 +2213,6 @@ export default {
           already exists on the map. If the immediate prerequisite that you need doesn't exist, then you can always
           propose it.
         </p>
-        <img src="/static/tutorial/SummarizingaPaperon1Cademy2.png" width="100%" />
         <p>
           {" "}
           Your next step is to propose the nodes. Make sure that you are paraphrasing or summarizing information. We
@@ -2234,7 +2221,6 @@ export default {
           knowledge for the field. For example, in the earlier mentioned pedagogy paper, what new concepts is the paper
           contributing to the field of education?
         </p>
-        <img src="/static/tutorial/SummarizingaPaperon1Cademy3.png" width="100%" />
         <p>
           Still using the pedagogy paper as an example, on 1Cademy, there are no nodes about the pedagogy paper’s
           methods, specifically there are no nodes about the literature review. All of the information has been
