@@ -27,7 +27,7 @@ import { darkBase, gray200, gray400, gray600, orangeDark, orangeLight, orangeLig
 const subSections = [
   {
     title: "Qualifications",
-    image: "/static/requirements/qualifications_dark_mode.svg",
+    image: "/static/requirements/qualifications.png",
     component: community => {
       return community ? (
         <ul>
@@ -56,7 +56,7 @@ const subSections = [
   },
   {
     title: "By Joining Us, You Will ...",
-    image: "/static/requirements/by_joining_us_dark_mode.svg",
+    image: "/static/requirements/by-joining-us.png",
 
     component: community => {
       return community ? (
@@ -71,7 +71,7 @@ const subSections = [
   },
   {
     title: "Responsibilities",
-    image: "/static/requirements/responsibilities_dark_mode.svg",
+    image: "/static/requirements/responsibilities.png",
     component: community => {
       return community ? (
         <ul>

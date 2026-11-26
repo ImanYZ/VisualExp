@@ -2,7 +2,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useWindowSize } from "../../hooks/useWindowSize";
 
-import backgroundImageDarkMode from "../../../../assets/darkModeLibraryBackground.jpg";
+import backgroundImageDarkMode from "../../../../assets/darkModeSiteBackground.jpg";
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
 import { orangeDark, orangeLight } from "../../../../utils/colors";
 

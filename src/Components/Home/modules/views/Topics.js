@@ -21,14 +21,14 @@ const TOPICS_ITEMS = [
     id: "health-psychology",
     title: "Health Psychology",
     // image: "home/communities/03-health-psychology.jpg",
-    image: "/static/Communities/Health_Psychology.png",
+    image: "/static/Communities/Health_Psychology.jpg",
     link: "/community/health-psychology",
   },
   {
     id: "disability-studies",
     title: "Disability Studies",
     // image: "home/communities/04-disability-studies.jpg",
-    image: "/static/Communities/Disability_Studies.png",
+    image: "/static/Communities/Disability_Studies.jpg",
     link: "/community/disability-studies",
   },
   {
@@ -49,7 +49,7 @@ const TOPICS_ITEMS = [
     id: "liaison-librarians",
     title: "Liaison Librarians",
     // image: "home/communities/08-liaisonlibrarians.jpg",
-    image: "/static/LibraryBackground.jpg",
+    image: "/static/SiteBackground.jpg",
     link: "/community/liaison-librarians",
   },
 ];
