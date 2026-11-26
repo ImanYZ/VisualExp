@@ -102,6 +102,7 @@ const Values = (props) => {
             >
               <img
                 alt={value.name}
+                loading="lazy"
                 src={theme.palette.mode === "light" ? "/static/why-section/" + value.image : "/static/why-section/" + value.imageDark}
                 style={{ flex: 1, width: "100%" }}
               />

@@ -26,7 +26,7 @@ const Benefits = () => {
           ...sx
         }}
       >
-        <img src={`/benefits/${value.imageDark}`} alt={value.name} style={{ width: "100%", height: "100%" }} />
+        <img src={`/benefits/${value.imageDark}`} alt={value.name} loading="lazy" style={{ width: "100%", height: "100%" }} />
       </Box>
     ) : null;
   };
