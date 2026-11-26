@@ -73,7 +73,6 @@ export default {
           institutions. These researchers and students share what they find helpful on 1Cademy and meet on a weekly
           basis to discuss their topics of interest.
         </p>
-        <img src="/static/tutorial/1CademyIntroductionFundamentals.png" width="100%" />
         <p>
           We learn about state-of-the-art topics and find connections that help us form new research ideas. With a
           node-based knowledge map system, 1Cademy helps us start learning from advanced topics and go backwards through
@@ -651,10 +650,12 @@ export default {
           required) to upload a profile picture of yourself. To change your profile picture, go to the sidebar that is
           on the left of the page and click on your current profile picture.
         </p>
+        <img src="/static/tutorial/ChangingYourProfilePicture1.png" width="100%" />
         <p>
           This will bring up your user profile. Next, click on your profile picture again and a file finder window will
           appear allowing you to browse your files for a new profile picture.
         </p>
+        <img src="/static/tutorial/ChangingYourProfilePicture2.png" width="100%" />
         <p>
           Once you have your desired image located and selected, you can click “open” to upload your new picture. Once
           you change your profile picture, every node you have proposed will now have a new profile picture in the
@@ -1605,6 +1606,7 @@ export default {
           horizontal social structure has not been added as a child yet. So, I'll propose an edit to add a concept node,
           because horizontal social structures is a concept, and I'll see a blank node pop up.
         </p>
+        <img src="/static/tutorial/GettingStartedAsaUser2.png" width="100%" />
         <p>
           You want to title your node as specifically, clearly, and concisely as possible. I'm going to just title the
           child node by what i'm defining, which is the horizontal social structure and then I need to define it in my
